@@ -1,0 +1,29 @@
+<html>
+<head>
+  <title>PDF Reviewer</title>
+
+  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+  <link href="http://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+
+  <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+  <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+
+  <script src="script.js"></script>
+</head>
+<body>
+  <div id="alerts" class="container">
+  </div>
+
+  <div class="container main">
+
+    <form id="form" method="post">
+      <span class="btn btn-file btn-default">
+        Browse
+        <input id="pdf-file" type="file" accept="application/pdf" />
+      </span>
+      <input type="submit" id="upload" class="btn btn-primary" value="Upload"/>
+    </form>
+  </div>
+</body>
+</html>

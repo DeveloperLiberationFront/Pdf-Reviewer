@@ -1,0 +1,36 @@
+body {
+  font-family: "Open Sans";
+}
+
+.main {
+  margin-top: 150px;
+  text-align: center;
+}
+
+#pdf-file {
+  display: inline;
+}
+
+#alerts {
+  min-height: 72px;
+}
+
+.btn-file {
+  overflow: hidden;
+  position: relative;
+}
+
+.btn-file input[type=file] {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  min-height: 100%;
+  min-width: 100%;
+  font-size: 999px;
+  text-align: right;
+  opacity: 0;
+  outline: none;
+  background: none;
+  cursor: inherit;
+  display: block;
+}
