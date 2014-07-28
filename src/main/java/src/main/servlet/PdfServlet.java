@@ -45,7 +45,5 @@ public class PdfServlet extends HttpServlet {
 		} catch(IOException | FileUploadException | JSONException e){
 			resp.sendError(500);
 		}
-		
-		//resp.getWriter().write("Done parsing Pdf.");
 	}
 }

@@ -18,7 +18,6 @@ public class Pdf {
 		doc = PDDocument.load(input);
 	}
 	
-	
 	public List<String> getComments() {
 		List<String> comments = new ArrayList<>();
 		 
