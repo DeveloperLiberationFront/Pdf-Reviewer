@@ -25,6 +25,9 @@ public class PdfServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {		
 		ServletFileUpload upload = new ServletFileUpload();
 		
+		String repoUrl = req.getParameter("repoUrl");
+		System.out.println(repoUrl);
+		
 		try {
 			FileItemIterator iter = upload.getItemIterator(req);
 			FileItemStream file = iter.next();

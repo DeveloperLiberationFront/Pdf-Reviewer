@@ -21,8 +21,7 @@ body {
 }
 
 #alerts {
-  min-height: 72px;
-  position: absolute;
+  position: fixed;
   top: 10px;
   left: 0;
   right: 0;
@@ -46,4 +45,25 @@ body {
   background: none;
   cursor: inherit;
   display: block;
+}
+
+table {
+  display: inline;
+}
+
+td {
+  padding: 5px;
+}
+
+#login {
+  float: right;
+}
+
+#repoList label {
+  padding-top: 15px;
+  padding-right: 15px;
+}
+
+.list-group-item {
+  cursor: pointer;
 }

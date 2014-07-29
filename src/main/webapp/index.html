@@ -9,7 +9,10 @@
   <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
   <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
 
-  <script src="script.js"></script>
+  <script src="js/login.js"></script>
+  <script src="js/repos.js"></script>
+  <script src="js/upload.js"></script>
+  <script src="js/main.js"></script>
 </head>
 <body>
 
@@ -17,20 +20,48 @@
   <div id="header" class="container">
     <h1><strong>Pdf Reviewer</strong></h1>
     <p>
-      Select a pdf to be uploaded and analyized. Nothing really happens yet. In the future, the comments will be turned into GitHub issues on a repository specified by you.
+      Login with GitHub then select a pdf to be uploaded and analyized. Nothing really happens yet. 
+      In the future, the comments will be turned into GitHub issues on a repository specified by you.
     </p>
   </div>
 </div>
 
   <div class="container main">
 
-    <form id="form" method="post">
-      <span class="btn btn-file btn-default">
-        Browse
-        <input id="pdf-file" type="file" accept="application/pdf" />
-      </span>
-      <input type="submit" id="upload" class="btn btn-primary" value="Upload"/>
+    <form id="loginForm" method="post">
+      <table>
+        <tr>
+          <td><label>User Name:</label></td>
+          <td><input type="text" id="user" placeholder="user" value="mpeterson2"/></td>
+        </tr>
+        <tr>
+          <td><label>Password:</label></td>
+          <td><input type="password" id="pass" placeholder="password" /></td>
+        </tr>
+          <tr><td colspan="2"><input type="submit" id="login" class="btn btn-primary" value="Login" /></td></tr>
+      </table>
     </form>
+
+    <div id="uploadingDiv">
+      <div id="selectRepo">
+          <h3>Select a repository</h3>
+        <div id="repoList" class="list-group">
+          <h3>Or:</h3>
+          <label>Url to Project:</label>
+          <input type="text" id="inputRepoUrl" placeholder="ex: https://github.com/mpeterson2/Pdf-Reviewer" />
+        </div>
+      </div>
+
+      <h3>Select a Pdf to upload</h3>
+      <form id="uploadForm" method="post">
+        <span class="btn btn-file btn-default">
+          Browse
+          <input id="pdf-file" type="file" accept="application/pdf" />
+        </span>
+        <input type="submit" id="upload" class="btn btn-primary" value="Upload" />
+      </form>
+
+    </div>
   </div>
 
   <div id="alerts" class="container">
