@@ -2,6 +2,15 @@ body {
   font-family: "Open Sans";
 }
 
+#header-top {
+  background: #772299;
+}
+
+#header-top {
+  color: white;
+  padding: 25px;
+}
+
 .main {
   margin-top: 150px;
   text-align: center;
@@ -13,6 +22,10 @@ body {
 
 #alerts {
   min-height: 72px;
+  position: absolute;
+  top: 10px;
+  left: 0;
+  right: 0;
 }
 
 .btn-file {
