@@ -1,6 +1,7 @@
 
 function setupLogin() {
   var code = getQueryParams("code");
+  var clientId = escape("afa90e71a06d85c5fcb5");
 
   if(code == null) {
     var loginBtn = $("#login");
