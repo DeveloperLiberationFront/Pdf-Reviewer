@@ -1,47 +1,46 @@
 package src.main.servlet;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.eclipse.egit.github.core.Repository;
-import org.eclipse.egit.github.core.client.GitHubClient;
-import org.eclipse.egit.github.core.service.RepositoryService;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.impl.client.HttpClients;
+
+import src.main.HttpUtils;
+
 
 public class LoginServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	
+	private static final String CLIENT_ID = "afa90e71a06d85c5fcb5";
+	private static final String CLIENT_SECRET = "36f1f7ba3f89b45df77776b1454ceb1d8a513289";
 
 	@Override
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		String user = req.getParameter("login");
-		String password = req.getParameter("password");
-		
-		GitHubClient gitHub = new GitHubClient();
-		gitHub.setCredentials(user, password);
-		RepositoryService repos = new RepositoryService(gitHub);
-		
-		JSONArray reposJson = new JSONArray();
-		
-		for(Repository repo : repos.getRepositories()) {
-			JSONObject repoJson = new JSONObject();
-			try {
-				repoJson.put("name", repo.getName());
-				repoJson.put("url", repo.getUrl());
-				
-				reposJson.put(repoJson);
-			} catch(JSONException e) {}
-		}
-		
+	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		try {
-			resp.setContentType("application/json");
-			resp.getWriter().write(reposJson.toString(2));
-		} catch (JSONException e) {
+			URIBuilder builder = new URIBuilder("https://github.com/login/oauth/access_token");
+			builder.addParameter("client_id", CLIENT_ID);
+			builder.addParameter("client_secret", CLIENT_SECRET);
+			builder.addParameter("code", req.getParameter("code"));
+			
+			HttpPost request = new HttpPost(builder.build());
+			
+			request.setHeader("accept", "application/json");
+	
+			
+			HttpClient client = HttpClients.createDefault();
+			HttpResponse response = client.execute(request);
+			String body = HttpUtils.getResponseBody(response);
+			System.out.println(body);		
+		} catch(URISyntaxException e) {
 			e.printStackTrace();
 		}
 	}

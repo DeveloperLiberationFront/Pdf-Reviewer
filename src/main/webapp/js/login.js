@@ -1,25 +1,24 @@
 
 function setupLogin() {
-  var loginBtn = $("#login");
+  var code = getQueryParams("code");
 
-  loginBtn.on("click", function(e) {
-    e.preventDefault();
-    var user = $("#user").val();
-    var pass = $("#pass").val();
-
-    $.ajax("/login", {
-      type: "POST",
-      data: {"login": user, "password": pass}
-    })
-    .done(function(data) {
-      showAlert("success", "<strong>Yay!</strong> You are now logged in as " + user + ".")
-      showRepos(data);
-      $("#loginForm").hide();
-      $("#uploadingDiv").show();
-    })
-    .fail(function() {
-      showAlert("danger", "<strong>Failed!</strong> Could not login, check your password and try again.");
+  if(code == null) {
+    var loginBtn = $("#login");
+    loginBtn.on("click", function(e) {
+      e.preventDefault();
+      window.location = "https://github.com/login/oauth/authorize?" + "client_id=" + clientId + "&scope=repo&state=totallyrandomstring";
     });
+  }
+  else {
+    $.get("/login?code=" + code)
+    .done(function(data) {
+      showAlert("success", "You are now logged in.");
+      console.log(data);
+    })
+    .fail(function(data) {
+      showAlert("danger", "<strong>Failed</strong> to login.");
+      console.log(data);
+    })
+  }
 
-  });
 }
