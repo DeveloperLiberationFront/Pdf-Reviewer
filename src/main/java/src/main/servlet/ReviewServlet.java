@@ -1,19 +1,28 @@
 package src.main.servlet;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.bind.DatatypeConverter;
 
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPut;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.HttpClients;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.Repository;
@@ -22,6 +31,8 @@ import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.IssueService;
 import org.eclipse.egit.github.core.service.RepositoryService;
 import org.eclipse.egit.github.core.service.UserService;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import src.main.model.Pdf;
 import src.main.model.PdfComment;
@@ -49,16 +60,19 @@ public class ReviewServlet extends HttpServlet {
 			Pdf pdf = new Pdf(file.openStream());
 			
 			List<String> commentsStr = pdf.getComments();
-			List<PdfComment> comments = PdfComment.getComments(commentsStr);
-			
-			pdf.close();
+			List<PdfComment> comments = PdfComment.getComments(commentsStr);	
 			
 			GitHubClient client = new GitHubClient();
 			client.setOAuth2Token(accessToken);
 			
-			createIssues(client, writerName, repoName, comments);
-			closeReviewIssue(client, writerName, repoName);
+			UserService userService = new UserService(client);
+			User reviewer = userService.getUser();
 			
+			createIssues(client, writerName, repoName, comments);
+			addPdfToRepo(client, accessToken, writerName, repoName, pdf, reviewer);
+			closeReviewIssue(client, writerName, repoName, reviewer);
+
+			pdf.close();
 		} catch(FileUploadException e) {
 			resp.sendError(500);
 		}
@@ -87,12 +101,10 @@ public class ReviewServlet extends HttpServlet {
 		
 	}
 	
-	public void closeReviewIssue(GitHubClient client, String writerName, String repoName) throws IOException {
+	public void closeReviewIssue(GitHubClient client, String writerName, String repoName, User reviewer) throws IOException {
 		IssueService issueService = new IssueService(client);
 		RepositoryService repoService = new RepositoryService(client);
 		Repository repo = repoService.getRepository(writerName, repoName);
-		UserService userService = new UserService(client);
-		User reviewer = userService.getUser();
 		
 		for(Issue issue : issueService.getIssues(repo, null)) {
 			if(issue.getAssignee() != null) {
@@ -103,6 +115,49 @@ public class ReviewServlet extends HttpServlet {
 					issueService.editIssue(writerName, repoName, issue);
 				}
 			}
+		}
+	}
+	
+	public void addPdfToRepo(GitHubClient client, String accessToken, String writerName, String repoName, Pdf pdf, User reviewer) throws IOException {
+		try {
+			String filePath = "reviews/" + reviewer.getLogin() + ".pdf";
+			URIBuilder builder = new URIBuilder("https://api.github.com/repos/" + writerName + "/" + repoName + "/contents/" + filePath);
+			builder.addParameter("access_token", accessToken);
+			
+			System.out.println(builder.build());
+			
+			HttpPut request = new HttpPut(builder.build());
+			
+			try {
+				ByteArrayOutputStream output = new ByteArrayOutputStream();
+				pdf.getDoc().save(output);
+				
+				
+				String content = DatatypeConverter.printBase64Binary(output.toByteArray());
+				MessageDigest md = MessageDigest.getInstance("SHA-256");
+				md.update(content.getBytes("US-ASCII"));
+				
+				String sha = md.digest().toString(); 
+						
+				JSONObject json = new JSONObject();
+				json.put("message", reviewer.getLogin() + " has submitted their review.");
+				json.put("path", filePath);
+				json.put("content", content);
+				json.put("sha", sha);
+				
+				StringEntity entity = new StringEntity(json.toString());
+				entity.setContentType("application/json");
+				request.setEntity(entity);
+				
+				HttpClient httpClient = HttpClients.createDefault();
+				httpClient.execute(request);
+				
+			} catch(JSONException | NoSuchAlgorithmException e) {
+				
+			}
+			
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
 		}
 	}
 }

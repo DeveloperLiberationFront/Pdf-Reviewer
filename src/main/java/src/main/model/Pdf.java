@@ -42,6 +42,10 @@ public class Pdf {
 		 return comments;
 	}
 	
+	public PDDocument getDoc() {
+		return doc;
+	}
+	
 	public void close() throws IOException {
 		doc.close();
 	}
