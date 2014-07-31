@@ -7,28 +7,27 @@ function main() {
   $("#writerDiv").hide();
   $("#loggedIn").hide();
 
-  setupLogin();
-  setupPdfUpload();
-  setupReviewRequest();
+  var repoName = getQueryParams("repoName");
+  var writer = getQueryParams("writer");
+
+  if(repoName != null && writer != null) {
+    setupLogin(setupReviewer);
+  }
+  else {
+    setupLogin(setupWriter);
+  }
 }
 
-function showWriterPage() {
+function setupWriter() {
   getRepos();
   getPossibleReviewers();
-
   $("#writerDiv").fadeIn();
-}
 
-function showReviewerPage() {
-  $("#reviewerDiv").fadeIn();
-}
-
-function setupReviewRequest() {
   $("#submitReview").on("click", function(e) {
     e.preventDefault();
 
     var data = {
-      repo: getRepoUrl(),
+      repo: getSelectedRepo(),
       reviewers: []
     };
 

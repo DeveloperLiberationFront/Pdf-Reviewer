@@ -1,4 +1,6 @@
-function setupPdfUpload() {
+function setupReviewer(writer, repoName) {
+  $("#reviewerDiv").fadeIn();
+
   var fileSelecters = $("#pdf-file");
   var fileSelecter = $("#pdf-file")[0];
   var uploadBtn = $("#upload");
@@ -21,28 +23,35 @@ function setupPdfUpload() {
   uploadBtn.on("click", function(e) {
     e.preventDefault();
 
-    // Get data
+    // Get data and be sure everything is there before it is sent.
     var file = fileSelecter.files[0];
     
     if(file == null) {
-      showAlert("danger", "<strong>Oh no!</strong> You forgot to select a file.");
+      showAlert("danger", "Be sure to select a file.");
       return;
     }
 
-    var repoUrl = getRepoUrl();
-    if(repoUrl == null) {
-      showAlert("danger", "Be sure to select a repository.");
+    var repoName = getQueryParams("repoName");
+    if(repoName == null) {
+      showAlert("danger", "No repository specified, be sure your link is correct.");
       return;
     }
 
+    var writer = getQueryParams("writer");
+    if(writer == null) {
+      showAlert("danger", "No writer specified, be sure your link is correct.");
+    }
+
+    // Show that data is being sent.
     uploadBtn.val("Uploading...")
     uploadBtn.attr("disabled", true)
 
+    // Attach the file to the request data.
     var formData = new FormData();
     formData.append("file", file);
 
     // Send data
-    $.ajax("/pdf?repoUrl=" + escape(repoUrl), {
+    $.ajax("/pdf?repoName=" + escape(repoName) + "&writer=" + escape(writer), {
       type: "POST",
       processData: false,
       contentType: false,
@@ -52,7 +61,7 @@ function setupPdfUpload() {
       showAlert("success", "<strong>Success!</strong> Your PDF has been processed.");
     })
     .fail(function() {
-      showAlert("danger", "<strong>Uh oh!</strong> There has been an error processing your PDF file.");
+      showAlert("danger", "<strong>Uh oh!</strong> There has been an error submitting your review.");
     })
     .always(function() {
       uploadBtn.val("Upload");

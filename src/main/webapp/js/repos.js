@@ -27,10 +27,10 @@ function getRepos() {
   })
 }
 
-function getRepoUrl() {
+function getSelectedRepo() {
   var active = $("#repoList .list-group-item.active");
   if(active.length > 0)
-    return active.data("url");
+    return active.text();
   else
     return null;
 }

@@ -1,7 +1,7 @@
 var accessToken = "";
 
 
-function setupLogin() {
+function setupLogin(afterLogin) {
   accessToken = localStorage.githubAccessToken;
 
   var code = getQueryParams("code");
@@ -18,7 +18,7 @@ function setupLogin() {
   }
   // If there is an access token, the user is logged in.
   else if(accessToken !== undefined) {
-    loggedIn();
+    loggedIn(afterLogin);
   }
   // If we have a code, automatically log the user in.
   else {
@@ -33,7 +33,7 @@ function setupLogin() {
       }
 
       localStorage.githubAccessToken = accessToken;
-      loggedIn();
+      loggedIn(afterLogin);
     })
     .fail(function(data) {
       showAlert("danger", "<strong>Failed</strong> to login.");
@@ -58,9 +58,8 @@ function getAvatar(fail, succeed) {
   })
 }
 
-function loggedIn() {
+function loggedIn(afterLogin) {
   getAvatar(setupLogin, function() {
-    showWriterPage();
-    
+    afterLogin();
   });
 }
