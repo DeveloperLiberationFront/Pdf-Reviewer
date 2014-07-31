@@ -61,6 +61,7 @@ public class ReviewRequestServlet extends HttpServlet {
 				issue.setTitle("Reviewer - " + u.getLogin());
 				issue.setBody("@" + u.getLogin() + " has been requested to review this paper\n." +
 							  "Click [here](http://pdfreviewhub.appspot.com/?repoName=" + repoName + "&writer=" + writer.getLogin() + ") to upload your review.");
+				issue.setAssignee(u);
 				issueService.createIssue(writer.getLogin(), repoName, issue);
 			}
 			
