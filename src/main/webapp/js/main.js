@@ -3,7 +3,7 @@ $(document).ready(main);
 
 function main() {
   $("#login").hide();
-  $("#uploadingDiv").hide();
+  $("#reviewerDiv").hide();
   $("#writerDiv").hide();
   $("#loggedIn").hide();
 
