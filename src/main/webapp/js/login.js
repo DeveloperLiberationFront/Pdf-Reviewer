@@ -42,20 +42,25 @@ function setupLogin() {
   }
 }
 
-function getAvatar() {
+function getAvatar(fail, succeed) {
   $.get("/avatar?access_token=" + accessToken)
   .done(function(data) {
     $("#avatar").attr("src", data.avatar);
     $("#loginName").text(data.login);
 
     $("#loggedIn").fadeIn();
+    succeed();
   })
   .fail(function(data) {
-    console.log(data);
+    $("#writerDiv").hide();
+    localStorage.removeItem("githubAccessToken");
+    fail();
   })
 }
 
 function loggedIn() {
-  showWriterPage();
-  getAvatar();
+  getAvatar(setupLogin, function() {
+    showWriterPage();
+    
+  });
 }

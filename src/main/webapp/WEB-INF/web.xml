@@ -41,13 +41,13 @@
     </servlet-mapping>
 
     <servlet>
-        <servlet-name>Review</servlet-name>
-        <servlet-class>src.main.servlet.ReviewServlet</servlet-class>
+        <servlet-name>ReviewRequest</servlet-name>
+        <servlet-class>src.main.servlet.ReviewRequestServlet</servlet-class>
     </servlet>
 
     <servlet-mapping>
-        <servlet-name>Review</servlet-name>
-        <url-pattern>/review</url-pattern>
+        <servlet-name>ReviewRequest</servlet-name>
+        <url-pattern>/reviewRequest</url-pattern>
     </servlet-mapping>
 
     <servlet>
@@ -58,6 +58,16 @@
     <servlet-mapping>
         <servlet-name>Avatar</servlet-name>
         <url-pattern>/avatar</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>Review</servlet-name>
+        <servlet-class>src.main.servlet.ReviewServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>Review</servlet-name>
+        <url-pattern>/review</url-pattern>
     </servlet-mapping>
 
 

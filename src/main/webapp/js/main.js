@@ -4,6 +4,7 @@ $(document).ready(main);
 function main() {
   $("#login").hide();
   $("#uploadingDiv").hide();
+  $("#writerDiv").hide();
   $("#loggedIn").hide();
 
   setupLogin();
@@ -16,6 +17,10 @@ function showWriterPage() {
   getPossibleReviewers();
 
   $("#writerDiv").fadeIn();
+}
+
+function showReviewerPage() {
+  $("#reviewerDiv").fadeIn();
 }
 
 function setupReviewRequest() {
@@ -42,7 +47,7 @@ function setupReviewRequest() {
       return;
     }
 
-    $.post("/review?access_token=" + accessToken, JSON.stringify(data))
+    $.post("/reviewRequest?access_token=" + accessToken, JSON.stringify(data))
     .done(function(data) {
       showAlert("success", "Your review request has been submitted.");
     })
