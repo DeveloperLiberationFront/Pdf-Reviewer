@@ -39,7 +39,8 @@ public class LoginServlet extends HttpServlet {
 			HttpClient client = HttpClients.createDefault();
 			HttpResponse response = client.execute(request);
 			String body = HttpUtils.getResponseBody(response);
-			System.out.println(body);		
+			resp.setContentType("application/json");
+			resp.getWriter().write(body);
 		} catch(URISyntaxException e) {
 			e.printStackTrace();
 		}

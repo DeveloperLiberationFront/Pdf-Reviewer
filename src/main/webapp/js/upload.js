@@ -5,6 +5,7 @@ function setupPdfUpload() {
 
   uploadBtn.attr("disabled", true);
 
+  // Show that the file has been changed.
   fileSelecters.on("change", function() {
     if($(this)[0].files[0] != null) {
       var selected = $(this)[0].files[0].name;
@@ -20,10 +21,17 @@ function setupPdfUpload() {
   uploadBtn.on("click", function(e) {
     e.preventDefault();
 
+    // Get data
     var file = fileSelecter.files[0];
     
     if(file == null) {
       showAlert("danger", "<strong>Oh no!</strong> You forgot to select a file.");
+      return;
+    }
+
+    var repoUrl = getRepoUrl();
+    if(repoUrl == null) {
+      showAlert("danger", "Be sure to select a repository.");
       return;
     }
 
@@ -32,9 +40,8 @@ function setupPdfUpload() {
 
     var formData = new FormData();
     formData.append("file", file);
-    
-    var repoUrl = getRepoUrl();
 
+    // Send data
     $.ajax("/pdf?repoUrl=" + escape(repoUrl), {
       type: "POST",
       processData: false,

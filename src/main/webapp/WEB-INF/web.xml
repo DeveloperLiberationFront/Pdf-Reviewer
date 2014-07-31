@@ -1,13 +1,18 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?><web-app xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.5" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
 
     <servlet>
-        <servlet-name>Pdf</servlet-name>
-        <servlet-class>src.main.servlet.PdfServlet</servlet-class>
-    </servlet>
-
-    <servlet>
         <servlet-name>Login</servlet-name>
         <servlet-class>src.main.servlet.LoginServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>Login</servlet-name>
+        <url-pattern>/login</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>Pdf</servlet-name>
+        <servlet-class>src.main.servlet.PdfServlet</servlet-class>
     </servlet>
 
     <servlet-mapping>
@@ -15,9 +20,44 @@
         <url-pattern>/pdf</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>Repo</servlet-name>
+        <servlet-class>src.main.servlet.RepoServlet</servlet-class>
+    </servlet>
+
     <servlet-mapping>
-        <servlet-name>Login</servlet-name>
-        <url-pattern>/login</url-pattern>
+        <servlet-name>Repo</servlet-name>
+        <url-pattern>/repo</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>Reviewer</servlet-name>
+        <servlet-class>src.main.servlet.ReviewerServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>Reviewer</servlet-name>
+        <url-pattern>/reviewer</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>Review</servlet-name>
+        <servlet-class>src.main.servlet.ReviewServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>Review</servlet-name>
+        <url-pattern>/review</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>Avatar</servlet-name>
+        <servlet-class>src.main.servlet.AvatarServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>Avatar</servlet-name>
+        <url-pattern>/avatar</url-pattern>
     </servlet-mapping>
 
 

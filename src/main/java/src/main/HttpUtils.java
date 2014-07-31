@@ -6,6 +6,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.http.HttpResponse;
 
 public class HttpUtils {
@@ -26,5 +28,21 @@ public class HttpUtils {
 		    }
 		}
 		return sb.toString();
+	}
+	
+	public static String getRequestBody(HttpServletRequest request) {
+    	StringBuilder sb = new StringBuilder();
+		BufferedReader reader;
+	    try {
+	    	reader = new BufferedReader(new InputStreamReader(request.getInputStream()));
+	        String line;
+	        while ((line = reader.readLine()) != null) {
+	            sb.append(line).append('\n');
+	        }
+	        reader.close();
+	    } catch(IOException e) {	
+	    }
+	    
+	    return sb.toString();
 	}
 }

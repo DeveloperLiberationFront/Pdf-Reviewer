@@ -1,23 +1,64 @@
 body {
   font-family: "Open Sans";
+  margin-bottom: 15px;
 }
 
-#header-top {
+.navbar {
   background: #772299;
+  color: white;
+  margin: 0;
+  border-radius: 0;
 }
 
-#header-top {
+.nav {
+  float: right;
+}
+
+#avatar {
+  width: 40px;
+  border-radius: 40px;
+}
+
+.navbar-toggle .icon-bar {
+  background-color: #F0F0F0;
+}
+
+.navbar-toggle:hover .icon-bar {
+  background-color: white;
+}
+
+.nav a, .nav span {
+  color: #F0F0F0;
+  font-weight: bold;
+  margin-left: 10px;
+  font-size: 1.5em;
+}
+.nav a:hover {
   color: white;
-  padding: 25px;
+}
+
+#title {
+  font-size: 2.5em;
+  font-weight: bold;
+}
+
+#introContainer {
+  background: #772299;
+  color: white;
+  padding-bottom: 25px;
 }
 
 .main {
-  margin-top: 150px;
   text-align: center;
 }
 
 #pdf-file {
   display: inline;
+}
+
+#login img {
+  height: 60px;
+  margin-right: 15px;
 }
 
 #alerts {
@@ -45,18 +86,6 @@ body {
   background: none;
   cursor: inherit;
   display: block;
-}
-
-table {
-  display: inline;
-}
-
-td {
-  padding: 5px;
-}
-
-#login {
-  float: right;
 }
 
 #repoList label {

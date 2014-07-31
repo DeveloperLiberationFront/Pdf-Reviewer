@@ -11,14 +11,39 @@
 
   <script src="js/login.js"></script>
   <script src="js/repos.js"></script>
+  <script src="js/reviewers.js"></script>
   <script src="js/upload.js"></script>
   <script src="js/main.js"></script>
 </head>
 <body>
 
-<div id="header-top">
-  <div id="header" class="container">
-    <h1><strong>Pdf Reviewer</strong></h1>
+  <div class="navbar" id="navbar" role="navigation">
+    <div class="container">
+      
+      <div class="navbar-header">
+        <img id="logo" src="">
+        <span id="title">Pdf Reviewer</span>
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+      </div>
+
+      <div class="collapse navbar-collapse">
+        <div class="nav navbar-nav">
+          <div id="loggedIn">
+            <img id="avatar">
+            <span id="loginName"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<div id="introContainer">
+  <div id="intro" class="container">
     <p>
       Login with GitHub then select a pdf to be uploaded and analyized. Nothing really happens yet. 
       In the future, the comments will be turned into GitHub issues on a repository specified by you.
@@ -28,30 +53,25 @@
 
   <div class="container main">
 
-    <form id="loginForm" method="post">
-      <table>
-        <tr>
-          <td><label>User Name:</label></td>
-          <td><input type="text" id="user" placeholder="user" value="mpeterson2"/></td>
-        </tr>
-        <tr>
-          <td><label>Password:</label></td>
-          <td><input type="password" id="pass" placeholder="password" /></td>
-        </tr>
-          <tr><td colspan="2"><input type="submit" id="login" class="btn btn-primary" value="Login" /></td></tr>
-      </table>
-    </form>
+    <button id="login" class="btn btn-primary btn-lg"><img src="images/github-icon.png">Login with GitHub</button>
 
-    <div id="uploadingDiv">
-      <div id="selectRepo">
-          <h3>Select a repository</h3>
+    <div id="writerDiv">
+      <div id="selectReviewers">
+        <h3>Select a repository</h3>
         <div id="repoList" class="list-group">
-          <h3>Or:</h3>
-          <label>Url to Project:</label>
-          <input type="text" id="inputRepoUrl" placeholder="ex: https://github.com/mpeterson2/Pdf-Reviewer" />
         </div>
       </div>
 
+      <div id="selectReviewers">
+        <h3>Select Reviewers</h3>
+        <div id="reviewersList" class="list-group">
+        </div>
+      </div>
+
+      <button id="submitReview" class="btn btn-primary btn-lg">Submit Review Request</button>
+    </div>
+
+    <div id="uploadingDiv">
       <h3>Select a Pdf to upload</h3>
       <form id="uploadForm" method="post">
         <span class="btn btn-file btn-default">
@@ -66,5 +86,6 @@
 
   <div id="alerts" class="container">
   </div>
+  
 </body>
 </html>

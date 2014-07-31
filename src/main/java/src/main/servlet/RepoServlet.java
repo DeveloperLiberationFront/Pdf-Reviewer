@@ -13,15 +13,16 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class ReposServlet extends HttpServlet {
+public class RepoServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		String user = req.getParameter("user");
-
+		String auth = req.getParameter("access_token");
+		
 		RepositoryService repos = new RepositoryService();
+		repos.getClient().setOAuth2Token(auth);
 		
 		JSONArray reposJson = new JSONArray();
 		

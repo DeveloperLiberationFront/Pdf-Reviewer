@@ -17,16 +17,20 @@ function showRepos(data) {
   $("#selectRepo").show();
 }
 
+function getRepos() {
+  $.get("/repo?access_token=" + accessToken)
+  .done(function(data) {
+    showRepos(data);
+  })
+  .fail(function(data) {
+    console.log(data);
+  })
+}
+
 function getRepoUrl() {
-  var textInput = $("#inputRepoUrl");
-  if(textInput.val() != "") {
-    return textInput.val();
-  }
-  else {
-    var active = $("#repoList .list-group-item.active");
-    if(active.length > 0)
-      return active.data("url");
-    else
-      return null;
-  }
+  var active = $("#repoList .list-group-item.active");
+  if(active.length > 0)
+    return active.data("url");
+  else
+    return null;
 }
