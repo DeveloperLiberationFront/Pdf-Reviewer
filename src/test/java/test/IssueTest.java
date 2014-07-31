@@ -6,29 +6,29 @@ import static org.junit.Assert.assertFalse;
 import org.junit.Before;
 import org.junit.Test;
 
-import src.main.model.Issue;
+import src.main.model.PdfComment;
 
 public class IssueTest {
 	
-	Issue a;
-	Issue b;
-	Issue c;
-	Issue d;
-	Issue e;
-	Issue f;
-	Issue g;
-	Issue h;
+	PdfComment a;
+	PdfComment b;
+	PdfComment c;
+	PdfComment d;
+	PdfComment e;
+	PdfComment f;
+	PdfComment g;
+	PdfComment h;
 	
 	@Before
 	public void setup() {
-		a = new Issue("{tag 1, mf} This is an issue");
-		b = new Issue("{tag 1, mf}This is an issue");
-		c = new Issue("This is an issue{tag 1, mf} ");
-		d = new Issue("This is an issue {tag 1, mf}");
-		e = new Issue("This is {tag 1, mf} an issue");
-		f = new Issue("This is {tag 1, mf}an issue");
-		g = new Issue("This is an issue");
-		h = new Issue("This is not an issue");
+		a = new PdfComment("{tag 1, mf} This is an issue");
+		b = new PdfComment("{tag 1, mf}This is an issue");
+		c = new PdfComment("This is an issue{tag 1, mf} ");
+		d = new PdfComment("This is an issue {tag 1, mf}");
+		e = new PdfComment("This is {tag 1, mf} an issue");
+		f = new PdfComment("This is {tag 1, mf}an issue");
+		g = new PdfComment("This is an issue");
+		h = new PdfComment("This is not an issue");
 	}
 	
 	@Test
@@ -56,9 +56,9 @@ public class IssueTest {
 	public void testTags() {
 		assertEquals(2, a.getTags().size());
 		
-		assertEquals("Must Fix", Issue.getTag("mf"));
-		assertEquals("Should Fix", Issue.getTag("sf"));
-		assertEquals("Consider Fixing", Issue.getTag("cf"));
-		assertEquals("Arbitrary Tag", Issue.getTag("Arbitrary Tag"));
+		assertEquals("Must Fix", PdfComment.getTag("mf"));
+		assertEquals("Should Fix", PdfComment.getTag("sf"));
+		assertEquals("Consider Fixing", PdfComment.getTag("cf"));
+		assertEquals("Arbitrary Tag", PdfComment.getTag("Arbitrary Tag"));
 	}
 }

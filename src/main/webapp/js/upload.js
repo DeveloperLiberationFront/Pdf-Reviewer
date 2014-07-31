@@ -51,7 +51,7 @@ function setupReviewer(writer, repoName) {
     formData.append("file", file);
 
     // Send data
-    $.ajax("/pdf?repoName=" + escape(repoName) + "&writer=" + escape(writer), {
+    $.ajax("/review?access_token=" + accessToken + "&repoName=" + escape(repoName) + "&writer=" + escape(writer), {
       type: "POST",
       processData: false,
       contentType: false,

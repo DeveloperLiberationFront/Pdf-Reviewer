@@ -11,16 +11,6 @@
     </servlet-mapping>
 
     <servlet>
-        <servlet-name>Pdf</servlet-name>
-        <servlet-class>src.main.servlet.PdfServlet</servlet-class>
-    </servlet>
-
-    <servlet-mapping>
-        <servlet-name>Pdf</servlet-name>
-        <url-pattern>/pdf</url-pattern>
-    </servlet-mapping>
-
-    <servlet>
         <servlet-name>Repo</servlet-name>
         <servlet-class>src.main.servlet.RepoServlet</servlet-class>
     </servlet>

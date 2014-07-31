@@ -6,7 +6,7 @@ import java.util.List;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class Issue {
+public class PdfComment {
 
 	public static final int TITLE_LENGTH = 47;
 	public static final String MUST_FIX = "Must Fix";
@@ -16,15 +16,15 @@ public class Issue {
 	private List<String> tags;
 	private String comment;
 	
-	public Issue(String string) {
+	public PdfComment(String string) {
 		setTags(string);
 		setComment(string);
 	}
 	
-	public static List<Issue> getIssues(List<String> comments) {
-		List<Issue> issues = new ArrayList<>();
+	public static List<PdfComment> getComments(List<String> comments) {
+		List<PdfComment> issues = new ArrayList<>();
 		for(String comment : comments) {
-			issues.add(new Issue(comment));
+			issues.add(new PdfComment(comment));
 		}
 		
 		return issues;
