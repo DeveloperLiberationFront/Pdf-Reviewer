@@ -41,6 +41,16 @@
     </servlet-mapping>
 
     <servlet>
+        <servlet-name>Files</servlet-name>
+        <servlet-class>src.main.servlet.FilesServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>Files</servlet-name>
+        <url-pattern>/files</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
         <servlet-name>Avatar</servlet-name>
         <servlet-class>src.main.servlet.AvatarServlet</servlet-class>
     </servlet>

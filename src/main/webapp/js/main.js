@@ -28,6 +28,7 @@ function setupWriter() {
 
     var data = {
       repo: getSelectedRepo(),
+      paper: getSelectedFile(),
       reviewers: []
     };
 
@@ -43,6 +44,11 @@ function setupWriter() {
 
     if(data.reviewers.length == 0) {
       showAlert("warning", "Please select at least one reviewer.");
+      return;
+    }
+
+    if(data.paper == null) {
+      showAlert("warning", "Please select a paper to be reviewed.");
       return;
     }
 

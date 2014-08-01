@@ -130,7 +130,6 @@ public class ReviewServlet extends HttpServlet {
 			int num = 1;
 			
 			for(String path : existingPaths) {
-				System.out.println(path);
 				if(path.startsWith(reviewer.getLogin())) {
 					num++;
 				}

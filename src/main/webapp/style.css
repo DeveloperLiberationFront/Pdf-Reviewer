@@ -97,3 +97,26 @@ body {
 .list-group-item {
   cursor: pointer;
 }
+
+.folder-icon {
+  width: 20px;
+  margin-right: 5px;
+}
+
+.fileList {
+  margin: 25px;
+}
+
+.fileList .list-group-item.active {
+  background-color: #772299 !important;
+  border-color: #772299 !important;
+}
+
+.fileList .file-list-group-item {
+  border: none;
+}
+
+.fileList .folder-list-group-item {
+  border: none;
+  border-bottom: 2px solid #ddd;
+}

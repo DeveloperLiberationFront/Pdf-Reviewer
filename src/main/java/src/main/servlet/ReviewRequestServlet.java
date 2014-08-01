@@ -35,6 +35,7 @@ public class ReviewRequestServlet extends HttpServlet {
 			System.out.println(data.toString(2));
 			JSONArray reviewersJson = data.getJSONArray("reviewers");
 			String repoName = data.getString("repo");
+			String paper = data.getString("paper");
 			
 			GitHubClient client = new GitHubClient();
 			client.setOAuth2Token(req.getParameter("access_token"));
@@ -60,7 +61,7 @@ public class ReviewRequestServlet extends HttpServlet {
 				Issue issue = new Issue();
 				issue.setTitle("Reviewer - " + u.getLogin());
 				issue.setBody("@" + u.getLogin() + " has been requested to review this paper\n." +
-							  "Click [here](http://pdfreviewhub.appspot.com/?repoName=" + repoName + "&writer=" + writer.getLogin() + ") to upload your review.");
+							  "Click [here](http://pdfreviewhub.appspot.com/?repoName=" + repoName + "&writer=" + writer.getLogin() + "&paper=" + paper + ") to upload your review.");
 				issue.setAssignee(u);
 				issueService.createIssue(writer.getLogin(), repoName, issue);
 			}
