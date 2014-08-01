@@ -182,8 +182,12 @@ public class ReviewServlet extends HttpServlet {
 		Repository repo = repoService.getRepository(writerName, repoName);
 		
 		ContentsService contentsService = new ContentsService(client);
-		List<RepositoryContents> repoContents = contentsService.getContents(repo, "/reviews");
-		System.out.println("Found it?");
+		List<RepositoryContents> repoContents = null;
+		try {
+			repoContents = contentsService.getContents(repo, "/reviews");
+		} catch(IOException e) {
+			return new ArrayList<String>();
+		}
 		
 		List<String> repoPaths = new ArrayList<>();
 		
