@@ -108,8 +108,7 @@ body {
 }
 
 .fileList .list-group-item.active {
-  background-color: #772299 !important;
-  border-color: #772299 !important;
+  background-color: #854F84 !important;
 }
 
 .fileList .file-list-group-item {
@@ -123,4 +122,8 @@ body {
 
 .instruction {
   display: none;
+}
+
+a.list-group-item.active, a.list-group-item.active:hover, a.list-group-item.active:focus {
+  background-color: #027b9a;
 }
