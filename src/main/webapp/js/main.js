@@ -12,9 +12,11 @@ function main() {
 
   if(repoName != null && writer != null) {
     setupLogin(setupReviewer);
+    $("#reviewerInstruction").show();
   }
   else {
     setupLogin(setupWriter);
+    $("#writerInstruction").show();
   }
 }
 
