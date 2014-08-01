@@ -26,8 +26,10 @@ import org.apache.http.impl.client.HttpClients;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.Repository;
+import org.eclipse.egit.github.core.RepositoryContents;
 import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.client.GitHubClient;
+import org.eclipse.egit.github.core.service.ContentsService;
 import org.eclipse.egit.github.core.service.IssueService;
 import org.eclipse.egit.github.core.service.RepositoryService;
 import org.eclipse.egit.github.core.service.UserService;
@@ -69,10 +71,11 @@ public class ReviewServlet extends HttpServlet {
 			User reviewer = userService.getUser();
 			
 			createIssues(client, writerName, repoName, comments);
-			addPdfToRepo(client, accessToken, writerName, repoName, pdf, reviewer);
+			String pdfPath = addPdfToRepo(client, accessToken, writerName, repoName, pdf, reviewer);
 			closeReviewIssue(client, writerName, repoName, reviewer);
 
 			pdf.close();
+			resp.getWriter().write(pdfPath);
 		} catch(FileUploadException e) {
 			resp.sendError(500);
 		}
@@ -118,20 +121,32 @@ public class ReviewServlet extends HttpServlet {
 		}
 	}
 	
-	public void addPdfToRepo(GitHubClient client, String accessToken, String writerName, String repoName, Pdf pdf, User reviewer) throws IOException {
+	public String addPdfToRepo(GitHubClient client, String accessToken, String writerName, String repoName, Pdf pdf, User reviewer) throws IOException {
+		String filePath = "";
+		
 		try {
-			String filePath = "reviews/" + reviewer.getLogin() + ".pdf";
+			List<String> existingPaths = getReviewContents(client, writerName, repoName, reviewer);
+	
+			int num = 1;
+			
+			for(String path : existingPaths) {
+				System.out.println(path);
+				if(path.startsWith(reviewer.getLogin())) {
+					num++;
+				}
+			}
+			
+			filePath = "reviews/" + reviewer.getLogin() + "-" + num + ".pdf";
+		
+		
 			URIBuilder builder = new URIBuilder("https://api.github.com/repos/" + writerName + "/" + repoName + "/contents/" + filePath);
 			builder.addParameter("access_token", accessToken);
-			
-			System.out.println(builder.build());
 			
 			HttpPut request = new HttpPut(builder.build());
 			
 			try {
 				ByteArrayOutputStream output = new ByteArrayOutputStream();
 				pdf.getDoc().save(output);
-				
 				
 				String content = DatatypeConverter.printBase64Binary(output.toByteArray());
 				MessageDigest md = MessageDigest.getInstance("SHA-256");
@@ -159,5 +174,24 @@ public class ReviewServlet extends HttpServlet {
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		}
+		
+		return filePath;
+	}
+	
+	public List<String> getReviewContents(GitHubClient client, String writerName, String repoName, User reviewer) throws IOException {
+		RepositoryService repoService = new RepositoryService(client);
+		Repository repo = repoService.getRepository(writerName, repoName);
+		
+		ContentsService contentsService = new ContentsService(client);
+		List<RepositoryContents> repoContents = contentsService.getContents(repo, "/reviews");
+		System.out.println("Found it?");
+		
+		List<String> repoPaths = new ArrayList<>();
+		
+		for(RepositoryContents content : repoContents) {
+			repoPaths.add(content.getName());
+		}
+		
+		return repoPaths;
 	}
 }

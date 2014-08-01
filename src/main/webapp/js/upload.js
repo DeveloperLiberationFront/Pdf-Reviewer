@@ -1,6 +1,8 @@
 function setupReviewer(writer, repoName) {
   $("#reviewerDiv").fadeIn();
 
+  setDownloadBtnLink(writer, repoName);
+
   var fileSelecters = $("#pdf-file");
   var fileSelecter = $("#pdf-file")[0];
   var uploadBtn = $("#upload");
@@ -57,8 +59,11 @@ function setupReviewer(writer, repoName) {
       contentType: false,
       data: formData 
     })
-    .done(function() {
-      showAlert("success", "<strong>Success!</strong> Your PDF has been processed.");
+    .done(function(data) {
+      //https://github.com/mpeterson2/Pdf-Reviewer-Test/blob/master/reviews/mpeterson2.pdf
+      //https://github.com/mpeterson2/Pdf-Reviewer-Test/raw/master/reviews/mpeterson2.pdf
+      var pdfUrl = "https://github.com/" + writer + "/" + repoName + "/raw/master/" + data;
+      showAlert("success", "<strong>Success!</strong> Your PDF has been processed. Click <a href=" + pdfUrl + ">here</a> download it.");
     })
     .fail(function() {
       showAlert("danger", "<strong>Uh oh!</strong> There has been an error submitting your review.");
@@ -69,4 +74,10 @@ function setupReviewer(writer, repoName) {
     })
 
   });
+}
+
+function setDownloadBtnLink(writer, repoName) {
+  var paper = getQueryParams("paper");
+  var url = "https://github.com/" + writer + "/" + repoName + "/raw/master" + paper;
+  $("#downloadPaper").attr("href", url);
 }
