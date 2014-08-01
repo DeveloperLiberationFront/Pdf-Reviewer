@@ -60,6 +60,15 @@ function getAvatar(fail, succeed) {
 
 function loggedIn(afterLogin) {
   getAvatar(setupLogin, function() {
+    setupLogout();
     afterLogin();
+  });
+}
+
+function setupLogout() {
+  $("#logout").on("click", function(e) {
+    e.preventDefault();
+    localStorage.removeItem("githubAccessToken");
+    window.location = "/";
   });
 }
