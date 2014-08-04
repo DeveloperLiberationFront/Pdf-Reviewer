@@ -1,5 +1,6 @@
 
 function setupStatus() {
+  $("#statusDiv").fadeIn();
   getReviews();
 }
 

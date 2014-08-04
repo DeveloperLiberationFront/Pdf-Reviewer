@@ -6,6 +6,7 @@ function main() {
   $("#reviewerDiv").hide();
   $("#writerDiv").hide();
   $("#loggedIn").hide();
+  $("#statusDiv").hide();
 
   var repoName = getQueryParams("repoName");
   var writer = getQueryParams("writer");
