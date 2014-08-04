@@ -20,15 +20,15 @@ function main() {
   }
 
   $("#showWriterBtn").on("click", function() {
-    setupWriter();
     $("#statusDiv").hide();
-    $("#writerDiv").fadeIn();
+    $("#reviewerDiv").hide();
+    setupWriter();
   });
 
   $("#showStatusBtn").on("click", function() {
     $("#writerDiv").hide();
     $("#reviewerDiv").hide();
-    $("#statusDiv").fadeIn();
+    setupStatus();
   });
 
 }

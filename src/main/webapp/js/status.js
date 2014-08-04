@@ -7,6 +7,7 @@ function setupStatus() {
 function getReviews() {
   $.get("/status?access_token=" + accessToken)
     .done(function(data) {
+      $("#reviewRequests, #pendingReviews").empty();
       showPendingRequests(data.requests);
       showPendingReviews(data.reviews);
     });
@@ -40,7 +41,6 @@ function showReviews(writerOrReviewer, reviews) {
 
   for(var i=0; i<reviews.length; i++) {
     var review = reviews[i];
-    console.log(review);
     var otherUser = getUserText(getOtherUser(review));
 
     var html = "<table>"

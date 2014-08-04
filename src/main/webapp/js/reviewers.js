@@ -1,6 +1,7 @@
 function getPossibleReviewers() {
   $.get("/reviewer?access_token=" + accessToken)
   .done(function(data) {
+    $("#reviewersList").empty();
     for(var i=0; i<data.length; i++) {
       showReviewer(data[i]);
     }
