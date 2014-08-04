@@ -13,14 +13,9 @@ function getPossibleReviewers() {
 }
 
 function showReviewer(r) {
-  var email = "email" in r ? " (" + r["email"] + ")" : "";
-  var name = "name" in r ? r["name"] + " - " : "";
-
-  var text = name + r["login"] + email;
-
   var btn = $("<a />")
     .attr("class", "list-group-item")
-    .text(text)
+    .text(getUserText(r))
     .attr("data-login", r["login"])
     .on("click", function() {
       btn.toggleClass("active");

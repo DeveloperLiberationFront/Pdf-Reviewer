@@ -47,10 +47,10 @@ public class ReviewServlet extends HttpServlet {
 		ServletFileUpload upload = new ServletFileUpload();
 		
 		String repoName = req.getParameter("repoName");
-		String writerName = req.getParameter("writer");
+		String writerLogin = req.getParameter("writer");
 		String accessToken = req.getParameter("access_token");
 		
-		if(repoName == null || writerName == null || accessToken == null) {
+		if(repoName == null || writerLogin == null || accessToken == null) {
 			resp.sendError(500);
 			return;
 		}
@@ -70,9 +70,10 @@ public class ReviewServlet extends HttpServlet {
 			UserService userService = new UserService(client);
 			User reviewer = userService.getUser();
 			
-			createIssues(client, writerName, repoName, comments);
-			String pdfPath = addPdfToRepo(client, accessToken, writerName, repoName, pdf, reviewer);
-			closeReviewIssue(client, writerName, repoName, reviewer);
+			createIssues(client, writerLogin, repoName, comments);
+			String pdfPath = addPdfToRepo(client, accessToken, writerLogin, repoName, pdf, reviewer);
+			closeReviewIssue(client, writerLogin, repoName, reviewer.getLogin());
+			ReviewRequestServlet.removeReviewFromDatastore(reviewer.getLogin(), writerLogin, repoName);
 
 			pdf.close();
 			resp.getWriter().write(pdfPath);
@@ -81,7 +82,7 @@ public class ReviewServlet extends HttpServlet {
 		}
 	}
 	
-	public void createIssues(GitHubClient client, String writerName, String repoName, List<PdfComment> comments) throws IOException {
+	public void createIssues(GitHubClient client, String writerLogin, String repoName, List<PdfComment> comments) throws IOException {
 		IssueService issueService = new IssueService(client);
 		
 		for(PdfComment comment : comments) {
@@ -98,34 +99,32 @@ public class ReviewServlet extends HttpServlet {
 			}
 			
 			issue.setLabels(labels);
-			issueService.createIssue(writerName, repoName, issue);
+			issueService.createIssue(writerLogin, repoName, issue);
 			
 		}
 		
 	}
 	
-	public void closeReviewIssue(GitHubClient client, String writerName, String repoName, User reviewer) throws IOException {
+	static public void closeReviewIssue(GitHubClient client, String writerLogin, String repoName, String reviewer) throws IOException {
 		IssueService issueService = new IssueService(client);
-		RepositoryService repoService = new RepositoryService(client);
-		Repository repo = repoService.getRepository(writerName, repoName);
 		
-		for(Issue issue : issueService.getIssues(repo, null)) {
+		for(Issue issue : issueService.getIssues(writerLogin, repoName, null)) {
 			if(issue.getAssignee() != null) {
 				System.out.println(issue.getState());
 			
-				if(issue.getTitle().startsWith("Reviewer - ") && issue.getAssignee().getLogin().equals(reviewer.getLogin())) {
+				if(issue.getTitle().startsWith("Reviewer - ") && issue.getAssignee().getLogin().equals(reviewer)) {
 					issue.setState("closed");
-					issueService.editIssue(writerName, repoName, issue);
+					issueService.editIssue(writerLogin, repoName, issue);
 				}
 			}
 		}
 	}
 	
-	public String addPdfToRepo(GitHubClient client, String accessToken, String writerName, String repoName, Pdf pdf, User reviewer) throws IOException {
+	public String addPdfToRepo(GitHubClient client, String accessToken, String writerLogin, String repoName, Pdf pdf, User reviewer) throws IOException {
 		String filePath = "";
 		
 		try {
-			List<String> existingPaths = getReviewContents(client, writerName, repoName, reviewer);
+			List<String> existingPaths = getReviewContents(client, writerLogin, repoName, reviewer);
 	
 			int num = 1;
 			
@@ -138,7 +137,7 @@ public class ReviewServlet extends HttpServlet {
 			filePath = "reviews/" + reviewer.getLogin() + "-" + num + ".pdf";
 		
 		
-			URIBuilder builder = new URIBuilder("https://api.github.com/repos/" + writerName + "/" + repoName + "/contents/" + filePath);
+			URIBuilder builder = new URIBuilder("https://api.github.com/repos/" + writerLogin + "/" + repoName + "/contents/" + filePath);
 			builder.addParameter("access_token", accessToken);
 			
 			HttpPut request = new HttpPut(builder.build());

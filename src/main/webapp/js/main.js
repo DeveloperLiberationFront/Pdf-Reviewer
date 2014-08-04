@@ -15,9 +15,21 @@ function main() {
     $("#reviewerInstruction").show();
   }
   else {
-    setupLogin(setupWriter);
-    $("#writerInstruction").show();
+    setupLogin(setupStatus);
   }
+
+  $("#showWriterBtn").on("click", function() {
+    setupWriter();
+    $("#statusDiv").hide();
+    $("#writerDiv").fadeIn();
+  });
+
+  $("#showStatusBtn").on("click", function() {
+    $("#writerDiv").hide();
+    $("#reviewerDiv").hide();
+    $("#statusDiv").fadeIn();
+  });
+
 }
 
 function setupWriter() {
@@ -79,4 +91,11 @@ function getQueryParams(key) {
     key = key.replace(/[*+?^$.\[\]{}()|\\\/]/g, "\\$&"); // escape RegEx meta chars
     var match = location.search.match(new RegExp("[?&]"+key+"=([^&]+)(&|$)"));
     return match && decodeURIComponent(match[1].replace(/\+/g, " "));
+}
+
+function getUserText(r) {
+  var email = "email" in r ? " (" + r["email"] + ")" : "";
+  var name = "name" in r ? r["name"] + " - " : "";
+
+  return name + r["login"] + email;
 }

@@ -13,6 +13,7 @@
   <script src="js/repos.js"></script>
   <script src="js/reviewers.js"></script>
   <script src="js/upload.js"></script>
+  <script src="js/status.js"></script>
   <script src="js/main.js"></script>
 </head>
 <body>
@@ -32,7 +33,12 @@
       </div>
 
       <div class="collapse navbar-collapse">
-        <div class="nav navbar-nav">
+        <ul class="nav navbar-nav">
+          <li><a id="showStatusBtn">Your Reviews</a></li>
+          <li><a id="showWriterBtn">New Review Request</a></li>
+        </ul>
+
+        <div class="nav navbar-nav navbar-right">
           <div id="loggedIn">
             <img id="avatar">
             <span id="loginName"></span>
@@ -75,6 +81,14 @@
   <div class="container main">
 
     <button id="login" class="btn btn-primary btn-lg"><img src="images/github-icon.png">Login with GitHub</button>
+
+    <div id="statusDiv">
+      <h3>Review these papers</h3>
+      <div id="reviewRequests"></div>
+
+      <h3>Waiting for these reviews</h3>
+      <div id="pendingReviews"></div>
+    </div>
 
     <div id="writerDiv">
       <div id="selectReviewers">
