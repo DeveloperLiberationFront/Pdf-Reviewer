@@ -61,12 +61,12 @@
     </servlet-mapping>
 
     <servlet>
-        <servlet-name>Review</servlet-name>
-        <servlet-class>src.main.servlet.ReviewServlet</servlet-class>
+        <servlet-name>ReviewSubmit</servlet-name>
+        <servlet-class>src.main.servlet.ReviewSubmitServlet</servlet-class>
     </servlet>
 
     <servlet-mapping>
-        <servlet-name>Review</servlet-name>
+        <servlet-name>ReviewSubmit</servlet-name>
         <url-pattern>/review</url-pattern>
     </servlet-mapping>
 

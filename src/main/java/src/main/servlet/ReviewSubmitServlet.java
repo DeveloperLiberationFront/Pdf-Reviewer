@@ -39,7 +39,7 @@ import org.json.JSONObject;
 import src.main.model.Pdf;
 import src.main.model.PdfComment;
 
-public class ReviewServlet extends HttpServlet {
+public class ReviewSubmitServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	
 	@Override
