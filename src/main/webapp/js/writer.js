@@ -3,6 +3,8 @@ function setupWriter() {
   getPossibleReviewers();
   $("#writerDiv").fadeIn();
 
+  setupAddOtherReviewer();
+
   $("#submitReview").on("click", function(e) {
     e.preventDefault();
 
@@ -57,7 +59,9 @@ function getPossibleReviewers() {
   });
 }
 
-function showReviewer(r) {
+function showReviewer(r, selected) {
+  if(selected === undefined) selected = false;
+
   var btn = $("<a />")
     .attr("class", "list-group-item")
     .text(getUserText(r))
@@ -65,5 +69,30 @@ function showReviewer(r) {
     .on("click", function() {
       btn.toggleClass("active");
     })
-    .prependTo($("#reviewersList"));
+    .appendTo($("#reviewersList"));
+
+    if(selected)
+      btn.addClass("active");
+}
+
+function setupAddOtherReviewer() {
+  $("#addOtherReviewerBtn").on("click", function(e) {
+    e.preventDefault();
+    addReviewer();
+  });
+
+  $("#addOtherReviewer").keyup(function(e) {
+    if(e.keyCode == 13)
+      addReviewer();
+  });
+}
+
+function addReviewer() {
+  var login = $("#addOtherReviewer").val();
+
+  $.get("/user?access_token=" + accessToken + "&user=" + escape(login))
+  .done(function(data) {
+    showReviewer(data, true);
+    $("#addOtherReviewer").val("");
+  });
 }

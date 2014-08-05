@@ -62,7 +62,7 @@
     </div>
 
     <div id="writerDiv">
-      <div id="selectReviewers">
+      <div id="selectRepo">
         <h3>Select a repository and a file to be reviewed</h3>
         <div id="repoList" class="list-group"></div>
       </div>
@@ -71,6 +71,8 @@
         <h3>Select Reviewers</h3>
         <div id="reviewersList" class="list-group">
         </div>
+        <label>Add another reviewer:</label><input type="text" id="addOtherReviewer" placeholder="GitHub Login">
+        <button class="btn btn-default" id="addOtherReviewerBtn">Add</button>
       </div>
 
       <button id="submitReview" class="btn btn-primary btn-lg">Submit Review Request</button>

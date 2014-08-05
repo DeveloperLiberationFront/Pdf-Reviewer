@@ -103,6 +103,15 @@ body {
   padding-right: 15px;
 }
 
+#addOtherReviewer {
+  width: calc(100% - 55px);
+  height: 35px;
+}
+
+#submitReview {
+  margin-top: 25px;
+}
+
 .list-group-item {
   cursor: pointer;
 }
