@@ -129,10 +129,6 @@ body {
   border-bottom: 2px solid #ddd;
 }
 
-.instruction {
-  display: none;
-}
-
 a.list-group-item.active, a.list-group-item.active:hover, a.list-group-item.active:focus {
   background-color: #027b9a;
 }
