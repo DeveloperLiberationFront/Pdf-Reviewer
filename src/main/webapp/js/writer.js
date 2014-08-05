@@ -76,14 +76,32 @@ function showReviewer(r, selected) {
 }
 
 function setupAddOtherReviewer() {
+
+  $("#addOtherReviewer").select2({
+    minimumInputLength: 1,
+    query: function (query) {
+        $.get("/search?access_token=" + accessToken + "&search=" + escape(query.term))
+        .done(function(data) {
+          
+          var results = {results: []};
+          for(var i=0; i<data.length; i++) {
+            results.results.push({id: data[i], text: data[i]});
+          }
+
+          query.callback(results);
+        })
+    }
+  });
+
   $("#addOtherReviewerBtn").on("click", function(e) {
     e.preventDefault();
     addReviewer();
   });
 
-  $("#addOtherReviewer").keyup(function(e) {
-    if(e.keyCode == 13)
+  $("#s2id_autogen1_search").keydown(function(e) {
+    if(e.keyCode == 13) {
       addReviewer();
+    }
   });
 }
 
@@ -93,6 +111,6 @@ function addReviewer() {
   $.get("/user?access_token=" + accessToken + "&user=" + escape(login))
   .done(function(data) {
     showReviewer(data, true);
-    $("#addOtherReviewer").val("");
+    $("#select2-chosen-1").text("");
   });
 }
