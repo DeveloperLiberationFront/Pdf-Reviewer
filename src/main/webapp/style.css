@@ -3,6 +3,10 @@ body {
   margin-bottom: 15px;
 }
 
+#login, #reviewerDiv, #writerDiv, #loggedIn, #statusDiv {
+  display: none;
+ }
+
 .navbar {
   background: #772299;
   color: white;

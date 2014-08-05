@@ -2,12 +2,6 @@
 $(document).ready(main);
 
 function main() {
-  $("#login").hide();
-  $("#reviewerDiv").hide();
-  $("#writerDiv").hide();
-  $("#loggedIn").hide();
-  $("#statusDiv").hide();
-
   setupLoadIndicator();
 
   var repoName = getQueryParams("repoName");
