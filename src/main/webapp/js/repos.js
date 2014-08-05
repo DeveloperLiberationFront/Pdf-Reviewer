@@ -113,7 +113,7 @@ function showFiles(repoName, path, files) {
         var type = $(this).data("type");
 
         if(type == "dir") {
-          getFiles(repoName, path + name);
+          getFiles(repoName, path + "/" + name);
         }
         else {
           $("#" + repoNameId + "-fileList .list-group-item.active").removeClass("active");
