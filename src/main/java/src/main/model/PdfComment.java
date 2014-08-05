@@ -12,6 +12,7 @@ public class PdfComment {
 	public static final String MUST_FIX = "Must Fix";
 	public static final String SHOULD_FIX = "Should Fix";
 	public static final String CONSIDER_FIX = "Consider Fixing";
+	public static final String POSITIVE = "Positive";
 	
 	private List<String> tags;
 	private String comment;
@@ -21,13 +22,24 @@ public class PdfComment {
 		setComment(string);
 	}
 	
-	public static List<PdfComment> getComments(List<String> comments) {
-		List<PdfComment> issues = new ArrayList<>();
+	public static List<PdfComment> getNegComments(List<String> comments) {
+		List<PdfComment> retVal = new ArrayList<>();
 		for(String comment : comments) {
-			issues.add(new PdfComment(comment));
+			PdfComment pdfComment = new PdfComment(comment);
+			if(!pdfComment.getTags().contains(POSITIVE)) {
+				retVal.add(pdfComment);
+			}
+		}
+		return retVal;
+	}
+	
+	public static List<PdfComment> getComments(List<String> comments) {
+		List<PdfComment> retVal = new ArrayList<>();
+		for(String comment : comments) {
+			retVal.add(new PdfComment(comment));
 		}
 		
-		return issues;
+		return retVal;
 	}
 	
 	private void setComment(String s) {
@@ -63,6 +75,8 @@ public class PdfComment {
 			return SHOULD_FIX;
 		else if(t.equals("cf"))
 			return CONSIDER_FIX;
+		else if(t.equals("g") || t.equals("p"))
+			return POSITIVE;
 		else
 			return t;
 	}
