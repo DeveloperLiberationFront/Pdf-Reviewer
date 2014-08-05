@@ -8,6 +8,8 @@ function main() {
   $("#loggedIn").hide();
   $("#statusDiv").hide();
 
+  setupLoadIndicator();
+
   var repoName = getQueryParams("repoName");
   var writer = getQueryParams("writer");
 
@@ -53,4 +55,14 @@ function getUserText(r) {
   var name = "name" in r ? r["name"] + " - " : "";
 
   return name + r["login"] + email;
+}
+
+function setupLoadIndicator() {
+  $(document).ajaxStart(function() {
+    $("#loading").fadeIn();
+  });
+
+  $(document).ajaxStop(function() {
+    $("#loading").hide();
+  })
 }

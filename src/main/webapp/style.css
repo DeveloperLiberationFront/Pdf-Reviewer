@@ -164,3 +164,11 @@ a.list-group-item.active, a.list-group-item.active:hover, a.list-group-item.acti
 .panel-body label {
   margin-right: 15px;
 }
+
+#loading {
+  width: 100%;
+  z-index: 2000;
+  position: fixed;
+  bottom: 0px;
+  padding: 10px;
+}
