@@ -166,6 +166,7 @@ a.list-group-item.active, a.list-group-item.active:hover, a.list-group-item.acti
 }
 
 #loading {
+  display: none;
   width: 100%;
   z-index: 2000;
   position: fixed;
