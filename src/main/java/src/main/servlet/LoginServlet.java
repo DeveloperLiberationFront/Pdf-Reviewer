@@ -15,20 +15,20 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.HttpClients;
 
 import src.main.HttpUtils;
+import src.main.SecretKeys;
 
 
 public class LoginServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	
 	private static final String CLIENT_ID = "afa90e71a06d85c5fcb5";
-	private static final String CLIENT_SECRET = "36f1f7ba3f89b45df77776b1454ceb1d8a513289";
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		try {
 			URIBuilder builder = new URIBuilder("https://github.com/login/oauth/access_token");
 			builder.addParameter("client_id", CLIENT_ID);
-			builder.addParameter("client_secret", CLIENT_SECRET);
+			builder.addParameter("client_secret", SecretKeys.GitHub);
 			builder.addParameter("code", req.getParameter("code"));
 			
 			HttpPost request = new HttpPost(builder.build());
