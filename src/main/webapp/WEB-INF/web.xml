@@ -101,6 +101,10 @@
     </servlet-mapping>
 
 
+    <static-files>
+      <include path="/favicon.ico"></include>
+    </static-files>
+
     <welcome-file-list>
         <welcome-file>index.html</welcome-file>
     </welcome-file-list>
