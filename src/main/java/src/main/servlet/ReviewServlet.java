@@ -72,7 +72,8 @@ public class ReviewServlet extends HttpServlet {
 			
 			createIssues(client, writerLogin, repoName, comments);
 			String pdfPath = addPdfToRepo(client, accessToken, writerLogin, repoName, pdf, reviewer);
-			closeReviewIssue(client, writerLogin, repoName, reviewer.getLogin());
+			String closeComment = "@" + reviewer.getLogin() + " has reviewed this paper.";
+			closeReviewIssue(client, writerLogin, repoName, reviewer.getLogin(), closeComment);
 			ReviewRequestServlet.removeReviewFromDatastore(reviewer.getLogin(), writerLogin, repoName);
 
 			pdf.close();
@@ -105,7 +106,7 @@ public class ReviewServlet extends HttpServlet {
 		
 	}
 	
-	static public void closeReviewIssue(GitHubClient client, String writerLogin, String repoName, String reviewer) throws IOException {
+	static public void closeReviewIssue(GitHubClient client, String writerLogin, String repoName, String reviewer, String comment) throws IOException {
 		IssueService issueService = new IssueService(client);
 		
 		for(Issue issue : issueService.getIssues(writerLogin, repoName, null)) {
@@ -113,6 +114,7 @@ public class ReviewServlet extends HttpServlet {
 				System.out.println(issue.getState());
 			
 				if(issue.getTitle().startsWith("Reviewer - ") && issue.getAssignee().getLogin().equals(reviewer)) {
+					issueService.createComment(writerLogin, repoName, issue.getNumber(), comment);
 					issue.setState("closed");
 					issueService.editIssue(writerLogin, repoName, issue);
 				}

@@ -103,7 +103,8 @@ public class ReviewRequestServlet extends HttpServlet {
 		String reviewer = req.getParameter("reviewer");
 		String repo = req.getParameter("repo");
 		
-		ReviewServlet.closeReviewIssue(client, writer, repo, reviewer);
+		String closeComment = "@" + reviewer + " is no longer reviewing this paper.";
+		ReviewServlet.closeReviewIssue(client, writer, repo, reviewer, closeComment);
 		
 		removeReviewFromDatastore(reviewer, writer, repo);
 	}
