@@ -81,6 +81,5 @@ function setDownloadBtnLink(writer, repoName, paper) {
   }
 
   var url = "https://github.com/" + writer + "/" + repoName + "/raw/master/" + paper;
-  console.log(url);
   $("#downloadPaper").attr("href", url);
 }

@@ -30,7 +30,6 @@ function main() {
     $("#reviewerDiv").hide();
     setupStatus();
   });
-
 }
 
 function setupWriter() {

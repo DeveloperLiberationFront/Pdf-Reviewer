@@ -27,6 +27,7 @@ function showRepos(data) {
 function getRepos() {
   $.get("/repo?access_token=" + accessToken)
   .done(function(data) {
+    $("#repoList").empty();
     showRepos(data);
   })
   .fail(function(data) {
