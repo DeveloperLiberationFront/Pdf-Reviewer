@@ -108,6 +108,14 @@ body {
   height: 35px;
 }
 
+.select2-container .select2-choice {
+  height: 100%;
+}
+
+.select2-container .select2-choice > .select2-chosen {
+  margin-top: 2px;
+}
+
 #submitReview {
   margin-top: 25px;
 }
