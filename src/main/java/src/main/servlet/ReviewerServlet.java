@@ -41,7 +41,6 @@ public class ReviewerServlet extends HttpServlet {
 			
 			reviewers.add(u);
 		}
-		reviewers.add(userService.getUser());
 		
 		JSONArray json = new JSONArray();
 		
