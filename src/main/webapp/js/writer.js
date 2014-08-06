@@ -106,11 +106,14 @@ function setupAddOtherReviewer() {
 }
 
 function addReviewer() {
-  var login = $("#addOtherReviewer").val();
+  var valA = $("#addOtherReviewer").val();
+  var valB = $("#s2id_autogen1_search").val();
+  var login = valA != "" ? valA : valB;
 
   $.get("/user?access_token=" + accessToken + "&user=" + escape(login))
   .done(function(data) {
     showReviewer(data, true);
     $("#select2-chosen-1").text("");
+    $("#addOtherReviewer").val("");
   });
 }

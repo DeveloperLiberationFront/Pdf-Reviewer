@@ -120,6 +120,11 @@ body {
   margin-top: 2px;
 }
 
+.select2-container .select2-choice,
+.select2-container .select2-choice .select2-arrow {
+  background: white;
+}
+
 #submitReview {
   margin-top: 25px;
 }
