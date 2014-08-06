@@ -170,17 +170,19 @@ public class ReviewSubmitServlet extends HttpServlet {
 		String filePath = "";
 		
 		try {
-			List<String> existingPaths = getReviewContents(client, writerLogin, repoName, reviewer);
-	
-			int num = 1;
 			
-			for(String path : existingPaths) {
-				if(path.startsWith(reviewer.getLogin())) {
-					num++;
+			filePath = "reviews/" + reviewer.getLogin() + ".pdf";
+			String sha = null;
+			
+			ContentsService contents = new ContentsService(client);
+			RepositoryService repoService = new RepositoryService(client);
+			Repository repo = repoService.getRepository(writerLogin, repoName);
+			try {
+				List<RepositoryContents> files = contents.getContents(repo, filePath);
+				if(!files.isEmpty()) {
+					sha = files.get(0).getSha();
 				}
-			}
-			
-			filePath = "reviews/" + reviewer.getLogin() + "-" + num + ".pdf";
+			} catch(IOException e) {}
 		
 		
 			URIBuilder builder = new URIBuilder("https://api.github.com/repos/" + writerLogin + "/" + repoName + "/contents/" + filePath);
@@ -195,8 +197,6 @@ public class ReviewSubmitServlet extends HttpServlet {
 				String content = DatatypeConverter.printBase64Binary(output.toByteArray());
 				MessageDigest md = MessageDigest.getInstance("SHA-256");
 				md.update(content.getBytes("US-ASCII"));
-				
-				String sha = md.digest().toString(); 
 						
 				JSONObject json = new JSONObject();
 				json.put("message", reviewer.getLogin() + " has submitted their review.");
@@ -220,26 +220,5 @@ public class ReviewSubmitServlet extends HttpServlet {
 		}
 		
 		return filePath;
-	}
-	
-	public List<String> getReviewContents(GitHubClient client, String writerName, String repoName, User reviewer) throws IOException {
-		RepositoryService repoService = new RepositoryService(client);
-		Repository repo = repoService.getRepository(writerName, repoName);
-		
-		ContentsService contentsService = new ContentsService(client);
-		List<RepositoryContents> repoContents = null;
-		try {
-			repoContents = contentsService.getContents(repo, "/reviews");
-		} catch(IOException e) {
-			return new ArrayList<String>();
-		}
-		
-		List<String> repoPaths = new ArrayList<>();
-		
-		for(RepositoryContents content : repoContents) {
-			repoPaths.add(content.getName());
-		}
-		
-		return repoPaths;
 	}
 }
