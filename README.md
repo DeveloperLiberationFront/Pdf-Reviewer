@@ -10,6 +10,7 @@ PDF-Reviewer
   - Otherwise, ask me for the secret key
   - Add a file called `src/main/java/src/main/SecretKeys.java`
     - See below for what to put in it
+  - Run `mvn clean install` to get dependencies
   - Run the app using `mvn appengine:devserver`
 
 
