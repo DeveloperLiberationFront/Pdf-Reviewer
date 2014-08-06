@@ -69,7 +69,9 @@ public class ReviewRequestServlet extends HttpServlet {
 				Issue issue = new Issue();
 				issue.setTitle("Reviewer - " + u.getLogin());
 				String link = "http://pdfreviewhub.appspot.com/?repoName=" + repoName + "&writer=" + writer.getLogin() + "&paper=" + paper;
-				issue.setBody("@" + u.getLogin() + " has been requested to review this paper\n." +
+				String downloadLink = "https://github.com/" + writer.getLogin() + "/" + repoName + "/raw/master/" + paper;
+				issue.setBody("@" + u.getLogin() + " has been requested to review this paper.\n" +
+							  "Click [here](" + downloadLink + ") to download the paper\n" +
 							  "Click [here](" + link + ") to upload your review.");
 				issue.setAssignee(u);
 				issueService.createIssue(writer.getLogin(), repoName, issue);
