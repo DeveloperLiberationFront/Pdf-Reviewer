@@ -71,7 +71,9 @@ public class ReviewSubmitServlet extends HttpServlet {
 			User reviewer = userService.getUser();
 			
 			createIssues(client, writerLogin, repoName, comments);
+			updatePdf(comments, pdf, writerLogin, repoName);
 			String pdfPath = addPdfToRepo(client, accessToken, writerLogin, repoName, pdf, reviewer);
+			
 			String closeComment = "@" + reviewer.getLogin() + " has reviewed this paper.";
 			closeReviewIssue(client, writerLogin, repoName, reviewer.getLogin(), closeComment);
 			ReviewRequestServlet.removeReviewFromDatastore(reviewer.getLogin(), writerLogin, repoName);
@@ -100,10 +102,13 @@ public class ReviewSubmitServlet extends HttpServlet {
 			}
 			
 			issue.setLabels(labels);
-			issueService.createIssue(writerLogin, repoName, issue);
-			
+			issue = issueService.createIssue(writerLogin, repoName, issue);
+			comment.setIssueNumber(issue.getNumber());
 		}
-		
+	}
+	
+	public void updatePdf(List<PdfComment> comments, Pdf pdf, String login, String repo) {
+		pdf.setComments(comments, login, repo);
 	}
 	
 	static public void closeReviewIssue(GitHubClient client, String writerLogin, String repoName, String reviewer, String comment) throws IOException {

@@ -33,14 +33,14 @@ public class IssueTest {
 	
 	@Before
 	public void setup() {
-		aS = "{tag 1, mf} This is an issue";
-		bS = "{tag 1, mf}This is an issue";
-		cS = "This is an issue{tag 1, mf} ";
-		dS = "This is an issue {tag 1, mf}";
-		eS = "This is {tag 1, mf} an issue";
-		fS = "This is {tag 1, mf}an issue";
-		gS = "This is an issue";
-		hS = "This is not an issue";
+		aS = "{tag 1, mf} [1] This is an issue";
+		bS = "{tag 1, mf}[2]This is an issue";
+		cS = "This is an [3]issue{tag 1, mf} ";
+		dS = "This is an [4]issue {tag 1, mf}";
+		eS = "This is [5]{tag 1, mf} an issue";
+		fS = "This is [6]{tag 1, mf}an issue";
+		gS = "This is  [7] an issue";
+		hS = "This is not an [19] issue";
 		iS = "{tag, p} This is a positive issue";
 		
 		a = new PdfComment(aS);
@@ -121,5 +121,31 @@ public class IssueTest {
 			assertFalse(com.getTags().contains("Positive"));
 		}
 		
+	}
+	
+	@Test
+	public void testIssueNumber() {
+		assertEquals(1, a.getIssueNumber());
+		assertEquals(2, b.getIssueNumber());
+		assertEquals(3, c.getIssueNumber());
+		assertEquals(4, d.getIssueNumber());
+		assertEquals(5, e.getIssueNumber());
+		assertEquals(6, f.getIssueNumber());
+		assertEquals(7, g.getIssueNumber());
+		assertEquals(19, h.getIssueNumber());
+		assertEquals(0, i.getIssueNumber());
+	}
+	
+	@Test
+	public void testContent() {
+		assertEquals("{tag 1, Must Fix} [https://github.com/mpeterson2/Pdf-Test/issues/1] This is an issue", a.getContents("mpeterson2", "Pdf-Test"));
+		assertEquals("{tag 1, Must Fix} [https://github.com/mpeterson2/Pdf-Test/issues/2] This is an issue", b.getContents("mpeterson2", "Pdf-Test"));
+		assertEquals("{tag 1, Must Fix} [https://github.com/mpeterson2/Pdf-Test/issues/3] This is an issue", c.getContents("mpeterson2", "Pdf-Test"));
+		assertEquals("{tag 1, Must Fix} [https://github.com/mpeterson2/Pdf-Test/issues/4] This is an issue", d.getContents("mpeterson2", "Pdf-Test"));
+		assertEquals("{tag 1, Must Fix} [https://github.com/mpeterson2/Pdf-Test/issues/5] This is an issue", e.getContents("mpeterson2", "Pdf-Test"));
+		assertEquals("{tag 1, Must Fix} [https://github.com/mpeterson2/Pdf-Test/issues/6] This is an issue", f.getContents("mpeterson2", "Pdf-Test"));
+		assertEquals("[https://github.com/mpeterson2/Pdf-Test/issues/7] This is an issue", g.getContents("mpeterson2", "Pdf-Test"));
+		assertEquals("[https://github.com/mpeterson2/Pdf-Test/issues/19] This is not an issue", h.getContents("mpeterson2", "Pdf-Test"));
+		assertEquals("{tag, Positive} This is a positive issue", i.getContents("mpeterson2", "Pdf-Test"));
 	}
 }

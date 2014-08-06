@@ -16,9 +16,11 @@ public class PdfComment {
 	
 	private List<String> tags;
 	private String comment;
+	private int issueNumber;
 	
 	public PdfComment(String string) {
 		setTags(string);
+		setIssueNumber(string);
 		setComment(string);
 	}
 	
@@ -43,15 +45,38 @@ public class PdfComment {
 	}
 	
 	private void setComment(String s) {
-		int tagsStartPos = s.indexOf("{");
-		int tagsEndPos = s.indexOf("}");
+		comment = s;
 		
+		int tagsStartPos = comment.indexOf("{");
+		int tagsEndPos = comment.indexOf("}");
 		if(tagsStartPos != -1 && tagsEndPos != -1) {
-			comment = (s.substring(0, tagsStartPos) + s.substring(tagsEndPos + 1, s.length()).trim()).trim();
+			String fHalf = comment.substring(0, tagsStartPos).trim();
+			String sHalf = comment.substring(tagsEndPos + 1, comment.length()).trim();
+			comment = fHalf + " " + sHalf;
 		}
-		else {
-			comment = s.trim();
+		
+		int issueStartPos = comment.indexOf("[");
+		int issueEndPos = comment.indexOf("]");
+		if(issueStartPos != -1 && issueEndPos != -1) {
+			String fHalf = comment.substring(0, issueStartPos).trim();
+			String sHalf = comment.substring(issueEndPos + 1, comment.length()).trim();
+			comment = fHalf + " " + sHalf;
 		}
+		
+		comment = comment.trim();
+	}
+	
+	public void setIssueNumber(String str) {
+		int issueStartPos = str.indexOf("[");
+		int issueEndPos = str.indexOf("]");
+		if(issueStartPos != -1 && issueEndPos != -1) {
+			String issueStr = str.substring(issueStartPos + 1, issueEndPos);
+			issueNumber = Integer.parseInt(issueStr);
+		}
+	}
+	
+	public void setIssueNumber(int issueNumber) {
+		this.issueNumber = issueNumber;
 	}
 	
 	private void setTags(String string) {
@@ -96,6 +121,14 @@ public class PdfComment {
 		return tags;
 	}
 	
+	public int getIssueNumber() {
+		return issueNumber;
+	}
+	
+	public String getLink(String login, String repoName) {
+		return "https://github.com/" + login + "/" + repoName + "/issues/" + getIssueNumber();
+	}
+	
 	public JSONObject toJson() {
 		JSONObject json = new JSONObject();
 		
@@ -103,6 +136,7 @@ public class PdfComment {
 			json.put("title", getTitle());
 			json.put("tags", getTags());
 			json.put("comment", getComment());
+			json.put("issueNumber", getIssueNumber());
 		} catch(JSONException e) {}
 		
 		return json;
@@ -110,6 +144,26 @@ public class PdfComment {
 	
 	@Override
 	public String toString() {
-		return getTitle() + " {" + getTags() + "}: " + getComment();
+		return getTitle() + " {" + getTags() + "} " + "[" + getIssueNumber() + "]" + getComment();
+	}
+	
+	public String getContents(String login, String repo) {
+		String tagStr = "";
+		if(!getTags().isEmpty()) {
+			StringBuilder tagsBuilder = new StringBuilder("{");
+			for(String tag : getTags()) {
+				tagsBuilder.append(tag).append(", ");
+			}
+			tagStr = tagsBuilder.toString();
+			tagStr = tagStr.substring(0, tagStr.length() - 2) + "} ";
+		}
+		
+		String issueStr = "";
+		
+		if(getIssueNumber() != 0) {
+			issueStr = "[" + getLink(login, repo) + "] ";
+		}
+		
+		return (tagStr + issueStr + getComment()).trim();
 	}
 }

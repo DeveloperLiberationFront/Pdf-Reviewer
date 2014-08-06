@@ -42,6 +42,28 @@ public class Pdf {
 		 return comments;
 	}
 	
+	public void setComments(List<PdfComment> comments, String login, String repo) {
+		@SuppressWarnings("unchecked")
+		List<PDPage> pages = doc.getDocumentCatalog().getAllPages();
+		int commentOn = 0;
+		for(PDPage page : pages) {
+			try {
+				for(int i=0; i<page.getAnnotations().size(); i++) {
+					PDAnnotation anno = page.getAnnotations().get(i);
+					
+					if(anno instanceof PDAnnotationTextMarkup) {
+						PDAnnotationTextMarkup comment = (PDAnnotationTextMarkup) anno;
+						
+						if(comment.getContents() != null) {
+							comment.setContents(comments.get(commentOn).getContents(login, repo));
+							commentOn++;
+						}
+					}
+				}
+			} catch(IOException e) {}
+		}
+	}
+	
 	public PDDocument getDoc() {
 		return doc;
 	}
