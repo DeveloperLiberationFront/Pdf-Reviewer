@@ -70,7 +70,8 @@ public class PdfComment {
 		int issueStartPos = str.indexOf("[");
 		int issueEndPos = str.indexOf("]");
 		if(issueStartPos != -1 && issueEndPos != -1) {
-			String issueStr = str.substring(issueStartPos + 1, issueEndPos);
+			String issueAreaStr = str.substring(issueStartPos + 1, issueEndPos);
+			String issueStr = issueAreaStr.substring(issueAreaStr.lastIndexOf("/") + 1);
 			issueNumber = Integer.parseInt(issueStr);
 		}
 	}

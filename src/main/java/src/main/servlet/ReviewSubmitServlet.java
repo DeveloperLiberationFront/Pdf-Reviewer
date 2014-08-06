@@ -89,21 +89,60 @@ public class ReviewSubmitServlet extends HttpServlet {
 		IssueService issueService = new IssueService(client);
 		
 		for(PdfComment comment : comments) {
-			Issue issue = new Issue();
-			issue.setTitle(comment.getTitle());
-			issue.setBody(comment.getComment());
-			
-			List<Label> labels = new ArrayList<>();
-			
-			for(String tag : comment.getTags()) {
-				Label label = new Label();
-				label.setName(tag);
-				labels.add(label);
+			// If the issue does not already exist
+			if(comment.getIssueNumber() == 0) { 
+				Issue issue = new Issue();
+				issue.setTitle(comment.getTitle());
+				issue.setBody(comment.getComment());
+				
+				List<Label> labels = new ArrayList<>();
+				
+				for(String tag : comment.getTags()) {
+					Label label = new Label();
+					label.setName(tag);
+					labels.add(label);
+				}
+				
+				issue.setLabels(labels);
+				issue = issueService.createIssue(writerLogin, repoName, issue);
+				comment.setIssueNumber(issue.getNumber());
 			}
-			
-			issue.setLabels(labels);
-			issue = issueService.createIssue(writerLogin, repoName, issue);
-			comment.setIssueNumber(issue.getNumber());
+			// If the issue already exists
+			else {
+				Issue issue = issueService.getIssue(writerLogin, repoName, comment.getIssueNumber());
+				String issueText = comment.getComment();
+				if(!issue.getBody().equals(issueText)) {
+					issueService.createComment(writerLogin, repoName, comment.getIssueNumber(), issueText);
+				}
+				
+				List<Label> existingLabels = issue.getLabels();
+				List<Label> labels = new ArrayList<>();
+				for(String tag : comment.getTags()) {
+					Label l = new Label();
+					l.setName(tag);
+					labels.add(l);
+				}
+				
+				boolean updateLabels = labels.size() != existingLabels.size();
+				if(!updateLabels) {
+					for(Label l1 : labels) {
+						updateLabels = true;
+						for(Label l2 : existingLabels) {
+							if(l1.getName().equals(l2.getName())) {
+								updateLabels = false;
+								break;
+							}
+						}
+						if(updateLabels)
+							break;
+					}
+				}
+				
+				if(updateLabels) {
+					issue.setLabels(labels);
+					issueService.editIssue(writerLogin, repoName, issue);
+				}
+			}
 		}
 	}
 	

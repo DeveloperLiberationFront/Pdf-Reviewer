@@ -33,14 +33,14 @@ public class IssueTest {
 	
 	@Before
 	public void setup() {
-		aS = "{tag 1, mf} [1] This is an issue";
-		bS = "{tag 1, mf}[2]This is an issue";
-		cS = "This is an [3]issue{tag 1, mf} ";
-		dS = "This is an [4]issue {tag 1, mf}";
-		eS = "This is [5]{tag 1, mf} an issue";
-		fS = "This is [6]{tag 1, mf}an issue";
-		gS = "This is  [7] an issue";
-		hS = "This is not an [19] issue";
+		aS = "{tag 1, mf} [https://github.com/mpeterson2/Pdf-Test/issues/1] This is an issue";
+		bS = "{tag 1, mf}[https://github.com/mpeterson2/Pdf-Test/issues/2]This is an issue";
+		cS = "This is an [https://github.com/mpeterson2/Pdf-Test/issues/3]issue{tag 1, mf} ";
+		dS = "This is an [https://github.com/mpeterson2/Pdf-Test/issues/4]issue {tag 1, mf}";
+		eS = "This is [https://github.com/mpeterson2/Pdf-Test/issues/5]{tag 1, mf} an issue";
+		fS = "This is [https://github.com/mpeterson2/Pdf-Test/issues/6]{tag 1, mf}an issue";
+		gS = "This is  [https://github.com/mpeterson2/Pdf-Test/issues/7] an issue";
+		hS = "This is not an [https://github.com/mpeterson2/Pdf-Test/issues/19] issue";
 		iS = "{tag, p} This is a positive issue";
 		
 		a = new PdfComment(aS);
