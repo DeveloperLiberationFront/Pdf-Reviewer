@@ -45,8 +45,11 @@ function getQueryParams(key) {
 }
 
 function getUserText(r) {
-  var email = "email" in r ? " (" + r["email"] + ")" : "";
-  var name = "name" in r ? r["name"] + " - " : "";
+  var hasEmail = "email" in r && r["email"] != "";
+  var hasName = "name" in r && r["name"] != "";
+
+  var email = hasEmail ? " (" + r["email"] + ")" : "";
+  var name = hasName ? r["name"] + " - " : "";
 
   return name + r["login"] + email;
 }

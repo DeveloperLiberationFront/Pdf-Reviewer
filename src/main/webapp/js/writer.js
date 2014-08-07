@@ -51,11 +51,17 @@ function getPossibleReviewers(login) {
   $.get("/reviewer?access_token=" + accessToken + "&login=" + escape(login))
   .done(function(data) {
     $("#reviewersList").empty();
+
+    if(data.length == 0) {
+      $("<h5 />")
+        .text("No Reviewers")
+        .appendTo($("#reviewersList"));
+      return;
+    }
+
     for(var i=0; i<data.length; i++) {
       showReviewer(data[i]);
     }
-
-    $("#selectReviewers").show();
   })
   .fail(function(data) {
     console.log(data);
