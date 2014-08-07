@@ -20,13 +20,14 @@ public class RepoServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		String auth = req.getParameter("access_token");
+		String login = req.getParameter("login");
 		
-		RepositoryService repos = new RepositoryService();
-		repos.getClient().setOAuth2Token(auth);
+		RepositoryService repoService = new RepositoryService();
+		repoService.getClient().setOAuth2Token(auth);
 		
 		JSONArray reposJson = new JSONArray();
 		
-		for(Repository repo : repos.getRepositories()) {
+		for(Repository repo : repoService.getRepositories(login)) {
 			JSONObject repoJson = new JSONObject();
 			try {
 				repoJson.put("name", repo.getName());

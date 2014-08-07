@@ -10,6 +10,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.egit.github.core.User;
+import org.eclipse.egit.github.core.client.GitHubClient;
+import org.eclipse.egit.github.core.service.OrganizationService;
 import org.eclipse.egit.github.core.service.UserService;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -20,26 +22,40 @@ public class ReviewerServlet extends HttpServlet {
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		UserService userService = new UserService();
-		userService.getClient().setOAuth2Token(req.getParameter("access_token"));
+		String login = req.getParameter("login");
 		
-		List<User> followers = userService.getFollowers();
-		List<User> following = userService.getFollowing();
+		GitHubClient client = new GitHubClient();
+		client.setOAuth2Token(req.getParameter("access_token"));
 		
-		List<User> both = new ArrayList<>();
-		both.addAll(followers);
-		both.addAll(following);
+		UserService userService = new UserService(client);
+		
+		User user = userService.getUser(login);
+		boolean isOrg = "Organization".equals(user.getType());
 		
 		List<User> reviewers = new ArrayList<>();
 		
-		u1: for(User u : both) {
-			for(User u2 : reviewers) {
-				if(u2.getLogin().equals(u.getLogin())) {
-					continue u1;
-				}
-			}
+		if(!isOrg) {
+			List<User> followers = userService.getFollowers();
+			List<User> following = userService.getFollowing();
 			
-			reviewers.add(u);
+			List<User> both = new ArrayList<>();
+			both.addAll(followers);
+			both.addAll(following);
+			
+			u1: for(User u : both) {
+				for(User u2 : reviewers) {
+					if(u2.getLogin().equals(u.getLogin())) {
+						continue u1;
+					}
+				}
+				
+				reviewers.add(u);
+			}
+		}
+		else {
+			OrganizationService orgService = new OrganizationService(client);
+			List<User> users = orgService.getMembers(user.getLogin());
+			reviewers.addAll(users);
 		}
 		
 		JSONArray json = new JSONArray();

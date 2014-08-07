@@ -100,6 +100,16 @@
         <url-pattern>/search</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>RepoSource</servlet-name>
+        <servlet-class>src.main.servlet.RepoSourceServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>RepoSource</servlet-name>
+        <url-pattern>/repoSource</url-pattern>
+    </servlet-mapping>
+
 
     <static-files>
       <include path="/favicon.ico"></include>

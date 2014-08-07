@@ -10,11 +10,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.RepositoryContents;
-import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.ContentsService;
 import org.eclipse.egit.github.core.service.RepositoryService;
-import org.eclipse.egit.github.core.service.UserService;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -27,13 +25,10 @@ public class FilesServlet extends HttpServlet {
 		String repoName = req.getParameter("repo");
 		String auth = req.getParameter("access_token");
 		String path = req.getParameter("path");
+		String login = req.getParameter("login");
 		
 		GitHubClient client = new GitHubClient();
 		client.setOAuth2Token(auth);
-		
-		UserService userService = new UserService(client);
-		User user = userService.getUser();
-		String login = user.getLogin();
 		
 		RepositoryService repoService = new RepositoryService(client);
 		Repository repo = repoService.getRepository(login, repoName);

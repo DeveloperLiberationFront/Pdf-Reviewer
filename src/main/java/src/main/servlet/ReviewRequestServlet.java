@@ -44,14 +44,16 @@ public class ReviewRequestServlet extends HttpServlet {
 			JSONArray reviewersJson = data.getJSONArray("reviewers");
 			String repoName = data.getString("repo");
 			String paper = data.getString("paper");
+			String login = data.getString("login");
+			System.out.println(login);
 			
 			GitHubClient client = new GitHubClient();
 			client.setOAuth2Token(req.getParameter("access_token"));
 			
 			UserService userService = new UserService(client);
 			
-			User writer = userService.getUser();
-			
+			User writer = userService.getUser(login);
+			boolean isOrg = "Organization".equals(writer.getType());
 			List<User> reviewers = new ArrayList<>();
 			
 			
@@ -65,7 +67,10 @@ public class ReviewRequestServlet extends HttpServlet {
 			CollaboratorService collaboratorService = new CollaboratorService(client);
 			
 			for(User u : reviewers) {
-				collaboratorService.addCollaborator(repo, u.getLogin());
+				if(!isOrg) {
+					collaboratorService.addCollaborator(repo, u.getLogin());
+				}
+				try {
 				Issue issue = new Issue();
 				issue.setTitle("Reviewer - " + u.getLogin());
 				String link = "http://pdfreviewhub.appspot.com/?repoName=" + repoName + "&writer=" + writer.getLogin() + "&paper=" + paper;
@@ -77,6 +82,9 @@ public class ReviewRequestServlet extends HttpServlet {
 				issueService.createIssue(writer.getLogin(), repoName, issue);
 				
 				addReviewToDatastore(u.getLogin(), writer.getLogin(), repoName, paper, link);
+				} catch(IOException e) {
+					resp.setStatus(417);
+				}
 			}
 			
 		} catch (JSONException e) {

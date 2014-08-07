@@ -1,5 +1,33 @@
+function getRepoSources() {
+  $.get("/repoSource?access_token=" + accessToken)
+    .done(function(data) {
+      $("#repoSourceList").empty();
+      for(var i=0; i<data.length; i++) {
+        var source = data[i];
+        var sourceBtn = $("<a />")
+          .attr("class", "list-group-item")
+          .text(source)
+          .on("click", function(e) {
+            $("#repoSourceList .list-group-item.active").removeClass("active");
+            $(this).addClass("active");
+            getRepos($(this).text());
+            getPossibleReviewers($(this).text());
+          })
+          .appendTo($("#repoSourceList")); 
+      }
+    });
+}
 
-function showRepos(data) {
+
+function showRepos(data, login) {
+  if(data.length == 0) {
+    $("<h5 />")
+      .text("No Repositories")
+      .appendTo($("#repoList"));
+
+    return;
+  }
+
   for(var i=0; i<data.length; i++) {
     var repo = data[i];
 
@@ -16,23 +44,35 @@ function showRepos(data) {
         $("#repoList .list-group-item.active").removeClass("active");
         $(this).addClass("active");
 
-        getFiles($(this).text(), "/");
+        getFiles($(this).text(), login, "/");
       })
-      .prependTo($("#repoList"));
+      .appendTo($("#repoList"));
   }
 
   $("#selectRepo").show();
 }
 
-function getRepos() {
-  $.get("/repo?access_token=" + accessToken)
-  .done(function(data) {
-    $("#repoList").empty();
-    showRepos(data);
-  })
-  .fail(function(data) {
-    console.log(data);
-  })
+function getRepos(login) {
+  $.get("/repo?access_token=" + accessToken + "&login=" + escape(login))
+    .done(function(data) {
+      $("#repoList").empty();
+      showRepos(data, login);
+    })
+    .fail(function(data) {
+      console.log(data);
+    })
+}
+
+function getSelectedInList(list) {
+  var active = $(list + " .list-group-item.active");
+  if(active.length > 0)
+    return active.text();
+  else
+    return null;
+}
+
+function getSelectedLogin() {
+  return getSelectedInList("#repoSourceList");
 }
 
 function getSelectedRepo() {
@@ -44,23 +84,19 @@ function getSelectedRepo() {
 }
 
 function getSelectedFile() {
-  var active = $(".fileList .list-group-item.active");
-  if(active.length > 0)
-    return active.text();
-  else
-    return null;
+  return getSelectedInList(".fileList");
 }
 
-function getFiles(repoName, path) {
-  $.get("/files?access_token=" + accessToken + "&repo=" + escape(repoName) + "&path=" + escape(path))
+function getFiles(repoName, login, path) {
+  $.get("/files?access_token=" + accessToken + "&repo=" + escape(repoName) + "&login=" + escape(login) + "&path=" + escape(path))
     .done(function(data) {
-      showFiles(repoName, path, data);
+      showFiles(repoName, login, path, data);
     })
     .fail(function(data) {
     });
 }
 
-function showFiles(repoName, path, files) {
+function showFiles(repoName, login, path, files) {
   $(".fileList").empty();
   $(".fileList").slideUp();
 
@@ -76,7 +112,7 @@ function showFiles(repoName, path, files) {
       .on("click", function(e) {
         e.stopPropagation();
         backPath = path.substr(0, path.lastIndexOf("/"));
-        getFiles(repoName, backPath);
+        getFiles(repoName, login, backPath);
       })
       .appendTo($("#" + repoNameId + "-fileList"));
   }
@@ -113,7 +149,7 @@ function showFiles(repoName, path, files) {
         var type = $(this).data("type");
 
         if(type == "dir") {
-          getFiles(repoName, path + "/" + name);
+          getFiles(repoName, login, path + "/" + name);
         }
         else {
           $("#" + repoNameId + "-fileList .list-group-item.active").removeClass("active");

@@ -1,6 +1,5 @@
 function setupWriter() {
-  getRepos();
-  getPossibleReviewers();
+  getRepoSources();
   $("#writerDiv").fadeIn();
 
   setupAddOtherReviewer();
@@ -9,6 +8,7 @@ function setupWriter() {
     e.preventDefault();
 
     var data = {
+      login: getSelectedLogin(),
       repo: getSelectedRepo(),
       paper: getSelectedFile(),
       reviewers: []
@@ -39,13 +39,16 @@ function setupWriter() {
       showAlert("success", "Your review request has been submitted.");
     })
     .fail(function(data) {
-      showAlert("danger", "There has been a problem submitting your review.");
+      if(data.status == 417)
+        showAlert("danger", "Some reviewers could not be added for review. Only members of the organization can review papers in an organization.")
+      else
+        showAlert("danger", "There has been a problem submitting your review.");
     });
   });
 }
 
-function getPossibleReviewers() {
-  $.get("/reviewer?access_token=" + accessToken)
+function getPossibleReviewers(login) {
+  $.get("/reviewer?access_token=" + accessToken + "&login=" + escape(login))
   .done(function(data) {
     $("#reviewersList").empty();
     for(var i=0; i<data.length; i++) {
