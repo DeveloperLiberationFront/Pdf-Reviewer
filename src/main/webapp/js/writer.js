@@ -88,17 +88,24 @@ function setupAddOtherReviewer() {
 
   $("#addOtherReviewer").select2({
     minimumInputLength: 1,
-    query: function (query) {
-        $.get("/search?access_token=" + accessToken + "&search=" + escape(query.term))
-        .done(function(data) {
-          
-          var results = {results: []};
-          for(var i=0; i<data.length; i++) {
-            results.results.push({id: data[i], text: data[i]});
-          }
-
-          query.callback(results);
-        })
+    cache: true,
+    ajax: {
+      url: "/search",
+      dataType: "json",
+      quietMillis: 500,
+      data: function(term, page) {
+        return {
+          search: term,
+          access_token: accessToken
+        };
+      },
+      results: function(data, page) {
+        var results = [];
+        for(var i=0; i<data.length; i++) {
+          results.push({id: data[i], text: data[i]});
+        }
+        return {results: results};
+      }
     }
   });
 
