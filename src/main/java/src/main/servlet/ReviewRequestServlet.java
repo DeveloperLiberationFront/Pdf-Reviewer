@@ -70,7 +70,7 @@ public class ReviewRequestServlet extends HttpServlet {
 			RepositoryService repoService = new RepositoryService(client);
 			Repository repo = repoService.getRepository(writer.getLogin(), repoName);
 			CollaboratorService collaboratorService = new CollaboratorService(client);
-			/*
+
 			for(User u : reviewers) {
 				if(!isOrg) {
 					collaboratorService.addCollaborator(repo, u.getLogin());
@@ -93,7 +93,6 @@ public class ReviewRequestServlet extends HttpServlet {
 					resp.setStatus(417);
 				}
 			}
-		*/	
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
