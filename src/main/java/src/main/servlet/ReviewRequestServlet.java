@@ -2,7 +2,6 @@ package src.main.servlet;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -11,11 +10,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.egit.github.core.Issue;
+import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.CollaboratorService;
 import org.eclipse.egit.github.core.service.IssueService;
+import org.eclipse.egit.github.core.service.LabelService;
 import org.eclipse.egit.github.core.service.RepositoryService;
 import org.eclipse.egit.github.core.service.UserService;
 import org.json.JSONArray;
@@ -71,17 +72,29 @@ public class ReviewRequestServlet extends HttpServlet {
 					collaboratorService.addCollaborator(repo, u.getLogin());
 				}
 				try {
-				Issue issue = new Issue();
-				issue.setTitle("Reviewer - " + u.getLogin());
-				String link = "http://pdfreviewhub.appspot.com/?repoName=" + repoName + "&writer=" + writer.getLogin() + "&paper=" + paper;
-				String downloadLink = "https://github.com/" + writer.getLogin() + "/" + repoName + "/raw/master/" + paper;
-				issue.setBody("@" + u.getLogin() + " has been requested to review this paper.\n" +
-							  "Click [here](" + downloadLink + ") to download the paper\n" +
-							  "Click [here](" + link + ") to upload your review.");
-				issue.setAssignee(u);
-				issueService.createIssue(writer.getLogin(), repoName, issue);
-				
-				addReviewToDatastore(u.getLogin(), writer.getLogin(), userService.getUser().getLogin(), repoName, paper, link);
+					Label l = new Label().setColor("009800").setName("Review Request");
+					
+					try {
+						LabelService labelService = new LabelService(client);
+						labelService.createLabel(writer.getLogin(), repoName, l);
+					} catch(IOException e) {}
+					
+					Issue issue = new Issue();
+					issue.setTitle("Reviewer - " + u.getLogin());
+					List<Label> labels = new ArrayList<>();
+					labels.add(l);
+					issue.setLabels(labels);
+					issue.setAssignee(u);
+					
+					String link = "http://pdfreviewhub.appspot.com/?repoName=" + repoName + "&writer=" + writer.getLogin() + "&paper=" + paper;
+					String downloadLink = "https://github.com/" + writer.getLogin() + "/" + repoName + "/raw/master/" + paper;
+					issue.setBody("@" + u.getLogin() + " has been requested to review this paper.\n" +
+								  "Click [here](" + downloadLink + ") to download the paper\n" +
+								  "Click [here](" + link + ") to upload your review.");
+					
+					issueService.createIssue(writer.getLogin(), repoName, issue);
+					
+					addReviewToDatastore(u.getLogin(), writer.getLogin(), userService.getUser().getLogin(), repoName, paper, link);
 				} catch(IOException e) {
 					resp.setStatus(417);
 				}
