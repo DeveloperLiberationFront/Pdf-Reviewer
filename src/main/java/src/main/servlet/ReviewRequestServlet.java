@@ -2,6 +2,7 @@ package src.main.servlet;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -56,16 +57,20 @@ public class ReviewRequestServlet extends HttpServlet {
 			boolean isOrg = "Organization".equals(writer.getType());
 			List<User> reviewers = new ArrayList<>();
 			
-			
+			System.out.println(reviewersJson.toString(2));
 			for(int i=0; i<reviewersJson.length(); i++) {
 				reviewers.add(userService.getUser(reviewersJson.getString(i)));
+			}
+			
+			for(int i=0; i<reviewers.size(); i++) {
+				System.out.println(reviewers.get(i).getLogin());
 			}
 
 			IssueService issueService = new IssueService(client);
 			RepositoryService repoService = new RepositoryService(client);
 			Repository repo = repoService.getRepository(writer.getLogin(), repoName);
 			CollaboratorService collaboratorService = new CollaboratorService(client);
-			
+			/*
 			for(User u : reviewers) {
 				if(!isOrg) {
 					collaboratorService.addCollaborator(repo, u.getLogin());
@@ -81,21 +86,24 @@ public class ReviewRequestServlet extends HttpServlet {
 				issue.setAssignee(u);
 				issueService.createIssue(writer.getLogin(), repoName, issue);
 				
-				addReviewToDatastore(u.getLogin(), writer.getLogin(), repoName, paper, link);
+				System.out.println("Reviewer: " + u.getLogin());
+				
+				addReviewToDatastore(u.getLogin(), writer.getLogin(), userService.getUser().getLogin(), repoName, paper, link);
 				} catch(IOException e) {
 					resp.setStatus(417);
 				}
 			}
-			
+		*/	
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
 	}
 	
-	void addReviewToDatastore(String reviewer, String writer, String repo, String paper, String link) {
+	void addReviewToDatastore(String reviewer, String writer, String requester, String repo, String paper, String link) {
 		Entity request = new Entity("request");
 		request.setProperty("reviewer", reviewer);
 		request.setProperty("writer", writer);
+		request.setProperty("requester", requester);
 		request.setProperty("repo", repo);
 		request.setProperty("paper", paper);
 		request.setUnindexedProperty("link", link);

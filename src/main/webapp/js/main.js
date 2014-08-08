@@ -3,6 +3,7 @@ $(document).ready(main);
 
 function main() {
   setupLoadIndicator();
+  setupButtons();
 
   var repoName = getQueryParams("repoName");
   var writer = getQueryParams("writer");
@@ -25,6 +26,11 @@ function main() {
     $("#reviewerDiv").hide();
     setupStatus();
   });
+}
+
+function setupButtons() {
+  setupWriterBtns();
+  setupReviewerBtns();
 }
 
 function showAlert(type, text) {

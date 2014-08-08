@@ -112,3 +112,7 @@ function cancelReview(writer, reviewer, repo) {
     console.log(data);
   });
 }
+
+function setupStatusBtns() {
+  
+}

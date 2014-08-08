@@ -1,26 +1,7 @@
-function setupReviewer() {
-  $("#reviewerDiv").fadeIn();
-
+function setupReviewerBtns() {
+  var uploadBtn = $("#upload");
   var fileSelecters = $("#pdf-file");
   var fileSelecter = $("#pdf-file")[0];
-  var uploadBtn = $("#upload");
-
-  uploadBtn.attr("disabled", true);
-
-  // Show that the file has been changed.
-  fileSelecters.on("change", function() {
-    if($(this)[0].files[0] != null) {
-      var selected = $(this)[0].files[0].name;
-      showAlert("info", selected + " has been selected to upload.");
-      uploadBtn.attr("disabled", false);
-    }
-    else {
-      showAlert("warning", "The file to upload has been deselected.");
-      uploadBtn.attr("disabled", true);
-    }
-  });
-
-  setDownloadBtnLink(getQueryParams("writer"), getQueryParams("repoName"), getQueryParams("paper"));
 
   uploadBtn.on("click", function(e) {
     e.preventDefault();
@@ -72,6 +53,25 @@ function setupReviewer() {
     })
 
   });
+
+  // Show that the file has been changed.
+  fileSelecters.on("change", function() {
+    if($(this)[0].files[0] != null) {
+      var selected = $(this)[0].files[0].name;
+      showAlert("info", selected + " has been selected to upload.");
+      uploadBtn.attr("disabled", false);
+    }
+    else {
+      showAlert("warning", "The file to upload has been deselected.");
+      uploadBtn.attr("disabled", true);
+    }
+  });
+}
+
+function setupReviewer() {
+  $("#reviewerDiv").fadeIn();
+  $("#upload").attr("disabled", true);
+  setDownloadBtnLink(getQueryParams("writer"), getQueryParams("repoName"), getQueryParams("paper"));
 }
 
 function setDownloadBtnLink(writer, repoName, paper) {

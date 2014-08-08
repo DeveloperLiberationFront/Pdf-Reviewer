@@ -1,9 +1,4 @@
-function setupWriter() {
-  getRepoSources();
-  $("#writerDiv").fadeIn();
-
-  setupAddOtherReviewer();
-
+function setupWriterBtns() {
   $("#submitReview").on("click", function(e) {
     e.preventDefault();
 
@@ -34,6 +29,8 @@ function setupWriter() {
       return;
     }
 
+    console.log(data);
+
     $.post("/reviewRequest?access_token=" + accessToken, JSON.stringify(data))
     .done(function(data) {
       showAlert("success", "Your review request has been submitted.");
@@ -45,6 +42,13 @@ function setupWriter() {
         showAlert("danger", "There has been a problem submitting your review.");
     });
   });
+
+  setupAddOtherReviewer();
+}
+
+function setupWriter() {
+  getRepoSources();
+  $("#writerDiv").fadeIn();
 }
 
 function getPossibleReviewers(login) {

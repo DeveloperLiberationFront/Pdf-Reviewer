@@ -48,7 +48,7 @@ public class StatusServlet extends HttpServlet {
 	private JSONArray getPendingReviews(User user, boolean isWriter, DatastoreService datastore, UserService userService) throws JSONException, IOException {
 		String login = user.getLogin();
 
-		String key = isWriter ? "reviewer" : "writer";
+		String key = isWriter ? "reviewer" : "requester";
 		
 		Query query = new Query("request");
 		FilterPredicate filter = new FilterPredicate(key, FilterOperator.EQUAL, login);
