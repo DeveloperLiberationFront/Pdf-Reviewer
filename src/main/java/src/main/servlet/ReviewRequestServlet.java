@@ -57,7 +57,6 @@ public class ReviewRequestServlet extends HttpServlet {
 			boolean isOrg = "Organization".equals(writer.getType());
 			List<User> reviewers = new ArrayList<>();
 			
-			System.out.println(reviewersJson.toString(2));
 			for(int i=0; i<reviewersJson.length(); i++) {
 				reviewers.add(userService.getUser(reviewersJson.getString(i)));
 			}

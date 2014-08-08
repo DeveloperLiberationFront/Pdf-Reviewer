@@ -6,13 +6,8 @@ function setupWriterBtns() {
       login: getSelectedLogin(),
       repo: getSelectedRepo(),
       paper: getSelectedFile(),
-      reviewers: []
+      reviewers: getSelectedReviewers()
     };
-
-    var selectedUsers = $("#reviewersList .list-group-item.active");
-    for(var i=0; i<selectedUsers.length; i++) {
-      data.reviewers[i] = $(selectedUsers[i]).data("login");
-    }
 
     if(data.repo == null) {
       showAlert("warning", "Please select a repository.");
@@ -49,6 +44,7 @@ function setupWriterBtns() {
 function setupWriter() {
   getRepoSources();
   $("#writerDiv").fadeIn();
+  $("#submitReview").attr("disabled", true);
 }
 
 function getPossibleReviewers(login) {
@@ -81,11 +77,14 @@ function showReviewer(r, selected) {
     .attr("data-login", r["login"])
     .on("click", function() {
       btn.toggleClass("active");
+      onSelectStuff();
     })
     .appendTo($("#reviewersList"));
 
-    if(selected)
+    if(selected) {
       btn.addClass("active");
+      onSelectStuff();
+    }
 }
 
 function setupAddOtherReviewer() {
@@ -136,4 +135,31 @@ function addReviewer() {
     $("#select2-chosen-1").text("");
     $("#addOtherReviewer").val("");
   });
+}
+
+function getSelectedReviewers() {
+  var selectedUsers = $("#reviewersList .list-group-item.active");
+  var users = [];
+  for(var i=0; i<selectedUsers.length; i++) {
+    users[i] = $(selectedUsers[i]).data("login");
+  }
+
+  return users;
+}
+
+function onSelectStuff() {
+  console.log("onSelectStuff");
+  console.log(getSelectedLogin());
+  console.log(getSelectedFile());
+  console.log(getSelectedRepo());
+  console.log(getSelectedReviewers());
+  if(getSelectedLogin() != null && getSelectedFile() != null
+     && getSelectedRepo() != null && getSelectedReviewers().length > 0) {
+    console.log("enable the btn");
+    $("#submitReview").attr("disabled", false);
+  }
+  else {
+    console.log("disable it");
+    $("#submitReview").attr("disabled", true);
+  }
 }

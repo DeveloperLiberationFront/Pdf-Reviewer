@@ -154,6 +154,7 @@ function showFiles(repoName, login, path, files) {
         else {
           $("#" + repoNameId + "-fileList .list-group-item.active").removeClass("active");
           $(this).addClass("active");
+          onSelectStuff();
         }
       });
 
