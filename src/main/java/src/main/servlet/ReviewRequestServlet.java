@@ -46,7 +46,6 @@ public class ReviewRequestServlet extends HttpServlet {
 			String repoName = data.getString("repo");
 			String paper = data.getString("paper");
 			String login = data.getString("login");
-			System.out.println(login);
 			
 			GitHubClient client = new GitHubClient();
 			client.setOAuth2Token(req.getParameter("access_token"));
@@ -60,10 +59,6 @@ public class ReviewRequestServlet extends HttpServlet {
 			System.out.println(reviewersJson.toString(2));
 			for(int i=0; i<reviewersJson.length(); i++) {
 				reviewers.add(userService.getUser(reviewersJson.getString(i)));
-			}
-			
-			for(int i=0; i<reviewers.size(); i++) {
-				System.out.println(reviewers.get(i).getLogin());
 			}
 
 			IssueService issueService = new IssueService(client);
@@ -85,8 +80,6 @@ public class ReviewRequestServlet extends HttpServlet {
 							  "Click [here](" + link + ") to upload your review.");
 				issue.setAssignee(u);
 				issueService.createIssue(writer.getLogin(), repoName, issue);
-				
-				System.out.println("Reviewer: " + u.getLogin());
 				
 				addReviewToDatastore(u.getLogin(), writer.getLogin(), userService.getUser().getLogin(), repoName, paper, link);
 				} catch(IOException e) {
