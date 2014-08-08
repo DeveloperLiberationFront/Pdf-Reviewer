@@ -27,16 +27,22 @@ function showReviews(writerOrReviewer, reviews) {
   }
 
   var isReviewer = writerOrReviewer == "reviewer";
-  var wrText = isReviewer ? "Writer" : "Reviewer";
+  var wrText = isReviewer ? "Account of Repository:" : "Reviewer:";
   var div = isReviewer ? "#reviewRequests" : "#pendingReviews"
 
 
   function getOtherUser(r) {
-    if(isReviewer) {
+    if(isReviewer)
       return r.writer;
-    }
     else
       return r.reviewer
+  }
+
+  function requesterOrReviewer(r) {
+    if(isReviewer)
+      return r.requester;
+    else
+      return r.reviewer;
   }
 
   for(var i=0; i<reviews.length; i++) {
@@ -53,7 +59,7 @@ function showReviews(writerOrReviewer, reviews) {
       .attr("class", "panel panel-default")
       .append($("<div />")
         .attr("class", "panel-heading")
-        .text(otherUser))
+        .text(getUserText(requesterOrReviewer(review))))
       .append($("<div />")
         .attr("class", "panel-body")
         .html(html));
@@ -114,5 +120,5 @@ function cancelReview(writer, reviewer, repo) {
 }
 
 function setupStatusBtns() {
-  
+
 }

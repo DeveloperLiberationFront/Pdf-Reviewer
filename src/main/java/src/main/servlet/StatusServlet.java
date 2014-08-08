@@ -58,25 +58,24 @@ public class StatusServlet extends HttpServlet {
 		JSONArray requests = new JSONArray();
 
 		for(Entity result : preparedQuery.asIterable()) {
+			String requesterLogin = (String) result.getProperty("requester");
 			String writerLogin = (String) result.getProperty("writer");
 			String reviewerLogin = (String) result.getProperty("reviewer");
 			String repo = (String) result.getProperty("repo");
 			String paper = (String) result.getProperty("paper");
 			String link = (String) result.getProperty("link");
 			
+			User requester = userService.getUser(requesterLogin);
+			JSONObject requesterJson = userToJson(requester);
+			
 			User writer = userService.getUser(writerLogin);
-			JSONObject writerJson = new JSONObject();
-			writerJson.put("login", writer.getLogin());
-			writerJson.put("email", writer.getEmail());
-			writerJson.put("name", writer.getName());
+			JSONObject writerJson = userToJson(writer);
 			
 			User reviewer = userService.getUser(reviewerLogin);
-			JSONObject reviewerJSON = new JSONObject();
-			reviewerJSON.put("login", reviewer.getLogin());
-			reviewerJSON.put("email", reviewer.getEmail());
-			reviewerJSON.put("name", reviewer.getName());
+			JSONObject reviewerJSON = userToJson(reviewer);
 
 			JSONObject request = new JSONObject();
+			request.put("requester", requesterJson);
 			request.put("writer", writerJson);
 			request.put("reviewer", reviewerJSON);
 			request.put("repo", repo);
@@ -87,5 +86,14 @@ public class StatusServlet extends HttpServlet {
 		}
 		
 		return requests;
+	}
+	
+	JSONObject userToJson(User user) throws JSONException {
+		JSONObject json = new JSONObject();
+		json.put("login", user.getLogin());
+		json.put("email", user.getEmail());
+		json.put("name", user.getName());
+
+		return json;
 	}
 }
