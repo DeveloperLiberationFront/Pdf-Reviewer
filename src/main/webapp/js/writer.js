@@ -1,3 +1,4 @@
+
 function setupWriterBtns() {
   $("#submitReview").on("click", function(e) {
     e.preventDefault();
@@ -5,6 +6,7 @@ function setupWriterBtns() {
     var data = {
       login: getSelectedLogin(),
       repo: getSelectedRepo(),
+      pathToPaper: pathToPaper,
       paper: getSelectedFile(),
       reviewers: getSelectedReviewers()
     };
@@ -148,18 +150,11 @@ function getSelectedReviewers() {
 }
 
 function onSelectStuff() {
-  console.log("onSelectStuff");
-  console.log(getSelectedLogin());
-  console.log(getSelectedFile());
-  console.log(getSelectedRepo());
-  console.log(getSelectedReviewers());
   if(getSelectedLogin() != null && getSelectedFile() != null
      && getSelectedRepo() != null && getSelectedReviewers().length > 0) {
-    console.log("enable the btn");
     $("#submitReview").attr("disabled", false);
   }
   else {
-    console.log("disable it");
     $("#submitReview").attr("disabled", true);
   }
 }

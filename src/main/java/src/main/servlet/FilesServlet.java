@@ -17,6 +17,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import src.main.HttpUtils;
+
 public class FilesServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 

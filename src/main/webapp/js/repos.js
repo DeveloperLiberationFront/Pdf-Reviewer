@@ -1,3 +1,6 @@
+
+var pathToPaper = "";
+
 function getRepoSources() {
   $.get("/repoSource?access_token=" + accessToken)
     .done(function(data) {
@@ -101,6 +104,7 @@ function showFiles(repoName, login, path, files) {
   $(".fileList").slideUp();
 
   var repoNameId = getRepoId(repoName);
+  pathToPaper = path;
 
   if(path.trim() != "/" && path.trim() != "") {
     $("<a />")
@@ -108,7 +112,7 @@ function showFiles(repoName, login, path, files) {
       .append($("<img />")
                 .attr("class", "folder-icon")
                 .attr("src", "images/octofolder.png"))
-      .append("...")
+      .append("../")
       .on("click", function(e) {
         e.stopPropagation();
         backPath = path.substr(0, path.lastIndexOf("/"));
@@ -149,7 +153,7 @@ function showFiles(repoName, login, path, files) {
         var type = $(this).data("type");
 
         if(type == "dir") {
-          getFiles(repoName, login, path + "/" + name);
+          getFiles(repoName, login, escape(path + "/" + name));
         }
         else {
           $("#" + repoNameId + "-fileList .list-group-item.active").removeClass("active");

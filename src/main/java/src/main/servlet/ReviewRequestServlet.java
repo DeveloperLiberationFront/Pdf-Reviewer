@@ -45,6 +45,7 @@ public class ReviewRequestServlet extends HttpServlet {
 			JSONObject data = new JSONObject(body);
 			JSONArray reviewersJson = data.getJSONArray("reviewers");
 			String repoName = data.getString("repo");
+			String pathToPaper = data.getString("pathToPaper");
 			String paper = data.getString("paper");
 			String login = data.getString("login");
 			
@@ -85,6 +86,7 @@ public class ReviewRequestServlet extends HttpServlet {
 					issue.setLabels(labels);
 					issue.setAssignee(u);
 					
+					paper = pathToPaper + "/" + paper;
 					String link = "http://pdfreviewhub.appspot.com/?repoName=" + repoName + "&writer=" + writer.getLogin() + "&paper=" + paper;
 					String downloadLink = "https://github.com/" + writer.getLogin() + "/" + repoName + "/raw/master/" + paper;
 					issue.setBody("@" + u.getLogin() + " has been requested to review this paper.\n" +

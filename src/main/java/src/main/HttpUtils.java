@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -44,5 +46,14 @@ public class HttpUtils {
 	    }
 	    
 	    return sb.toString();
+	}
+	
+	public static String UriEncode(String string) {
+		try {
+			URI uri = new URI("https", "api.github.com", string);
+			return uri.getRawFragment();
+		} catch(URISyntaxException e){}
+		
+		return null;
 	}
 }
