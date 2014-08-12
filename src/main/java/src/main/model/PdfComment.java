@@ -6,6 +6,10 @@ import java.util.List;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+/**
+ * Parses comments in pdf to a more rich data type.
+ *
+ */
 public class PdfComment {
 
 	public static final int TITLE_LENGTH = 47;

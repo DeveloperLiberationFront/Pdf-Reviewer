@@ -11,8 +11,13 @@ import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationTextMarkup;
 
 
+/** 
+ * Puts a wrapper around the PDF library
+ *
+ */
 public class Pdf {
 	PDDocument doc;
+	
 	
 	public Pdf(InputStream input) throws IOException {
 		doc = PDDocument.load(input);
