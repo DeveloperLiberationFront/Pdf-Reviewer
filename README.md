@@ -3,23 +3,11 @@ PDF-Reviewer
 
 # Building
 
-  - Install [Appengine](https://developers.google.com/appengine/docs/java/gettingstarted/setup)
-  - Install [Maven](http://maven.apache.org/download.cgi)
-  - Download the repository
-  - If you have forked it, [register](https://github.com/settings/applications/new) the app on GitHub
-  - Otherwise, ask me for the secret key
-  - Add a file called `src/main/java/src/main/SecretKeys.java`
-    - See below for what to put in it
+  1. Install [Maven](http://maven.apache.org/download.cgi).  You will not need to explicitly install AppEngine, Maven will do that for you.
+  2. Download the repository
+  3. If you have forked it, [register](https://github.com/settings/applications/new) the app on GitHub, to get your app key.  Otherwise, ask me for the current key.
+  - Make a copy of [SecretKeys.java.example](blob/master/src/main/java/src/main/SecretKeys.java.example) and rename this copy `SecretKeys.java`.  This will hold your app key, and is **not** tracked by version control.  Replace the dummy `GitHub` String with the actual key.
   - Run `mvn clean install` to get dependencies
-  - Run the app using `mvn appengine:devserver`
+  - Run the app using `mvn appengine:devserver`.  This will involve downloading the AppEngine SDK, which is quite large. 
 
 
-# `SecretKeys.java`
-
-```java
-package src.main;
-
-public class SecretKeys {
-	public static final String GitHub = "CLIENT_SECRET";
-}
-```
