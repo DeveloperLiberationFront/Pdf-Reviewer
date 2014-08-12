@@ -5,7 +5,7 @@ function setupLogin(afterLogin) {
   accessToken = localStorage.githubAccessToken;
 
   var code = getQueryParams("code");
-  var clientId = escape("afa90e71a06d85c5fcb5");
+  var clientId = escape("b08a834d3b797794e83f");
 
   $("#login").on("click", function(e) {
     e.preventDefault();
@@ -13,7 +13,7 @@ function setupLogin(afterLogin) {
   });
 
   // If there is no code or accessToken, have the user login.
-  if(code == null && accessToken === undefined) {
+  if(code === null && accessToken === undefined) {
     $("#login").fadeIn();
   }
   // If there is an access token, the user is logged in.

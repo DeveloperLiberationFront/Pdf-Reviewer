@@ -21,7 +21,7 @@ import src.main.SecretKeys;
 public class LoginServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	
-	private static final String CLIENT_ID = "afa90e71a06d85c5fcb5";
+	private static final String CLIENT_ID = "b08a834d3b797794e83f"; //The GitHub "public key"
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
