@@ -53,8 +53,9 @@ public class Pdf {
 		int commentOn = 0;
 		for(PDPage page : pages) {
 			try {
-				for(int i=0; i<page.getAnnotations().size(); i++) {
-					PDAnnotation anno = page.getAnnotations().get(i);
+				List<PDAnnotation> annotations = page.getAnnotations();
+				for(int i=0; i<annotations.size(); i++) {
+					PDAnnotation anno = annotations.get(i);
 					
 					if(anno instanceof PDAnnotationTextMarkup) {
 						PDAnnotationTextMarkup comment = (PDAnnotationTextMarkup) anno;

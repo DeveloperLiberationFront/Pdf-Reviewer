@@ -47,7 +47,9 @@ public class RepoServlet extends HttpServlet {
 				repoJson.put("url", repo.getUrl());
 				
 				reposJson.put(repoJson);
-			} catch(JSONException e) {}
+			} catch(JSONException e) {
+				e.printStackTrace();
+			}
 		}
 		
 		try {

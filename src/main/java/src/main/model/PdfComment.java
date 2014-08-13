@@ -51,16 +51,16 @@ public class PdfComment {
 	private void setComment(String s) {
 		comment = s;
 		
-		int tagsStartPos = comment.indexOf("{");
-		int tagsEndPos = comment.indexOf("}");
+		int tagsStartPos = comment.indexOf('{');
+		int tagsEndPos = comment.indexOf('}');
 		if(tagsStartPos != -1 && tagsEndPos != -1) {
 			String fHalf = comment.substring(0, tagsStartPos).trim();
 			String sHalf = comment.substring(tagsEndPos + 1, comment.length()).trim();
 			comment = fHalf + " " + sHalf;
 		}
 		
-		int issueStartPos = comment.indexOf("[");
-		int issueEndPos = comment.indexOf("]");
+		int issueStartPos = comment.indexOf('[');
+		int issueEndPos = comment.indexOf(']');
 		if(issueStartPos != -1 && issueEndPos != -1) {
 			String fHalf = comment.substring(0, issueStartPos).trim();
 			String sHalf = comment.substring(issueEndPos + 1, comment.length()).trim();
@@ -70,12 +70,12 @@ public class PdfComment {
 		comment = comment.trim();
 	}
 	
-	public void setIssueNumber(String str) {
-		int issueStartPos = str.indexOf("[");
-		int issueEndPos = str.indexOf("]");
+	public final void setIssueNumber(String str) {
+		int issueStartPos = str.indexOf('[');
+		int issueEndPos = str.indexOf(']');
 		if(issueStartPos != -1 && issueEndPos != -1) {
 			String issueAreaStr = str.substring(issueStartPos + 1, issueEndPos);
-			String issueStr = issueAreaStr.substring(issueAreaStr.lastIndexOf("/") + 1);
+			String issueStr = issueAreaStr.substring(issueAreaStr.lastIndexOf('/') + 1);
 			issueNumber = Integer.parseInt(issueStr);
 		}
 	}
@@ -99,13 +99,13 @@ public class PdfComment {
 	
 	public static String getTag(String t) {
 		t = t.trim();
-		if(t.equals("mf"))
+		if("mf".equals(t))
 			return MUST_FIX;
-		else if(t.equals("sf"))
+		else if("sf".equals(t))
 			return SHOULD_FIX;
-		else if(t.equals("cf"))
+		else if("cf".equals(t))
 			return CONSIDER_FIX;
-		else if(t.equals("g") || t.equals("p"))
+		else if("g".equals(t) || "p".equals(t))
 			return POSITIVE;
 		else
 			return t;

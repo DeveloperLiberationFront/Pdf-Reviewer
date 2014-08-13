@@ -36,6 +36,8 @@ public class UserServlet extends HttpServlet {
 			
 			resp.setContentType("application/json");
 			resp.getWriter().write(userJ.toString());
-		} catch(JSONException e) {}
+		} catch(JSONException e) {
+			e.printStackTrace();
+		}
 	}
 }

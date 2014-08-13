@@ -56,23 +56,25 @@ public class IssueTest {
 	
 	@Test
 	public void testComment() {
-		assertEquals(a.getComment(), b.getComment());
-		assertEquals(a.getComment(), c.getComment());
-		assertEquals(a.getComment(), d.getComment());
-		assertEquals(a.getComment(), e.getComment());
-		assertEquals(a.getComment(), f.getComment());
-		assertEquals(a.getComment(), g.getComment());
-		assertFalse(a.getComment() == h.getComment());
+		String aComment = a.getComment();
+		assertEquals(aComment, b.getComment());
+		assertEquals(aComment, c.getComment());
+		assertEquals(aComment, d.getComment());
+		assertEquals(aComment, e.getComment());
+		assertEquals(aComment, f.getComment());
+		assertEquals(aComment, g.getComment());
+		assertNotEquals(aComment, h.getComment());
 	}
 	
 	@Test
 	public void testTitle() {
-		assertEquals(a.getTitle(), b.getTitle());
-		assertEquals(a.getTitle(), c.getTitle());
-		assertEquals(a.getTitle(), d.getTitle());
-		assertEquals(a.getTitle(), e.getTitle());
-		assertEquals(a.getTitle(), f.getTitle());
-		assertEquals(a.getTitle(), g.getTitle());
+		String aTitle = a.getTitle();
+		assertEquals(aTitle, b.getTitle());
+		assertEquals(aTitle, c.getTitle());
+		assertEquals(aTitle, d.getTitle());
+		assertEquals(aTitle, e.getTitle());
+		assertEquals(aTitle, f.getTitle());
+		assertEquals(aTitle, g.getTitle());
 	}
 	
 	@Test
