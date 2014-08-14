@@ -159,23 +159,25 @@ public class ReviewSubmitServlet extends HttpServlet {
 	}
 	
 	public void updatePdf(List<String> comments, Pdf pdf, String login, String repo, GitHubClient client) throws IOException {
-		List<PdfComment> pdfComments = PdfComment.getComments(comments);
 		
-		// Upload first issue
-		Issue firstIssue = null;
-		if(!pdfComments.isEmpty())
-			firstIssue = createIssue(client, login, repo, pdfComments.get(0));
-		
-		// Set the issue numbers
-		int issueNumber = firstIssue.getNumber();
-		for(PdfComment com : pdfComments) {
-			if(com.getIssueNumber() == 0) {
-				System.out.println(com.getIssueNumber());
-				com.setIssueNumber(issueNumber++);
+		if(!comments.isEmpty()) {
+			List<PdfComment> pdfComments = PdfComment.getComments(comments);
+			
+			// Upload first issue
+			Issue firstIssue = createIssue(client, login, repo, pdfComments.get(0));
+			
+			// Set the issue numbers
+			int issueNumber = firstIssue.getNumber();
+			for(PdfComment com : pdfComments) {
+				if(com.getIssueNumber() == 0) {
+					System.out.println(com.getIssueNumber());
+					com.setIssueNumber(issueNumber++);
+				}
 			}
+			
+			// Update the comments
+			pdf.setComments(pdfComments, login, repo);
 		}
-		
-		pdf.setComments(pdfComments, login, repo);
 	}
 	
 	static public void closeReviewIssue(GitHubClient client, String writerLogin, String repoName, String reviewer, String comment) throws IOException {
