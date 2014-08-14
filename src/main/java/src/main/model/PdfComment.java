@@ -166,7 +166,7 @@ public class PdfComment {
 		String issueStr = "";
 		
 		if(getIssueNumber() != 0) {
-			issueStr = "[" + getLink(login, repo) + "] ";
+			issueStr = "[[" + getLink(login, repo) + "]] ";
 		}
 		
 		return (tagStr + issueStr + getComment()).trim();

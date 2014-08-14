@@ -37,6 +37,11 @@ import org.eclipse.egit.github.core.service.UserService;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.google.appengine.api.taskqueue.DeferredTask;
+import com.google.appengine.api.taskqueue.Queue;
+import com.google.appengine.api.taskqueue.QueueFactory;
+import com.google.appengine.api.taskqueue.TaskOptions;
+
 import src.main.model.Pdf;
 import src.main.model.PdfComment;
 
@@ -44,111 +49,132 @@ public class ReviewSubmitServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	
 	@Override
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		ServletFileUpload upload = new ServletFileUpload();
+	protected void doPost(final HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		final ServletFileUpload upload = new ServletFileUpload();
 		
-		String repoName = req.getParameter("repoName");
-		String writerLogin = req.getParameter("writer");
-		String accessToken = req.getParameter("access_token");
+		final String repoName = req.getParameter("repoName");
+		final String writerLogin = req.getParameter("writer");
+		final String accessToken = req.getParameter("access_token");
 		
 		if(repoName == null || writerLogin == null || accessToken == null) {
 			resp.sendError(500);
 			return;
 		}
+
+		SubmitTask task = new SubmitTask();
 		
 		try {
 			FileItemIterator iter = upload.getItemIterator(req);
 			FileItemStream file = iter.next();
-			
 			Pdf pdf = new Pdf(file.openStream());
-			
-			List<String> commentsStr = pdf.getComments();
-			List<PdfComment> comments = PdfComment.getComments(commentsStr);	
+			List<String> comments = pdf.getComments();
 			
 			GitHubClient client = new GitHubClient();
 			client.setOAuth2Token(accessToken);
-			
 			UserService userService = new UserService(client);
 			User reviewer = userService.getUser();
 			
-			createIssues(client, writerLogin, repoName, comments);
-			updatePdf(comments, pdf, writerLogin, repoName);
-			String pdfPath = addPdfToRepo(client, accessToken, writerLogin, repoName, pdf, reviewer);
+			updatePdf(comments, pdf, writerLogin, repoName, client);
+			addPdfToRepo(client, accessToken, writerLogin, repoName, pdf, reviewer);
+			task.setter(comments, accessToken, writerLogin, repoName);
 			
-			String closeComment = "@" + reviewer.getLogin() + " has reviewed this paper.";
-			closeReviewIssue(client, writerLogin, repoName, reviewer.getLogin(), closeComment);
-			ReviewRequestServlet.removeReviewFromDatastore(reviewer.getLogin(), writerLogin, repoName);
-
 			pdf.close();
-			resp.getWriter().write(pdfPath);
 		} catch(FileUploadException e) {
-			resp.sendError(500);
+			
+		}
+		
+		resp.getWriter().write("Uploading");
+		
+		Queue taskQueue = QueueFactory.getDefaultQueue();
+		taskQueue.add(TaskOptions.Builder.withPayload(task));
+	}
+	
+	public Issue createIssue(GitHubClient client, String writerLogin, String repoName, PdfComment comment) throws IOException {
+		IssueService issueService = new IssueService(client);
+		
+		// If the issue does not already exist
+		if(comment.getIssueNumber() == 0) { 
+			Issue issue = new Issue();
+			issue.setTitle(comment.getTitle());
+			issue.setBody(comment.getComment());
+			
+			List<Label> labels = new ArrayList<>();
+			
+			for(String tag : comment.getTags()) {
+				Label label = new Label();
+				label.setName(tag);
+				labels.add(label);
+			}
+			
+			issue.setLabels(labels);
+			issue = issueService.createIssue(writerLogin, repoName, issue);
+			comment.setIssueNumber(issue.getNumber());
+			return issue;
+		}
+		// If the issue already exists
+		else {
+			Issue issue = issueService.getIssue(writerLogin, repoName, comment.getIssueNumber());
+			String issueText = comment.getComment();
+			if(!issue.getBody().equals(issueText)) {
+				issueService.createComment(writerLogin, repoName, comment.getIssueNumber(), issueText);
+			}
+			
+			List<Label> existingLabels = issue.getLabels();
+			List<Label> labels = new ArrayList<>();
+			for(String tag : comment.getTags()) {
+				Label l = new Label();
+				l.setName(tag);
+				labels.add(l);
+			}
+			
+			boolean updateLabels = labels.size() != existingLabels.size();
+			if(!updateLabels) {
+				for(Label l1 : labels) {
+					updateLabels = true;
+					for(Label l2 : existingLabels) {
+						if(l1.getName().equals(l2.getName())) {
+							updateLabels = false;
+							break;
+						}
+					}
+					if(updateLabels)
+						break;
+				}
+			}
+			
+			if(updateLabels) {
+				issue.setLabels(labels);
+				issueService.editIssue(writerLogin, repoName, issue);
+			}
+			
+			return issue;
 		}
 	}
 	
 	public void createIssues(GitHubClient client, String writerLogin, String repoName, List<PdfComment> comments) throws IOException {
-		IssueService issueService = new IssueService(client);
-		
 		for(PdfComment comment : comments) {
-			// If the issue does not already exist
-			if(comment.getIssueNumber() == 0) { 
-				Issue issue = new Issue();
-				issue.setTitle(comment.getTitle());
-				issue.setBody(comment.getComment());
-				
-				List<Label> labels = new ArrayList<>();
-				
-				for(String tag : comment.getTags()) {
-					Label label = new Label();
-					label.setName(tag);
-					labels.add(label);
-				}
-				
-				issue.setLabels(labels);
-				issue = issueService.createIssue(writerLogin, repoName, issue);
-				comment.setIssueNumber(issue.getNumber());
-			}
-			// If the issue already exists
-			else {
-				Issue issue = issueService.getIssue(writerLogin, repoName, comment.getIssueNumber());
-				String issueText = comment.getComment();
-				if(!issue.getBody().equals(issueText)) {
-					issueService.createComment(writerLogin, repoName, comment.getIssueNumber(), issueText);
-				}
-				
-				List<Label> existingLabels = issue.getLabels();
-				List<Label> labels = new ArrayList<>();
-				for(String tag : comment.getTags()) {
-					Label l = new Label();
-					l.setName(tag);
-					labels.add(l);
-				}
-				
-				boolean updateLabels = labels.size() != existingLabels.size();
-				if(!updateLabels) {
-					for(Label l1 : labels) {
-						updateLabels = true;
-						for(Label l2 : existingLabels) {
-							if(l1.getName().equals(l2.getName())) {
-								updateLabels = false;
-								break;
-							}
-						}
-						if(updateLabels)
-							break;
-					}
-				}
-				
-				if(updateLabels) {
-					issue.setLabels(labels);
-					issueService.editIssue(writerLogin, repoName, issue);
-				}
-			}
+			createIssue(client, writerLogin, repoName, comment);
 		}
 	}
 	
-	public void updatePdf(List<PdfComment> comments, Pdf pdf, String login, String repo) {
-		pdf.setComments(comments, login, repo);
+	public void updatePdf(List<String> comments, Pdf pdf, String login, String repo, GitHubClient client) throws IOException {
+		List<PdfComment> pdfComments = PdfComment.getComments(comments);
+		
+		// Upload first issue
+		Issue firstIssue = null;
+		if(!pdfComments.isEmpty())
+			firstIssue = createIssue(client, login, repo, pdfComments.get(0));
+		
+		// Set the issue numbers
+		int issueNumber = firstIssue.getNumber();
+		for(PdfComment com : pdfComments) {
+			if(com.getIssueNumber() == 0) {
+				System.out.println(com.getIssueNumber());
+				com.setIssueNumber(issueNumber++);
+			}
+		}
+		
+		pdf.setComments(pdfComments, login, repo);
 	}
 	
 	static public void closeReviewIssue(GitHubClient client, String writerLogin, String repoName, String reviewer, String comment) throws IOException {
@@ -156,7 +182,6 @@ public class ReviewSubmitServlet extends HttpServlet {
 		
 		for(Issue issue : issueService.getIssues(writerLogin, repoName, null)) {
 			if(issue.getAssignee() != null) {
-				System.out.println(issue.getState());
 			
 				if(issue.getTitle().startsWith("Reviewer - ") && issue.getAssignee().getLogin().equals(reviewer)) {
 					issueService.createComment(writerLogin, repoName, issue.getNumber(), comment);
@@ -223,5 +248,42 @@ public class ReviewSubmitServlet extends HttpServlet {
 		}
 		
 		return filePath;
+	}
+	
+	private final class SubmitTask implements DeferredTask {
+		private static final long serialVersionUID = -603761725725342674L;
+		private String accessToken;
+		private List<String> commentStrs;
+		private String writerLogin;
+		private String repoName;
+		
+		public void setter(List<String> comments, String accessToken, String writerLogin, String repoName) {
+			this.commentStrs = comments;
+			this.accessToken = accessToken;
+			this.writerLogin = writerLogin;
+			this.repoName = repoName;
+		}
+
+		@Override
+		public void run() {
+				try {
+					GitHubClient client = new GitHubClient();
+					client.setOAuth2Token(accessToken);
+					
+					UserService userService = new UserService(client);
+					User reviewer = userService.getUser();
+					
+					List<PdfComment> comments = PdfComment.getComments(commentStrs);
+					
+					createIssues(client, writerLogin, repoName, comments);
+					
+					String closeComment = "@" + reviewer.getLogin() + " has reviewed this paper.";
+					closeReviewIssue(client, writerLogin, repoName, reviewer.getLogin(), closeComment);
+					ReviewRequestServlet.removeReviewFromDatastore(reviewer.getLogin(), writerLogin, repoName);
+					
+				} catch(IOException e) {
+					System.err.println("Error processing Pdf.");
+				}
+		}
 	}
 }
