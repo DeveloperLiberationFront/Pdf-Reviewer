@@ -55,11 +55,11 @@ public class PdfComment {
 			comment = fHalf + " " + sHalf;
 		}
 		
-		int issueStartPos = comment.indexOf("[");
-		int issueEndPos = comment.indexOf("]");
+		int issueStartPos = comment.indexOf("[[");
+		int issueEndPos = comment.indexOf("]]");
 		if(issueStartPos != -1 && issueEndPos != -1) {
 			String fHalf = comment.substring(0, issueStartPos).trim();
-			String sHalf = comment.substring(issueEndPos + 1, comment.length()).trim();
+			String sHalf = comment.substring(issueEndPos + 2, comment.length()).trim();
 			comment = fHalf + " " + sHalf;
 		}
 		
@@ -67,8 +67,8 @@ public class PdfComment {
 	}
 	
 	public void setIssueNumber(String str) {
-		int issueStartPos = str.indexOf("[");
-		int issueEndPos = str.indexOf("]");
+		int issueStartPos = str.indexOf("[[");
+		int issueEndPos = str.indexOf("]]");
 		if(issueStartPos != -1 && issueEndPos != -1) {
 			String issueAreaStr = str.substring(issueStartPos + 1, issueEndPos);
 			String issueStr = issueAreaStr.substring(issueAreaStr.lastIndexOf("/") + 1);
