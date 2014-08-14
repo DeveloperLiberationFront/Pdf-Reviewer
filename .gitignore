@@ -2,7 +2,7 @@
 
 # Package Files #
 *.jar
-!lib/*.jar
+!src/main/webapp/WEB-INF/lib/*.jar
 *.war
 
 # gwt caches and compiled units #
