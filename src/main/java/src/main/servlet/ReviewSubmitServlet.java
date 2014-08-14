@@ -62,6 +62,7 @@ public class ReviewSubmitServlet extends HttpServlet {
 		}
 
 		SubmitTask task = new SubmitTask();
+		String pdfUrl = "";
 		
 		try {
 			FileItemIterator iter = upload.getItemIterator(req);
@@ -75,15 +76,15 @@ public class ReviewSubmitServlet extends HttpServlet {
 			User reviewer = userService.getUser();
 			
 			updatePdf(comments, pdf, writerLogin, repoName, client);
-			addPdfToRepo(client, accessToken, writerLogin, repoName, pdf, reviewer);
+			pdfUrl = addPdfToRepo(client, accessToken, writerLogin, repoName, pdf, reviewer);
 			task.setter(comments, accessToken, writerLogin, repoName);
 			
 			pdf.close();
 		} catch(FileUploadException e) {
-			
+			resp.sendError(500, "There has been an error uploading your Pdf.");
 		}
 		
-		resp.getWriter().write("Uploading");
+		resp.getWriter().write(pdfUrl);
 		
 		Queue taskQueue = QueueFactory.getDefaultQueue();
 		taskQueue.add(TaskOptions.Builder.withPayload(task));
