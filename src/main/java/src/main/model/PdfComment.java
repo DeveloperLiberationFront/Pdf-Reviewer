@@ -70,7 +70,7 @@ public class PdfComment {
 		comment = comment.trim();
 	}
 	
-	public void setIssueNumber(String str) {
+	public final void setIssueNumber(String str) {
 		int issueStartPos = str.indexOf("[[");
 		int issueEndPos = str.indexOf("]]");
 		if(issueStartPos != -1 && issueEndPos != -1) {
