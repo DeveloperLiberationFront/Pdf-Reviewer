@@ -6,6 +6,10 @@ import java.util.List;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+/**
+ * Parses comments in pdf to a more rich data type.
+ *
+ */
 public class PdfComment {
 
 	public static final int TITLE_LENGTH = 47;
@@ -47,8 +51,8 @@ public class PdfComment {
 	private void setComment(String s) {
 		comment = s;
 		
-		int tagsStartPos = comment.indexOf("{");
-		int tagsEndPos = comment.indexOf("}");
+		int tagsStartPos = comment.indexOf('{');
+		int tagsEndPos = comment.indexOf('}');
 		if(tagsStartPos != -1 && tagsEndPos != -1) {
 			String fHalf = comment.substring(0, tagsStartPos).trim();
 			String sHalf = comment.substring(tagsEndPos + 1, comment.length()).trim();
@@ -71,7 +75,7 @@ public class PdfComment {
 		int issueEndPos = str.indexOf("]]");
 		if(issueStartPos != -1 && issueEndPos != -1) {
 			String issueAreaStr = str.substring(issueStartPos + 1, issueEndPos);
-			String issueStr = issueAreaStr.substring(issueAreaStr.lastIndexOf("/") + 1);
+			String issueStr = issueAreaStr.substring(issueAreaStr.lastIndexOf('/') + 1);
 			issueNumber = Integer.parseInt(issueStr);
 		}
 	}
@@ -95,13 +99,13 @@ public class PdfComment {
 	
 	public static String getTag(String t) {
 		t = t.trim();
-		if(t.equals("mf"))
+		if("mf".equals(t))
 			return MUST_FIX;
-		else if(t.equals("sf"))
+		else if("sf".equals(t))
 			return SHOULD_FIX;
-		else if(t.equals("cf"))
+		else if("cf".equals(t))
 			return CONSIDER_FIX;
-		else if(t.equals("g") || t.equals("p"))
+		else if("g".equals(t) || "p".equals(t))
 			return POSITIVE;
 		else
 			return t;

@@ -3,6 +3,7 @@ package src.main.servlet;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -196,7 +197,7 @@ public class ReviewSubmitServlet extends HttpServlet {
 				
 				String content = DatatypeConverter.printBase64Binary(output.toByteArray());
 				MessageDigest md = MessageDigest.getInstance("SHA-256");
-				md.update(content.getBytes("US-ASCII"));
+				md.update(content.getBytes(StandardCharsets.US_ASCII));
 						
 				JSONObject json = new JSONObject();
 				json.put("message", reviewer.getLogin() + " has submitted their review.");
@@ -212,7 +213,9 @@ public class ReviewSubmitServlet extends HttpServlet {
 				httpClient.execute(request);
 				
 			} catch(JSONException | NoSuchAlgorithmException e) {
-				
+				e.printStackTrace();
+			} finally {
+				request.releaseConnection();
 			}
 			
 		} catch (URISyntaxException e) {

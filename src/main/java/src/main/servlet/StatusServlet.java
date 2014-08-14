@@ -42,7 +42,9 @@ public class StatusServlet extends HttpServlet {
 			
 			resp.setContentType("application/json");
 			resp.getWriter().write(json.toString(2));
-		} catch(JSONException e) {}
+		} catch(JSONException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	private JSONArray getPendingReviews(User user, boolean isWriter, DatastoreService datastore, UserService userService) throws JSONException, IOException {

@@ -21,17 +21,18 @@ import src.main.SecretKeys;
 public class LoginServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	
-	private static final String CLIENT_ID = "afa90e71a06d85c5fcb5";
+	private static final String CLIENT_ID = "b08a834d3b797794e83f"; //The GitHub "public key"
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		HttpPost request = null;
 		try {
 			URIBuilder builder = new URIBuilder("https://github.com/login/oauth/access_token");
 			builder.addParameter("client_id", CLIENT_ID);
 			builder.addParameter("client_secret", SecretKeys.GitHub);
 			builder.addParameter("code", req.getParameter("code"));
 			
-			HttpPost request = new HttpPost(builder.build());
+			request = new HttpPost(builder.build());
 			
 			request.setHeader("accept", "application/json");
 	
@@ -43,6 +44,10 @@ public class LoginServlet extends HttpServlet {
 			resp.getWriter().write(body);
 		} catch(URISyntaxException e) {
 			e.printStackTrace();
+		} finally{
+			if (request != null) {
+				request.releaseConnection();
+			}
 		}
 	}
 	

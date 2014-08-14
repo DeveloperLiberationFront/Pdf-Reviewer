@@ -11,8 +11,13 @@ import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationTextMarkup;
 
 
+/** 
+ * Puts a wrapper around the PDF library
+ *
+ */
 public class Pdf {
 	PDDocument doc;
+	
 	
 	public Pdf(InputStream input) throws IOException {
 		doc = PDDocument.load(input);
@@ -48,8 +53,9 @@ public class Pdf {
 		int commentOn = 0;
 		for(PDPage page : pages) {
 			try {
-				for(int i=0; i<page.getAnnotations().size(); i++) {
-					PDAnnotation anno = page.getAnnotations().get(i);
+				List<PDAnnotation> annotations = page.getAnnotations();
+				for(int i=0; i<annotations.size(); i++) {
+					PDAnnotation anno = annotations.get(i);
 					
 					if(anno instanceof PDAnnotationTextMarkup) {
 						PDAnnotationTextMarkup comment = (PDAnnotationTextMarkup) anno;
