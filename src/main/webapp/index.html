@@ -106,6 +106,32 @@
         </span>
         <input type="submit" id="upload" class="btn btn-primary" value="Upload" />
       </form>
+      
+      <h3 id="commentInfoTitle">Comment Info</h3>
+        Comments can be more useful if you use the syntax of Pdf-Reviewer. These are both optional, and can be combined with each other as well.
+      <h4>Labels</h4>
+      <ul class="commentInfo">
+        <li><code>{{label1, label2}}</code> will create an issue with two labels <code>label1</code>, and <code>label2</code></li>
+        <li>Shortcut tags include
+          <ul>
+            <li><code>mf</code> - <code>Must Fix</code></li>
+            <li><code>sf</code> - <code>Should Fix</code></li>
+            <li><code>cf</code> - <code>Consider Fixing</code></li>
+            <li><code>g</code> - <code>Positive</code> (This will not be included as an issue).</li>
+            <li><code>p</code> - <code>Positive</code> (This will not be included as an issue).</li>
+          </ul>
+        </li>
+      </ul>
+      <h4>Connecting to Issues</h4>
+      <ul class="commentInfo">
+        <li><code>[[https://github.com/mpeterson2/Pdf-Reviewer/issues/4]]</code> will connect <code>issue #4</code> of <code>mpeterson2's</code> <code>Pdf-Reviewer</code> project.</li>
+        <li>Your Pdf will be updated with the issues included when you submit it. If you want to update your review, just download your review in the repository, edit the comments, and reupload it.
+          <ul>
+            <li>Any unchanged comments connected to an issue will not be recreated.</li>
+            <li>Any changed comments will append a comment to the connected issue.</li>
+          </ul>
+        </li>
+      </ul>
 
     </div>
   </div>
