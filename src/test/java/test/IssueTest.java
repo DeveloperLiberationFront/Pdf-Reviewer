@@ -33,15 +33,15 @@ public class IssueTest {
 	
 	@Before
 	public void setup() {
-		aS = "{tag 1, mf} [[https://github.com/mpeterson2/Pdf-Test/issues/1]] This is an issue";
-		bS = "{tag 1, mf}[[https://github.com/mpeterson2/Pdf-Test/issues/2]]This is an issue";
-		cS = "This is an [[https://github.com/mpeterson2/Pdf-Test/issues/3]]issue{tag 1, mf} ";
-		dS = "This is an [[https://github.com/mpeterson2/Pdf-Test/issues/4]]issue {tag 1, mf}";
-		eS = "This is [[https://github.com/mpeterson2/Pdf-Test/issues/5]]{tag 1, mf} an issue";
-		fS = "This is [[https://github.com/mpeterson2/Pdf-Test/issues/6]]{tag 1, mf}an issue";
+		aS = "{{tag 1, mf}} [[https://github.com/mpeterson2/Pdf-Test/issues/1]] This is an issue";
+		bS = "{{tag 1, mf}}[[https://github.com/mpeterson2/Pdf-Test/issues/2]]This is an issue";
+		cS = "This is an [[https://github.com/mpeterson2/Pdf-Test/issues/3]]issue{{tag 1, mf}} ";
+		dS = "This is an [[https://github.com/mpeterson2/Pdf-Test/issues/4]]issue {{tag 1, mf}}";
+		eS = "This is [[https://github.com/mpeterson2/Pdf-Test/issues/5]]{{tag 1, mf}} an issue";
+		fS = "This is [[https://github.com/mpeterson2/Pdf-Test/issues/6]]{{tag 1, mf}}an issue";
 		gS = "This is  [[https://github.com/mpeterson2/Pdf-Test/issues/7]] an issue";
 		hS = "This is not an [[https://github.com/mpeterson2/Pdf-Test/issues/19]] issue";
-		iS = "{tag, p} This is a positive issue";
+		iS = "{{tag, p}} This is a positive issue";
 		
 		a = new PdfComment(aS);
 		b = new PdfComment(bS);
@@ -142,14 +142,14 @@ public class IssueTest {
 	
 	@Test
 	public void testContent() {
-		assertEquals("{tag 1, Must Fix} [[https://github.com/mpeterson2/Pdf-Test/issues/1]] This is an issue", a.getContents("mpeterson2", "Pdf-Test"));
-		assertEquals("{tag 1, Must Fix} [[https://github.com/mpeterson2/Pdf-Test/issues/2]] This is an issue", b.getContents("mpeterson2", "Pdf-Test"));
-		assertEquals("{tag 1, Must Fix} [[https://github.com/mpeterson2/Pdf-Test/issues/3]] This is an issue", c.getContents("mpeterson2", "Pdf-Test"));
-		assertEquals("{tag 1, Must Fix} [[https://github.com/mpeterson2/Pdf-Test/issues/4]] This is an issue", d.getContents("mpeterson2", "Pdf-Test"));
-		assertEquals("{tag 1, Must Fix} [[https://github.com/mpeterson2/Pdf-Test/issues/5]] This is an issue", e.getContents("mpeterson2", "Pdf-Test"));
-		assertEquals("{tag 1, Must Fix} [[https://github.com/mpeterson2/Pdf-Test/issues/6]] This is an issue", f.getContents("mpeterson2", "Pdf-Test"));
+		assertEquals("{{tag 1, Must Fix}} [[https://github.com/mpeterson2/Pdf-Test/issues/1]] This is an issue", a.getContents("mpeterson2", "Pdf-Test"));
+		assertEquals("{{tag 1, Must Fix}} [[https://github.com/mpeterson2/Pdf-Test/issues/2]] This is an issue", b.getContents("mpeterson2", "Pdf-Test"));
+		assertEquals("{{tag 1, Must Fix}} [[https://github.com/mpeterson2/Pdf-Test/issues/3]] This is an issue", c.getContents("mpeterson2", "Pdf-Test"));
+		assertEquals("{{tag 1, Must Fix}} [[https://github.com/mpeterson2/Pdf-Test/issues/4]] This is an issue", d.getContents("mpeterson2", "Pdf-Test"));
+		assertEquals("{{tag 1, Must Fix}} [[https://github.com/mpeterson2/Pdf-Test/issues/5]] This is an issue", e.getContents("mpeterson2", "Pdf-Test"));
+		assertEquals("{{tag 1, Must Fix}} [[https://github.com/mpeterson2/Pdf-Test/issues/6]] This is an issue", f.getContents("mpeterson2", "Pdf-Test"));
 		assertEquals("[[https://github.com/mpeterson2/Pdf-Test/issues/7]] This is an issue", g.getContents("mpeterson2", "Pdf-Test"));
 		assertEquals("[[https://github.com/mpeterson2/Pdf-Test/issues/19]] This is not an issue", h.getContents("mpeterson2", "Pdf-Test"));
-		assertEquals("{tag, Positive} This is a positive issue", i.getContents("mpeterson2", "Pdf-Test"));
+		assertEquals("{{tag, Positive}} This is a positive issue", i.getContents("mpeterson2", "Pdf-Test"));
 	}
 }

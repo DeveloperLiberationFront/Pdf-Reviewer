@@ -51,11 +51,11 @@ public class PdfComment {
 	private void setComment(String s) {
 		comment = s;
 		
-		int tagsStartPos = comment.indexOf('{');
-		int tagsEndPos = comment.indexOf('}');
+		int tagsStartPos = comment.indexOf("{{");
+		int tagsEndPos = comment.indexOf("}}");
 		if(tagsStartPos != -1 && tagsEndPos != -1) {
 			String fHalf = comment.substring(0, tagsStartPos).trim();
-			String sHalf = comment.substring(tagsEndPos + 1, comment.length()).trim();
+			String sHalf = comment.substring(tagsEndPos + 2, comment.length()).trim();
 			comment = fHalf + " " + sHalf;
 		}
 		
@@ -84,16 +84,16 @@ public class PdfComment {
 		this.issueNumber = issueNumber;
 	}
 	
-	private void setTags(String string) {
+	private void setTags(String str) {
 		tags = new ArrayList<>();
+		int startPos = str.indexOf("{{");
+		int endPos = str.indexOf("}}");
 		
-		if(string.contains("{") && string.contains("}")) {
-			String tagList = string.substring(string.indexOf('{') + 1, string.indexOf('}'));
-			String[] tagsStr = tagList.split(",");
-			
-			for(String tag : tagsStr) {
+		if(startPos != -1 && endPos != -1) {
+			String areaStr = str.substring(startPos + 2, endPos);
+			String[] tagsStr = areaStr.split(",");
+			for(String tag : tagsStr)
 				tags.add(getTag(tag));
-			}	
 		}
 	}
 	
@@ -155,12 +155,12 @@ public class PdfComment {
 	public String getContents(String login, String repo) {
 		String tagStr = "";
 		if(!getTags().isEmpty()) {
-			StringBuilder tagsBuilder = new StringBuilder("{");
+			StringBuilder tagsBuilder = new StringBuilder("{{");
 			for(String tag : getTags()) {
 				tagsBuilder.append(tag).append(", ");
 			}
 			tagStr = tagsBuilder.toString();
-			tagStr = tagStr.substring(0, tagStr.length() - 2) + "} ";
+			tagStr = tagStr.substring(0, tagStr.length() - 2) + "}} ";
 		}
 		
 		String issueStr = "";
