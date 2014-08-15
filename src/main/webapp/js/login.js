@@ -60,6 +60,8 @@ function getAvatar(fail, succeed) {
 
 function loggedIn(afterLogin) {
   getAvatar(setupLogin, function() {
+    $("#showStatusBtn").fadeIn();
+    $("#showWriterBtn").fadeIn();
     setupLogout();
     afterLogin();
   });

@@ -3,7 +3,8 @@ body {
   margin-bottom: 15px;
 }
 
-#login, #reviewerDiv, #writerDiv, #loggedIn, #statusDiv {
+#login, #reviewerDiv, #writerDiv, #loggedIn, #statusDiv,
+#showStatusBtn, #showWriterBtn {
   display: none;
  }
 
