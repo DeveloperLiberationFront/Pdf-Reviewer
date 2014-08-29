@@ -15,6 +15,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.bind.DatatypeConverter;
 
+import com.google.appengine.api.taskqueue.DeferredTask;
+import com.google.appengine.api.taskqueue.Queue;
+import com.google.appengine.api.taskqueue.QueueFactory;
+import com.google.appengine.api.taskqueue.TaskOptions;
+
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.FileUploadException;
@@ -30,18 +35,12 @@ import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.RepositoryContents;
 import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.client.GitHubClient;
-import org.eclipse.egit.github.core.client.GitHubRequest;
 import org.eclipse.egit.github.core.service.ContentsService;
 import org.eclipse.egit.github.core.service.IssueService;
 import org.eclipse.egit.github.core.service.RepositoryService;
 import org.eclipse.egit.github.core.service.UserService;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import com.google.appengine.api.taskqueue.DeferredTask;
-import com.google.appengine.api.taskqueue.Queue;
-import com.google.appengine.api.taskqueue.QueueFactory;
-import com.google.appengine.api.taskqueue.TaskOptions;
 
 import src.main.model.Pdf;
 import src.main.model.PdfComment;
@@ -91,7 +90,7 @@ public class ReviewSubmitServlet extends HttpServlet {
 		taskQueue.add(TaskOptions.Builder.withPayload(task));
 	}
 	
-	public Issue createIssue(GitHubClient client, String writerLogin, String repoName, PdfComment comment) throws IOException {
+	public void createIssue(GitHubClient client, String writerLogin, String repoName, PdfComment comment) throws IOException {
 		IssueService issueService = new IssueService(client);
 		
 		// If the issue does not already exist
@@ -109,9 +108,9 @@ public class ReviewSubmitServlet extends HttpServlet {
 			}
 			
 			issue.setLabels(labels);
+			//creates an issue remotely
 			issue = issueService.createIssue(writerLogin, repoName, issue);
 			comment.setIssueNumber(issue.getNumber());
-			return issue;
 		}
 		// If the issue already exists
 		else {
@@ -148,8 +147,6 @@ public class ReviewSubmitServlet extends HttpServlet {
 				issue.setLabels(labels);
 				issueService.editIssue(writerLogin, repoName, issue);
 			}
-			
-			return issue;
 		}
 	}
 	
@@ -165,7 +162,7 @@ public class ReviewSubmitServlet extends HttpServlet {
 			List<PdfComment> pdfComments = PdfComment.getComments(comments);
 			
 			// Set the issue numbers
-			int issueNumber = getNumTotalIssues(client);
+			int issueNumber = getNumTotalIssues(client) + 1;
 			for(PdfComment com : pdfComments) {
 				if(com.getIssueNumber() == 0) {
 					System.out.println(com.getIssueNumber());
@@ -178,15 +175,10 @@ public class ReviewSubmitServlet extends HttpServlet {
 		}
 	}
 	
-	private int getNumTotalIssues(GitHubClient client) {
+	private int getNumTotalIssues(GitHubClient client) throws IOException {
 	    IssueService issueService = new IssueService(client);
-	    
-	    try {
-            return issueService.getIssues().size();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return 0;
-        }
+
+        return issueService.getIssues().size();
     }
 
     public static void closeReviewIssue(GitHubClient client, String writerLogin, String repoName, String reviewer, String comment) throws IOException {
