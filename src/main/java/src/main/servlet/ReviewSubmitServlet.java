@@ -2,12 +2,13 @@ package src.main.servlet;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -48,13 +49,23 @@ import src.main.model.PdfComment;
 public class ReviewSubmitServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	
+	private transient HttpClient httpClient = HttpClients.createDefault();
+
+    private String repoName;
+
+    private String writerLogin;
+
+    private String accessToken;
+
+    private transient GitHubClient client;
+	
 	@Override
 	protected void doPost(final HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		final ServletFileUpload upload = new ServletFileUpload();
 		
-		final String repoName = req.getParameter("repoName");
-		final String writerLogin = req.getParameter("writer");
-		final String accessToken = req.getParameter("access_token");
+		this.repoName = req.getParameter("repoName");
+		this.writerLogin = req.getParameter("writer");
+		this.accessToken = req.getParameter("access_token");
 		
 		if(repoName == null || writerLogin == null || accessToken == null) {
 			resp.sendError(500);
@@ -70,13 +81,13 @@ public class ReviewSubmitServlet extends HttpServlet {
 			Pdf pdf = new Pdf(file.openStream());
 			List<String> comments = pdf.getComments();
 			
-			GitHubClient client = new GitHubClient();
+			this.client = new GitHubClient();
 			client.setOAuth2Token(accessToken);
 			UserService userService = new UserService(client);
 			User reviewer = userService.getUser();
 			
-			updatePdf(comments, pdf, writerLogin, repoName, client);
-			pdfUrl = addPdfToRepo(client, accessToken, writerLogin, repoName, pdf, reviewer);
+			updatePdf(comments, pdf);
+			pdfUrl = addPdfToRepo(pdf, reviewer);
 			task.setter(comments, accessToken, writerLogin, repoName);
 			
 			pdf.close();
@@ -156,13 +167,13 @@ public class ReviewSubmitServlet extends HttpServlet {
 		}
 	}
 	
-	public void updatePdf(List<String> comments, Pdf pdf, String login, String repo, GitHubClient client) throws IOException {
+	public void updatePdf(List<String> comments, Pdf pdf) throws IOException {
 		
 		if(!comments.isEmpty()) {
 			List<PdfComment> pdfComments = PdfComment.getComments(comments);
 			
 			// Set the issue numbers
-			int issueNumber = getNumTotalIssues(client) + 1;
+			int issueNumber = getNumTotalIssues() + 1;
 			for(PdfComment com : pdfComments) {
 				if(com.getIssueNumber() == 0) {
 					System.out.println(com.getIssueNumber());
@@ -171,14 +182,20 @@ public class ReviewSubmitServlet extends HttpServlet {
 			}
 			
 			// Update the comments
-			pdf.setComments(pdfComments, login, repo);
+			pdf.setComments(pdfComments, this.writerLogin, this.repoName);
 		}
 	}
 	
-	private int getNumTotalIssues(GitHubClient client) throws IOException {
+	private int getNumTotalIssues() throws IOException {
 	    IssueService issueService = new IssueService(client);
 
-        return issueService.getIssues().size();
+	    Map<String, String> prefs = new HashMap<String, String>();
+	    //By default, only open issues are shown
+	    prefs.put(IssueService.FILTER_STATE, "all");
+	    //get all issus for this repo
+	    List<Issue> issues = issueService.getIssues(getRepo(client), prefs);
+	    
+        return issues.size();
     }
 
     public static void closeReviewIssue(GitHubClient client, String writerLogin, String repoName, String reviewer, String comment) throws IOException {
@@ -196,63 +213,87 @@ public class ReviewSubmitServlet extends HttpServlet {
 		}
 	}
 	
-	public String addPdfToRepo(GitHubClient client, String accessToken, String writerLogin, String repoName, Pdf pdf, User reviewer) throws IOException {
-		String filePath = "";
-		
-		try {
-			
-			filePath = "reviews/" + reviewer.getLogin() + ".pdf";
-			String sha = null;
-			
-			ContentsService contents = new ContentsService(client);
-			RepositoryService repoService = new RepositoryService(client);
-			Repository repo = repoService.getRepository(writerLogin, repoName);
-			try {
-				List<RepositoryContents> files = contents.getContents(repo, filePath);
-				if(!files.isEmpty()) {
-					sha = files.get(0).getSha();
-				}
-			} catch(IOException e) {}
-		
-		
-			URIBuilder builder = new URIBuilder("https://api.github.com/repos/" + writerLogin + "/" + repoName + "/contents/" + filePath);
-			builder.addParameter("access_token", accessToken);
-			
-			HttpPut request = new HttpPut(builder.build());
-			
-			try {
-				ByteArrayOutputStream output = new ByteArrayOutputStream();
-				pdf.getDoc().save(output);
-				
-				String content = DatatypeConverter.printBase64Binary(output.toByteArray());
-				MessageDigest md = MessageDigest.getInstance("SHA-256");
-				md.update(content.getBytes(StandardCharsets.US_ASCII));
-						
-				JSONObject json = new JSONObject();
-				json.put("message", reviewer.getLogin() + " has submitted their review.");
-				json.put("path", filePath);
-				json.put("content", content);
-				json.put("sha", sha);
-				
-				StringEntity entity = new StringEntity(json.toString());
-				entity.setContentType("application/json");
-				request.setEntity(entity);
-				
-				HttpClient httpClient = HttpClients.createDefault();
-				httpClient.execute(request);
-				
-			} catch(JSONException | NoSuchAlgorithmException e) {
-				e.printStackTrace();
-			} finally {
-				request.releaseConnection();
-			}
-			
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-		}
-		
-		return filePath;
-	}
+    public String addPdfToRepo(Pdf pdf, User reviewer) throws IOException {
+        String filePath = "reviews/" + reviewer.getLogin() + ".pdf";
+        String sha = null;
+        
+        ContentsService contents = new ContentsService(client);
+        Repository repo = getRepo(client);
+        try {
+            //list all the files in reviews.  We can't just fetch our paper, because it might be 
+            //bigger than 1MB which breaks this API call
+            List<RepositoryContents> files = contents.getContents(repo, "reviews/");
+            for(RepositoryContents file: files) {
+                if (file.getName().equals(reviewer.getLogin()+".pdf")) {
+                    sha = file.getSha();
+                }
+            }
+        } catch(IOException e) {
+            e.printStackTrace();
+        }
+
+        HttpPut request = new HttpPut(buildURIForFileUpload(accessToken, writerLogin, repoName, filePath));	
+        try {
+            ByteArrayOutputStream output = new ByteArrayOutputStream();
+            pdf.getDoc().save(output);
+
+            String content = DatatypeConverter.printBase64Binary(output.toByteArray());
+
+            JSONObject json = new JSONObject();
+            if (sha == null) {
+                //if we are uploading the review for the first time
+                json.put("message", reviewer.getLogin() + " has submitted their review.");
+            } else {
+                //updating review
+                json.put("message", reviewer.getLogin() + " has updated their review.");
+                json.put("sha", sha);
+            }
+
+            json.put("path", filePath);
+            json.put("content", content);
+
+
+            StringEntity entity = new StringEntity(json.toString());
+            entity.setContentType("application/json");
+            request.setEntity(entity);
+
+            httpClient.execute(request);
+        } catch(JSONException e) {
+            e.printStackTrace();
+        } finally {
+            request.releaseConnection();
+        }
+
+        return filePath;
+    }
+
+    private Repository getRepo(GitHubClient client) throws IOException {
+        RepositoryService repoService = new RepositoryService(client);
+        Repository repo = repoService.getRepository(writerLogin, repoName);
+        return repo;
+    }
+	
+	private void readObject(ObjectInputStream inputStream) throws IOException, ClassNotFoundException
+    {
+        inputStream.defaultReadObject();
+        //reinstantiate our transient variables.
+        this.httpClient = HttpClients.createDefault();
+        this.client = new GitHubClient();
+        client.setOAuth2Token(accessToken);
+    }
+
+    private URI buildURIForFileUpload(String accessToken, String writerLogin, String repoName, String filePath) throws IOException {
+        try {
+            URIBuilder builder = new URIBuilder("https://api.github.com/repos/" + writerLogin + "/" + repoName + "/contents/" + filePath);
+            builder.addParameter("access_token", accessToken);
+
+            URI build = builder.build();
+            return build;
+        } catch (URISyntaxException e) {
+            throw new IOException("Could not build uri", e);
+        }
+        
+    }
 	
 	private final class SubmitTask implements DeferredTask {
 		private static final long serialVersionUID = -603761725725342674L;
