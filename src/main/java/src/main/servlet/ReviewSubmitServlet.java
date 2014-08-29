@@ -30,6 +30,7 @@ import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.RepositoryContents;
 import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.client.GitHubClient;
+import org.eclipse.egit.github.core.client.GitHubRequest;
 import org.eclipse.egit.github.core.service.ContentsService;
 import org.eclipse.egit.github.core.service.IssueService;
 import org.eclipse.egit.github.core.service.RepositoryService;
@@ -163,11 +164,8 @@ public class ReviewSubmitServlet extends HttpServlet {
 		if(!comments.isEmpty()) {
 			List<PdfComment> pdfComments = PdfComment.getComments(comments);
 			
-			// Upload first issue
-			Issue firstIssue = createIssue(client, login, repo, pdfComments.get(0));
-			
 			// Set the issue numbers
-			int issueNumber = firstIssue.getNumber();
+			int issueNumber = getNumTotalIssues(client);
 			for(PdfComment com : pdfComments) {
 				if(com.getIssueNumber() == 0) {
 					System.out.println(com.getIssueNumber());
@@ -180,7 +178,18 @@ public class ReviewSubmitServlet extends HttpServlet {
 		}
 	}
 	
-	static public void closeReviewIssue(GitHubClient client, String writerLogin, String repoName, String reviewer, String comment) throws IOException {
+	private int getNumTotalIssues(GitHubClient client) {
+	    IssueService issueService = new IssueService(client);
+	    
+	    try {
+            return issueService.getIssues().size();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+    public static void closeReviewIssue(GitHubClient client, String writerLogin, String repoName, String reviewer, String comment) throws IOException {
 		IssueService issueService = new IssueService(client);
 		
 		for(Issue issue : issueService.getIssues(writerLogin, repoName, null)) {

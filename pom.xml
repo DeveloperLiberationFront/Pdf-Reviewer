@@ -67,6 +67,7 @@
             <groupId>org.eclipse.mylyn.github</groupId>
             <artifactId>org.eclipse.egit.github.core</artifactId>
             <version>2.1.5</version>
+			<downloadJavadocs>true</downloadJavadocs>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
