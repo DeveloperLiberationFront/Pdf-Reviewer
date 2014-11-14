@@ -36,7 +36,8 @@ public class RepoServlet extends HttpServlet {
 		if("Organization".equals(owner.getType()))
 			repos = repoService.getOrgRepositories(login);
 		else
-			repos = repoService.getRepositories(login);
+			repos = repoService.getRepositories();
+		
 		
 		JSONArray reposJson = new JSONArray();
 		
