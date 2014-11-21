@@ -61,7 +61,8 @@ public class Pdf {
 						PDAnnotationTextMarkup comment = (PDAnnotationTextMarkup) anno;
 						
 						if(comment.getContents() != null) {
-							comment.setContents(comments.get(commentOn).getContents(login, repo));
+							PdfComment userComment = comments.get(commentOn);
+                            comment.setContents(userComment.getMessageWithLink(login, repo));
 							commentOn++;
 						}
 					}

@@ -130,7 +130,7 @@ public class PdfComment {
 		return issueNumber;
 	}
 	
-	public String getLink(String login, String repoName) {
+	public String buildLink(String login, String repoName) {
 		return "https://github.com/" + login + "/" + repoName + "/issues/" + getIssueNumber();
 	}
 	
@@ -152,7 +152,7 @@ public class PdfComment {
 		return getTitle() + " {" + getTags() + "} " + "[" + getIssueNumber() + "]" + getComment();
 	}
 	
-	public String getContents(String login, String repo) {
+	public String getMessageWithLink(String login, String repo) {
 		String tagStr = "";
 		if(!getTags().isEmpty()) {
 			StringBuilder tagsBuilder = new StringBuilder("{{");
@@ -166,7 +166,7 @@ public class PdfComment {
 		String issueStr = "";
 		
 		if(getIssueNumber() != 0) {
-			issueStr = "[[" + getLink(login, repo) + "]] ";
+			issueStr = "[[" + buildLink(login, repo) + "]] ";
 		}
 		
 		return (tagStr + issueStr + getComment()).trim();

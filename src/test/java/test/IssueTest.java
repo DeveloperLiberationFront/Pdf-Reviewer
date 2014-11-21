@@ -142,14 +142,14 @@ public class IssueTest {
 	
 	@Test
 	public void testContent() {
-		assertEquals("{{tag 1, Must Fix}} [[https://github.com/mpeterson2/Pdf-Test/issues/1]] This is an issue", a.getContents("mpeterson2", "Pdf-Test"));
-		assertEquals("{{tag 1, Must Fix}} [[https://github.com/mpeterson2/Pdf-Test/issues/2]] This is an issue", b.getContents("mpeterson2", "Pdf-Test"));
-		assertEquals("{{tag 1, Must Fix}} [[https://github.com/mpeterson2/Pdf-Test/issues/3]] This is an issue", c.getContents("mpeterson2", "Pdf-Test"));
-		assertEquals("{{tag 1, Must Fix}} [[https://github.com/mpeterson2/Pdf-Test/issues/4]] This is an issue", d.getContents("mpeterson2", "Pdf-Test"));
-		assertEquals("{{tag 1, Must Fix}} [[https://github.com/mpeterson2/Pdf-Test/issues/5]] This is an issue", e.getContents("mpeterson2", "Pdf-Test"));
-		assertEquals("{{tag 1, Must Fix}} [[https://github.com/mpeterson2/Pdf-Test/issues/6]] This is an issue", f.getContents("mpeterson2", "Pdf-Test"));
-		assertEquals("[[https://github.com/mpeterson2/Pdf-Test/issues/7]] This is an issue", g.getContents("mpeterson2", "Pdf-Test"));
-		assertEquals("[[https://github.com/mpeterson2/Pdf-Test/issues/19]] This is not an issue", h.getContents("mpeterson2", "Pdf-Test"));
-		assertEquals("{{tag, Positive}} This is a positive issue", i.getContents("mpeterson2", "Pdf-Test"));
+		assertEquals("{{tag 1, Must Fix}} [[https://github.com/mpeterson2/Pdf-Test/issues/1]] This is an issue", a.getMessageWithLink("mpeterson2", "Pdf-Test"));
+		assertEquals("{{tag 1, Must Fix}} [[https://github.com/mpeterson2/Pdf-Test/issues/2]] This is an issue", b.getMessageWithLink("mpeterson2", "Pdf-Test"));
+		assertEquals("{{tag 1, Must Fix}} [[https://github.com/mpeterson2/Pdf-Test/issues/3]] This is an issue", c.getMessageWithLink("mpeterson2", "Pdf-Test"));
+		assertEquals("{{tag 1, Must Fix}} [[https://github.com/mpeterson2/Pdf-Test/issues/4]] This is an issue", d.getMessageWithLink("mpeterson2", "Pdf-Test"));
+		assertEquals("{{tag 1, Must Fix}} [[https://github.com/mpeterson2/Pdf-Test/issues/5]] This is an issue", e.getMessageWithLink("mpeterson2", "Pdf-Test"));
+		assertEquals("{{tag 1, Must Fix}} [[https://github.com/mpeterson2/Pdf-Test/issues/6]] This is an issue", f.getMessageWithLink("mpeterson2", "Pdf-Test"));
+		assertEquals("[[https://github.com/mpeterson2/Pdf-Test/issues/7]] This is an issue", g.getMessageWithLink("mpeterson2", "Pdf-Test"));
+		assertEquals("[[https://github.com/mpeterson2/Pdf-Test/issues/19]] This is not an issue", h.getMessageWithLink("mpeterson2", "Pdf-Test"));
+		assertEquals("{{tag, Positive}} This is a positive issue", i.getMessageWithLink("mpeterson2", "Pdf-Test"));
 	}
 }
