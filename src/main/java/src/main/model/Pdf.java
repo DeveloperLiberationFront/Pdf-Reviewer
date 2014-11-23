@@ -14,6 +14,8 @@ import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationTextMarkup;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAppearanceDictionary;
 
+import src.main.model.PdfComment.Tag;
+
 
 /** 
  * Puts a wrapper around the PDF library
@@ -22,6 +24,7 @@ import org.apache.pdfbox.pdmodel.interactive.annotation.PDAppearanceDictionary;
 public class Pdf {
 	private static final PDGamma ORANGE = new PDGamma();
 	private static final PDGamma GREEN = new PDGamma();
+    private static final PDGamma YELLOW = new PDGamma();
 	
 	static {
 	    ORANGE.setR(0.9921568627f);
@@ -31,6 +34,10 @@ public class Pdf {
 	    GREEN.setR(0);
 	    GREEN.setG(1);
 	    GREEN.setB(0);
+	    
+	    YELLOW.setR(1);
+	    YELLOW.setG(1);
+	    YELLOW.setB(0);
 	}
     private PDDocument doc;
 	
@@ -75,21 +82,30 @@ public class Pdf {
 					
 					if(anno instanceof PDAnnotationTextMarkup) {
 					    PDAnnotationTextMarkup comment = (PDAnnotationTextMarkup) anno;
-	                    PDAnnotationTextMarkup thing = new PDAnnotationTextMarkup(PDAnnotationTextMarkup.SUB_TYPE_HIGHLIGHT);
-	                    thing.setColour(GREEN);
-	                    thing.setRectangle(comment.getRectangle());
-	                    thing.setQuadPoints(comment.getQuadPoints());
-	                    thing.setInvisible(false);
-	                    thing.setAnnotationFlags(PDAnnotationTextMarkup.FLAG_PRINTED);
-						thing.setAppearanceStream(comment.getAppearanceStream());
-						thing.setConstantOpacity(1.0f);
-						thing.setSubject(comment.getSubject());
-						if(comment.getContents() != null) {
-							PdfComment userComment = comments.get(commentOn);
-                            thing.setContents(userComment.getMessageWithLink(login, repo));
-							commentOn++;
-						}
-						newList.add(thing);
+	                    PDAnnotationTextMarkup newComment = new PDAnnotationTextMarkup(PDAnnotationTextMarkup.SUB_TYPE_HIGHLIGHT);
+	                    if(comment.getContents() != null) {
+                            PdfComment userComment = comments.get(commentOn);
+                            List<Tag> tags = userComment.getTags();
+                            if (tags.contains(Tag.CONSIDER_FIX) || tags.contains(Tag.POSITIVE)) {
+                                newComment.setColour(GREEN);
+                            } else if (tags.contains(Tag.MUST_FIX)) {
+                                newComment.setColour(ORANGE);
+                            } else {
+                                newComment.setColour(YELLOW);
+                            }
+                            newComment.setContents(userComment.getMessageWithLink(login, repo));
+                            commentOn++;
+                        }
+	                    newComment.setRectangle(comment.getRectangle());
+	                    newComment.setQuadPoints(comment.getQuadPoints());
+	                    newComment.setInvisible(false);
+	                    newComment.setAnnotationFlags(PDAnnotationTextMarkup.FLAG_PRINTED);
+						newComment.setAppearanceStream(comment.getAppearanceStream());
+						newComment.setConstantOpacity(1.0f);
+						newComment.setSubject(comment.getSubject());
+
+						
+						newList.add(newComment);
 					}
 				}
 				
