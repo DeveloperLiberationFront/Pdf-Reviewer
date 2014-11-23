@@ -210,6 +210,9 @@ public class ReviewSubmitServlet extends HttpServlet {
         // Update the comments
         pdf.updateComments(pdfComments, servlet.writerLogin, servlet.repoName);
 
+        pdf.getDoc().save("C:\\Users\\KevinLubick\\Downloads\\test_anno_1.pdf");
+        
+        pdf.close();
     }
 	
 	private int getNumTotalIssues() throws IOException {

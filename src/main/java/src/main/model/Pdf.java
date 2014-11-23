@@ -3,13 +3,16 @@ package src.main.model;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.graphics.color.PDGamma;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationTextMarkup;
+import org.apache.pdfbox.pdmodel.interactive.annotation.PDAppearanceDictionary;
 
 
 /** 
@@ -65,23 +68,37 @@ public class Pdf {
 		int commentOn = 0;
 		for(PDPage page : pages) {
 			try {
+			    List<PDAnnotation> newList = new ArrayList<PDAnnotation>(); 
 				List<PDAnnotation> annotations = page.getAnnotations();
 				for(int i=0; i<annotations.size(); i++) {
 					PDAnnotation anno = annotations.get(i);
 					
 					if(anno instanceof PDAnnotationTextMarkup) {
-						PDAnnotationTextMarkup comment = (PDAnnotationTextMarkup) anno;
-						
+					    PDAnnotationTextMarkup comment = (PDAnnotationTextMarkup) anno;
+	                    PDAnnotationTextMarkup thing = new PDAnnotationTextMarkup(PDAnnotationTextMarkup.SUB_TYPE_HIGHLIGHT);
+	                    thing.setColour(GREEN);
+	                    thing.setRectangle(comment.getRectangle());
+	                    thing.setQuadPoints(comment.getQuadPoints());
+	                    thing.setInvisible(false);
+	                    thing.setAnnotationFlags(PDAnnotationTextMarkup.FLAG_PRINTED);
+						thing.setAppearanceStream(comment.getAppearanceStream());
+						thing.setConstantOpacity(1.0f);
+						thing.setSubject(comment.getSubject());
 						if(comment.getContents() != null) {
 							PdfComment userComment = comments.get(commentOn);
-                            comment.setContents(userComment.getMessageWithLink(login, repo));
+                            thing.setContents(userComment.getMessageWithLink(login, repo));
 							commentOn++;
 						}
-						anno.setColour(ORANGE);
+						newList.add(thing);
 					}
 				}
+				
+				page.setAnnotations(newList);
 			} catch(IOException e) {
 			    e.printStackTrace();
+			} finally {
+			    page.clearCache();
+			    page.updateLastModified();
 			}
 		}
 	}
