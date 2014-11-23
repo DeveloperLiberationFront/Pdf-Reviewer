@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.graphics.color.PDGamma;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationTextMarkup;
 
@@ -16,7 +17,19 @@ import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationTextMarkup;
  *
  */
 public class Pdf {
-	PDDocument doc;
+	private static final PDGamma ORANGE = new PDGamma();
+	private static final PDGamma GREEN = new PDGamma();
+	
+	static {
+	    ORANGE.setR(0.9921568627f);
+	    ORANGE.setG(0.5333333333f);
+	    ORANGE.setB(0.1803921568f);
+	    
+	    GREEN.setR(0);
+	    GREEN.setG(1);
+	    GREEN.setB(0);
+	}
+    private PDDocument doc;
 	
 	
 	public Pdf(InputStream input) throws IOException {
@@ -65,9 +78,13 @@ public class Pdf {
                             comment.setContents(userComment.getMessageWithLink(login, repo));
 							commentOn++;
 						}
+						
+						comment.setColour(ORANGE);
 					}
 				}
-			} catch(IOException e) {}
+			} catch(IOException e) {
+			    e.printStackTrace();
+			}
 		}
 	}
 	
