@@ -9,6 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import src.main.model.PdfComment;
+import src.main.model.PdfComment.Tag;
 
 public class IssueTest {
 	String aS;
@@ -83,18 +84,35 @@ public class IssueTest {
 	public void testTags() {
 		assertEquals(2, a.getTags().size());
 		
-		assertEquals("Must Fix", PdfComment.getTag("mf"));
-		assertEquals("Should Fix", PdfComment.getTag("sf"));
-		assertEquals("Consider Fixing", PdfComment.getTag("cf"));
-		assertEquals("Arbitrary Tag", PdfComment.getTag("Arbitrary Tag"));
+		assertEquals(Tag.MUST_FIX, PdfComment.getTag("mf"));
+		assertEquals(Tag.MUST_FIX, PdfComment.getTag("must-fix"));
+		assertEquals(Tag.MUST_FIX, PdfComment.getTag("must fix"));
+		assertEquals(Tag.MUST_FIX, PdfComment.getTag("mustfix"));
+		assertEquals(Tag.MUST_FIX, PdfComment.getTag("mustFix"));
+		assertEquals(Tag.SHOULD_FIX, PdfComment.getTag("sf"));
+		assertEquals(Tag.SHOULD_FIX, PdfComment.getTag("should-fix"));
+        assertEquals(Tag.SHOULD_FIX, PdfComment.getTag("should fix"));
+        assertEquals(Tag.SHOULD_FIX, PdfComment.getTag("shouldfix"));
+        assertEquals(Tag.SHOULD_FIX, PdfComment.getTag("shouldFix"));
+		assertEquals(Tag.CONSIDER_FIX, PdfComment.getTag("cf"));
+		assertEquals(Tag.CONSIDER_FIX, PdfComment.getTag("could-fix"));
+		assertEquals(Tag.CONSIDER_FIX, PdfComment.getTag("could fix"));
+		assertEquals(Tag.CONSIDER_FIX, PdfComment.getTag("couldFix"));
+		assertEquals(Tag.CONSIDER_FIX, PdfComment.getTag("couldfix"));
+		assertEquals(Tag.CUSTOM_TAG, PdfComment.getTag("Arbitrary Tag"));
 	}
 	
 	@Test
 	public void testPositive() {
-		assertTrue(i.getTags().contains(PdfComment.POSITIVE));
+		assertTrue(i.getTags().contains(PdfComment.Tag.POSITIVE));
 
-		assertEquals("Positive", PdfComment.getTag("g"));
-		assertEquals("Positive", PdfComment.getTag("p"));
+		assertEquals(Tag.POSITIVE, PdfComment.getTag("g"));
+		assertEquals(Tag.POSITIVE, PdfComment.getTag("good"));
+		assertEquals(Tag.POSITIVE, PdfComment.getTag("p"));
+		assertEquals(Tag.POSITIVE, PdfComment.getTag("positive"));
+		assertEquals(Tag.POSITIVE, PdfComment.getTag("plus"));
+		assertEquals(Tag.POSITIVE, PdfComment.getTag("pos"));
+		assertEquals(Tag.POSITIVE, PdfComment.getTag("+"));
 	}
 	
 	@Test
@@ -112,12 +130,12 @@ public class IssueTest {
 		
 		List<PdfComment> allComments = PdfComment.getComments(commentStrL);
 		
-		boolean contains = false;
+		boolean containsPositive = false;
 		for(PdfComment com : allComments) {
-			if(com.getTags().contains("Positive"))
-				contains = true;
+			if(com.getTags().contains(Tag.POSITIVE))
+				containsPositive = true;
 		}
-		assertTrue(contains);
+		assertTrue(containsPositive);
 		
 		List<PdfComment> negComments = PdfComment.getNegComments(commentStrL);
 		

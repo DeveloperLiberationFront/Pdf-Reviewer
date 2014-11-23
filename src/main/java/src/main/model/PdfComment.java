@@ -1,7 +1,11 @@
 package src.main.model;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -13,12 +17,42 @@ import org.json.JSONObject;
 public class PdfComment {
 
 	public static final int TITLE_LENGTH = 47;
-	public static final String MUST_FIX = "Must Fix";
-	public static final String SHOULD_FIX = "Should Fix";
-	public static final String CONSIDER_FIX = "Consider Fixing";
-	public static final String POSITIVE = "Positive";
 	
-	private List<String> tags;
+	public enum Tag {
+	    MUST_FIX, SHOULD_FIX, CONSIDER_FIX, POSITIVE, CUSTOM_TAG
+	}
+	
+	private static Map<String, Tag> tagMap = new HashMap<String, PdfComment.Tag>();
+	
+	static {
+	    tagMap.put("mf", Tag.MUST_FIX);
+	    tagMap.put("must-fix", Tag.MUST_FIX);
+	    tagMap.put("must fix", Tag.MUST_FIX);
+	    tagMap.put("mustfix", Tag.MUST_FIX);
+	    tagMap.put("mustFix", Tag.MUST_FIX);
+	    tagMap.put("sf", Tag.SHOULD_FIX);
+        tagMap.put("should-fix", Tag.SHOULD_FIX);
+        tagMap.put("should fix", Tag.SHOULD_FIX);
+        tagMap.put("shouldfix", Tag.SHOULD_FIX);
+        tagMap.put("shouldFix", Tag.SHOULD_FIX);
+        tagMap.put("cf", Tag.CONSIDER_FIX);
+        tagMap.put("could-fix", Tag.CONSIDER_FIX);
+        tagMap.put("could fix", Tag.CONSIDER_FIX);
+        tagMap.put("couldfix", Tag.CONSIDER_FIX);
+        tagMap.put("couldFix", Tag.CONSIDER_FIX);
+        tagMap.put("considerfix", Tag.CONSIDER_FIX);
+        tagMap.put("considerFix", Tag.CONSIDER_FIX);
+        
+        tagMap.put("g", Tag.POSITIVE);
+        tagMap.put("good", Tag.POSITIVE);
+        tagMap.put("p", Tag.POSITIVE);
+        tagMap.put("positive", Tag.POSITIVE);
+        tagMap.put("pos", Tag.POSITIVE);
+        tagMap.put("plus", Tag.POSITIVE);
+        tagMap.put("+", Tag.POSITIVE);
+	}
+	
+	private List<Tag> tags;
 	private String comment;
 	private int issueNumber;
 	
@@ -32,7 +66,7 @@ public class PdfComment {
 		List<PdfComment> retVal = new ArrayList<>();
 		for(String comment : comments) {
 			PdfComment pdfComment = new PdfComment(comment);
-			if(!pdfComment.getTags().contains(POSITIVE)) {
+			if(!pdfComment.getTags().contains(Tag.POSITIVE)) {
 				retVal.add(pdfComment);
 			}
 		}
@@ -97,18 +131,12 @@ public class PdfComment {
 		}
 	}
 	
-	public static String getTag(String t) {
+	public static Tag getTag(String t) {
 		t = t.trim();
-		if("mf".equals(t))
-			return MUST_FIX;
-		else if("sf".equals(t))
-			return SHOULD_FIX;
-		else if("cf".equals(t))
-			return CONSIDER_FIX;
-		else if("g".equals(t) || "p".equals(t))
-			return POSITIVE;
+		if (tagMap.containsKey(t))
+		    return tagMap.get(t);
 		else
-			return t;
+			return Tag.CUSTOM_TAG;
 	}
 	
 	public String getComment() {
@@ -122,7 +150,7 @@ public class PdfComment {
 		return comment.substring(0, end).trim() + ellipsis;
 	}
 	
-	public List<String> getTags() {
+	public List<Tag> getTags() {
 		return tags;
 	}
 	
@@ -156,19 +184,19 @@ public class PdfComment {
 		String tagStr = "";
 		if(!getTags().isEmpty()) {
 			StringBuilder tagsBuilder = new StringBuilder("{{");
-			for(String tag : getTags()) {
+			for(Tag tag : getTags()) {
 				tagsBuilder.append(tag).append(", ");
 			}
 			tagStr = tagsBuilder.toString();
 			tagStr = tagStr.substring(0, tagStr.length() - 2) + "}} ";
 		}
 		
-		String issueStr = "";
+		String issueLinkStr = "";
 		
 		if(getIssueNumber() != 0) {
-			issueStr = "[[" + buildLink(login, repo) + "]] ";
+			issueLinkStr = "[[" + buildLink(login, repo) + "]] ";
 		}
 		
-		return (tagStr + issueStr + getComment()).trim();
+		return (tagStr + issueLinkStr + getComment()).trim();
 	}
 }

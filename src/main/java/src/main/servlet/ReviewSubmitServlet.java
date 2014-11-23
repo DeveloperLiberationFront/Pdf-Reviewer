@@ -45,6 +45,7 @@ import org.json.JSONObject;
 
 import src.main.model.Pdf;
 import src.main.model.PdfComment;
+import src.main.model.PdfComment.Tag;
 
 public class ReviewSubmitServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -112,9 +113,9 @@ public class ReviewSubmitServlet extends HttpServlet {
 			
 			List<Label> labels = new ArrayList<>();
 			
-			for(String tag : comment.getTags()) {
+			for(Tag tag : comment.getTags()) {
 				Label label = new Label();
-				label.setName(tag);
+				label.setName(tag.name());
 				labels.add(label);
 			}
 			
@@ -133,9 +134,9 @@ public class ReviewSubmitServlet extends HttpServlet {
 			
 			List<Label> existingLabels = issue.getLabels();
 			List<Label> labels = new ArrayList<>();
-			for(String tag : comment.getTags()) {
+			for(Tag tag : comment.getTags()) {
 				Label l = new Label();
-				l.setName(tag);
+				l.setName(tag.name());
 				labels.add(l);
 			}
 			
