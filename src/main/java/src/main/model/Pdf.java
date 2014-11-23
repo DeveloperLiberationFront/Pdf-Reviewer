@@ -52,7 +52,6 @@ public class Pdf {
 							 comments.add(comment.getContents());
 						 }
 					 }
-					 
 				 }
 			 } catch(IOException e) {}
 		 }
@@ -60,7 +59,7 @@ public class Pdf {
 		 return comments;
 	}
 	
-	public void setComments(List<PdfComment> comments, String login, String repo) {
+	public void updateComments(List<PdfComment> comments, String login, String repo) {
 		@SuppressWarnings("unchecked")
 		List<PDPage> pages = doc.getDocumentCatalog().getAllPages();
 		int commentOn = 0;
@@ -78,8 +77,7 @@ public class Pdf {
                             comment.setContents(userComment.getMessageWithLink(login, repo));
 							commentOn++;
 						}
-						
-						comment.setColour(ORANGE);
+						anno.setColour(ORANGE);
 					}
 				}
 			} catch(IOException e) {

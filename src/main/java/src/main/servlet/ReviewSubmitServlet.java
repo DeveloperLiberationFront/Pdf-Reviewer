@@ -1,6 +1,8 @@
 package src.main.servlet;
 
 import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.URI;
@@ -80,14 +82,16 @@ public class ReviewSubmitServlet extends HttpServlet {
 			FileItemIterator iter = upload.getItemIterator(req);
 			FileItemStream file = iter.next();
 			Pdf pdf = new Pdf(file.openStream());
-			List<String> comments = pdf.getComments();
+			
+			
 			
 			this.client = new GitHubClient();
 			client.setOAuth2Token(accessToken);
 			UserService userService = new UserService(client);
 			User reviewer = userService.getUser();
 			
-			updatePdf(comments, pdf);
+			
+			 List<String> comments = updatePdf(pdf);
 			pdfUrl = addPdfToRepo(pdf, reviewer);
 			task.setter(comments, accessToken, writerLogin, repoName);
 			
@@ -168,8 +172,8 @@ public class ReviewSubmitServlet extends HttpServlet {
 		}
 	}
 	
-	public void updatePdf(List<String> comments, Pdf pdf) throws IOException {
-		
+	public List<String> updatePdf(Pdf pdf) throws IOException {
+	    List<String> comments = pdf.getComments();
 		if(!comments.isEmpty()) {
 			List<PdfComment> pdfComments = PdfComment.getComments(comments);
 			
@@ -183,9 +187,30 @@ public class ReviewSubmitServlet extends HttpServlet {
 			}
 			
 			// Update the comments
-			pdf.setComments(pdfComments, this.writerLogin, this.repoName);
+			pdf.updateComments(pdfComments, this.writerLogin, this.repoName);
 		}
+		return comments;
 	}
+	
+	public static void main(String[] args) throws IOException {
+        Pdf pdf = new Pdf(new FileInputStream("C:\\Users\\KevinLubick\\Downloads\\test_anno.pdf"));
+        ReviewSubmitServlet servlet = new ReviewSubmitServlet();
+        List<String> comments = pdf.getComments();
+        List<PdfComment> pdfComments = PdfComment.getComments(comments);
+
+        // Set the issue numbers
+        int issueNumber = 1;
+        for (PdfComment com : pdfComments) {
+            if (com.getIssueNumber() == 0) {
+                System.out.println(com.getIssueNumber());
+                com.setIssueNumber(issueNumber++);
+            }
+        }
+
+        // Update the comments
+        pdf.updateComments(pdfComments, servlet.writerLogin, servlet.repoName);
+
+    }
 	
 	private int getNumTotalIssues() throws IOException {
 	    IssueService issueService = new IssueService(client);
