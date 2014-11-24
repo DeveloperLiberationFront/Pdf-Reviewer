@@ -3,16 +3,13 @@ package src.main.model;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
-import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.graphics.color.PDGamma;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationTextMarkup;
-import org.apache.pdfbox.pdmodel.interactive.annotation.PDAppearanceDictionary;
 
 import src.main.model.PdfComment.Tag;
 
@@ -69,7 +66,7 @@ public class Pdf {
 		 return comments;
 	}
 	
-	public void updateComments(List<PdfComment> comments, String login, String repo) {
+	public void updateComments(List<PdfComment> comments, String repoOwner, String repo) {
 		@SuppressWarnings("unchecked")
 		List<PDPage> pages = doc.getDocumentCatalog().getAllPages();
 		int commentOn = 0;
@@ -81,34 +78,16 @@ public class Pdf {
 					PDAnnotation anno = annotations.get(i);
 					
 					if(anno instanceof PDAnnotationTextMarkup) {
-					    PDAnnotationTextMarkup comment = (PDAnnotationTextMarkup) anno;
-	                    PDAnnotationTextMarkup newComment = new PDAnnotationTextMarkup(PDAnnotationTextMarkup.SUB_TYPE_HIGHLIGHT);
-	                    if(comment.getContents() != null) {
-                            PdfComment userComment = comments.get(commentOn);
-                            List<Tag> tags = userComment.getTags();
-                            if (tags.contains(Tag.CONSIDER_FIX) || tags.contains(Tag.POSITIVE)) {
-                                newComment.setColour(GREEN);
-                            } else if (tags.contains(Tag.MUST_FIX)) {
-                                newComment.setColour(ORANGE);
-                            } else {
-                                newComment.setColour(YELLOW);
-                            }
-                            newComment.setContents(userComment.getMessageWithLink(login, repo));
-                            commentOn++;
+					    if(anno.getContents() != null) {
+					        PdfComment userComment = comments.get(commentOn);
+					        commentOn++;
+					        String newMessage = userComment.getMessageWithLink(repoOwner, repo);
+                            PDAnnotationTextMarkup newComment = makeNewAnnotation((PDAnnotationTextMarkup) anno, userComment, newMessage);
+					        
+                            newList.add(newComment);
                         }
-	                    newComment.setRectangle(comment.getRectangle());
-	                    newComment.setQuadPoints(comment.getQuadPoints());
-	                    newComment.setInvisible(false);
-	                    newComment.setAnnotationFlags(PDAnnotationTextMarkup.FLAG_PRINTED);
-						newComment.setAppearanceStream(comment.getAppearanceStream());
-						newComment.setConstantOpacity(1.0f);
-						newComment.setSubject(comment.getSubject());
-
-						
-						newList.add(newComment);
 					}
-				}
-				
+				}			
 				page.setAnnotations(newList);
 			} catch(IOException e) {
 			    e.printStackTrace();
@@ -118,7 +97,28 @@ public class Pdf {
 			}
 		}
 	}
-	
+
+	//Makes a brand new text annotation that is almost exactly like the one passed in.
+	// this is the only way I could get the annotations to actually change color.
+    private PDAnnotationTextMarkup makeNewAnnotation(PDAnnotationTextMarkup comment, PdfComment userComment, String messageWithLink) {
+        PDAnnotationTextMarkup newComment = new PDAnnotationTextMarkup(PDAnnotationTextMarkup.SUB_TYPE_HIGHLIGHT);
+        List<Tag> tags = userComment.getTags();
+        if (tags.contains(Tag.CONSIDER_FIX) || tags.contains(Tag.POSITIVE)) {
+            newComment.setColour(GREEN);
+        } else if (tags.contains(Tag.MUST_FIX)) {
+            newComment.setColour(ORANGE);
+        } else {
+            newComment.setColour(YELLOW);
+        }
+        newComment.setContents(messageWithLink);
+
+        newComment.setRectangle(comment.getRectangle());   //both rectangle and quadpoints are needed... don't know why
+        newComment.setQuadPoints(comment.getQuadPoints());
+        newComment.setSubject(comment.getSubject());
+        newComment.setTitlePopup(comment.getTitlePopup());    //author name
+        return newComment;
+    }
+
 	public PDDocument getDoc() {
 		return doc;
 	}
