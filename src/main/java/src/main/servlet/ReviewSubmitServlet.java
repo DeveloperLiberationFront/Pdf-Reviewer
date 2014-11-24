@@ -2,7 +2,6 @@ package src.main.servlet;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.URI;
@@ -192,7 +191,8 @@ public class ReviewSubmitServlet extends HttpServlet {
 		return comments;
 	}
 	
-	public static void main(String[] args) throws IOException {
+	@SuppressWarnings("unused")
+    private static void main(String[] args) throws IOException {
         Pdf pdf = new Pdf(new FileInputStream("C:\\Users\\KevinLubick\\Downloads\\test_anno.pdf"));
         ReviewSubmitServlet servlet = new ReviewSubmitServlet();
         List<String> comments = pdf.getComments();
