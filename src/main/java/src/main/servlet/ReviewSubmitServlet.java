@@ -61,52 +61,49 @@ public class ReviewSubmitServlet extends HttpServlet {
 
     private transient GitHubClient client;
 	
-	@Override
-	protected void doPost(final HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		final ServletFileUpload upload = new ServletFileUpload();
-		
-		this.repoName = req.getParameter("repoName");
-		this.writerLogin = req.getParameter("writer");
-		this.accessToken = req.getParameter("access_token");
-		System.out.println("Hello "+repoName+" "+writerLogin);
-		
-		if(repoName == null || writerLogin == null || accessToken == null) {
-		    System.out.println("Something blank");
-			resp.sendError(500);
-			return;
-		}
+    @Override
+    protected void doPost(final HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        final ServletFileUpload upload = new ServletFileUpload();
 
-		SubmitTask task = new SubmitTask();
-		String pdfUrl = "";
-		
-		try {
-			FileItemIterator iter = upload.getItemIterator(req);
-			FileItemStream file = iter.next();
-			Pdf pdf = new Pdf(file.openStream());
-			
-			
-			
-			this.client = new GitHubClient();
-			client.setOAuth2Token(accessToken);
-			UserService userService = new UserService(client);
-			User reviewer = userService.getUser();
-			
-			
-			 List<String> comments = updatePdf(pdf);
-			pdfUrl = addPdfToRepo(pdf, reviewer);
-			task.setter(comments, accessToken, writerLogin, repoName);
-			
-			pdf.close();
-		} catch(FileUploadException e) {
-		    e.printStackTrace();
-			resp.sendError(500, "There has been an error uploading your Pdf.");
-		}
-		
-		resp.getWriter().write(pdfUrl);
-		
-		Queue taskQueue = QueueFactory.getDefaultQueue();
-		taskQueue.add(TaskOptions.Builder.withPayload(task));
-	}
+        this.repoName = req.getParameter("repoName");
+        this.writerLogin = req.getParameter("writer");
+        this.accessToken = req.getParameter("access_token");
+        System.out.println("Hello " + repoName + " " + writerLogin);
+
+        if (repoName == null || writerLogin == null || accessToken == null) {
+            System.out.println("Something blank");
+            resp.sendError(500);
+            return;
+        }
+
+        SubmitTask task = new SubmitTask();
+        String pdfUrl = "";
+
+        try {
+            FileItemIterator iter = upload.getItemIterator(req);
+            FileItemStream file = iter.next();
+            Pdf pdf = new Pdf(file.openStream());
+
+            this.client = new GitHubClient();
+            client.setOAuth2Token(accessToken);
+            UserService userService = new UserService(client);
+            User reviewer = userService.getUser();
+
+            List<String> comments = updatePdf(pdf);
+            pdfUrl = addPdfToRepo(pdf, reviewer);
+            task.setter(comments, accessToken, writerLogin, repoName);
+
+            pdf.close();
+        } catch (FileUploadException e) {
+            e.printStackTrace();
+            resp.sendError(500, "There has been an error uploading your Pdf.");
+        }
+
+        resp.getWriter().write(pdfUrl);
+
+        Queue taskQueue = QueueFactory.getDefaultQueue();
+        taskQueue.add(TaskOptions.Builder.withPayload(task));
+    }
 	
 	public void createIssue(GitHubClient client, String writerLogin, String repoName, PdfComment comment) throws IOException {
 		IssueService issueService = new IssueService(client);
@@ -170,6 +167,11 @@ public class ReviewSubmitServlet extends HttpServlet {
 	
 	public void createIssues(GitHubClient client, String writerLogin, String repoName, List<PdfComment> comments) throws IOException {
 		for(PdfComment comment : comments) {
+		    try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
 			createIssue(client, writerLogin, repoName, comment);
 		}
 	}
@@ -183,7 +185,6 @@ public class ReviewSubmitServlet extends HttpServlet {
 			int issueNumber = getNumTotalIssues() + 1;
 			for(PdfComment com : pdfComments) {
 				if(com.getIssueNumber() == 0) {
-					System.out.println(com.getIssueNumber());
 					com.setIssueNumber(issueNumber++);
 				}
 			}
@@ -205,7 +206,6 @@ public class ReviewSubmitServlet extends HttpServlet {
         int issueNumber = 1;
         for (PdfComment com : pdfComments) {
             if (com.getIssueNumber() == 0) {
-                System.out.println(com.getIssueNumber());
                 com.setIssueNumber(issueNumber++);
             }
         }
