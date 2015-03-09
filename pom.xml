@@ -47,7 +47,7 @@
             <version>2.0.0</version>
             <scope>system</scope>
             <systemPath>${project.basedir}/src/main/webapp/WEB-INF/lib/pdfbox-2.0.0.jar</systemPath>
-		</dependency>
+        </dependency>
         <dependency>
             <groupId>commons-fileupload</groupId>
             <artifactId>commons-fileupload</artifactId>
@@ -73,7 +73,11 @@
             <artifactId>httpclient</artifactId>
             <version>4.3.4</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpcore</artifactId>
+            <version>4.3.2</version>
+        </dependency>
 
         <!-- Test Dependencies -->
         <dependency>
