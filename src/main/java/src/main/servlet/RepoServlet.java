@@ -45,6 +45,7 @@ public class RepoServlet extends HttpServlet {
 			JSONObject repoJson = new JSONObject();
 			try {
 				repoJson.put("name", repo.getName());
+				repoJson.put("owner", repo.getOwner().getLogin());
 				repoJson.put("url", repo.getUrl());
 				
 				reposJson.put(repoJson);

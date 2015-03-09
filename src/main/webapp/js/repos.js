@@ -34,20 +34,21 @@ function showRepos(data, login) {
   for(var i=0; i<data.length; i++) {
     var repo = data[i];
 
-    var repoBtn = $("<a />")
+    $("<a />")
       .attr("class", "list-group-item")
-      .data("name", repo["name"])
-      .html(repo["name"])
+      .data("name", repo.name)
+      .html(repo.name)
       .append($("<div />")
-                .attr("id", repo["name"] + "-fileList")
+                .attr("id", repo.name + "-fileList")
                 .attr("class", "fileList")
                 .css("display", "none"))
-      .attr("data-url", repo["url"])
+      .data("url", repo.url)
+      .data("owner", repo.owner)
       .on("click", function() {
         $("#repoList .list-group-item.active").removeClass("active");
         $(this).addClass("active");
 
-        getFiles($(this).text(), login, "/");
+        getFiles($(this).data("name"), $(this).data("owner"), "/");
       })
       .appendTo($("#repoList"));
   }
@@ -90,12 +91,13 @@ function getSelectedFile() {
   return getSelectedInList(".fileList");
 }
 
-function getFiles(repoName, login, path) {
-  $.get("/files?access_token=" + accessToken + "&repo=" + escape(repoName) + "&login=" + escape(login) + "&path=" + escape(path))
+function getFiles(repoName, owner, path) {
+  $.get("/files?access_token=" + accessToken + "&repo=" + escape(repoName) + "&owner=" + escape(owner) + "&path=" + escape(path))
     .done(function(data) {
-      showFiles(repoName, login, path, data);
+      showFiles(repoName, owner, path, data);
     })
     .fail(function(data) {
+      console.log("Problem "+data+" "+JSON.stringify(data));
     });
 }
 

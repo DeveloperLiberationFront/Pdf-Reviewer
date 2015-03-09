@@ -19,19 +19,18 @@ import org.json.JSONObject;
 
 public class FilesServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		String repoName = req.getParameter("repo");
 		String auth = req.getParameter("access_token");
 		String path = req.getParameter("path");
-		String login = req.getParameter("login");
+		String owner = req.getParameter("owner");
 		
 		GitHubClient client = new GitHubClient();
 		client.setOAuth2Token(auth);
 		
 		RepositoryService repoService = new RepositoryService(client);
-		Repository repo = repoService.getRepository(login, repoName);
+		Repository repo = repoService.getRepository(owner, repoName);
 		ContentsService contentsService = new ContentsService(client);
 		List<RepositoryContents> contents = contentsService.getContents(repo, path);
 		
