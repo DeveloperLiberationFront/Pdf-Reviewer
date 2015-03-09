@@ -27,8 +27,8 @@
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-            <version>3.0-alpha-1</version>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>3.1.0</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -120,28 +120,39 @@
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>com.google.appengine</groupId>
-                <artifactId>appengine-maven-plugin</artifactId>
-                <version>1.9.10</version>
+                <groupId>org.apache.tomcat.maven</groupId>
+                <artifactId>tomcat7-maven-plugin</artifactId>
+                <version>2.2</version>
                 <configuration>
-                    <enableJarClasses>false</enableJarClasses>
-                    <!-- Comment in the below snippet to bind to all IPs instead of just localhost -->
-                    <!-- address>0.0.0.0</address>
-                    <port>8080</port -->
-                    <!-- Comment in the below snippet to enable local debugging with a remove debugger
-                         like those included with Eclipse or IntelliJ -->
-                    <!-- jvmFlags>
-                      <jvmFlag>-agentlib:jdwp=transport=dt_socket,address=8000,server=y,suspend=n</jvmFlag>
-                    </jvmFlags -->
+                  <!-- http port -->
+                  <port>9090</port>
+                  <!-- application path always starts with /-->
+                  <path>/</path>
+                  <!-- optional path to a context file 
+                  <contextFile>${tomcatContextXml}</contextFile>-->
+                  <!-- optional system properties you want to add 
+                  <systemProperties>
+                    <appserver.base>${project.build.directory}/appserver-base</appserver.base>
+                    <appserver.home>${project.build.directory}/appserver-home</appserver.home>
+                    <derby.system.home>${project.build.directory}/appserver-base/logs</derby.system.home>
+                    <java.io.tmpdir>${project.build.directory}</java.io.tmpdir>
+                  </systemProperties>-->
+                  <!-- if you want to use test dependencies rather than only runtime -->
+                  <useTestClasspath>false</useTestClasspath>
+                  <!-- optional if you want to add some extra directories into the classloader -->
+                  <additionalClasspathDirs>
+                    <additionalClasspathDir></additionalClasspathDir>
+                  </additionalClasspathDirs>
                 </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>endpoints_get_discovery_doc</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
+                <!-- For any extra dependencies needed when running embedded Tomcat (not WAR dependencies) add them below -->
+                <dependencies>
+                   <dependency>
+                    <groupId>javax.servlet</groupId>
+                    <artifactId>javax.servlet-api</artifactId>
+                    <version>3.1.0</version>
+                </dependency>
+                </dependencies>
+              </plugin>
         </plugins>
     </build>
 
