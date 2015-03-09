@@ -68,8 +68,10 @@ public class ReviewSubmitServlet extends HttpServlet {
 		this.repoName = req.getParameter("repoName");
 		this.writerLogin = req.getParameter("writer");
 		this.accessToken = req.getParameter("access_token");
+		System.out.println("Hello "+repoName+" "+writerLogin);
 		
 		if(repoName == null || writerLogin == null || accessToken == null) {
+		    System.out.println("Something blank");
 			resp.sendError(500);
 			return;
 		}
@@ -96,6 +98,7 @@ public class ReviewSubmitServlet extends HttpServlet {
 			
 			pdf.close();
 		} catch(FileUploadException e) {
+		    e.printStackTrace();
 			resp.sendError(500, "There has been an error uploading your Pdf.");
 		}
 		
@@ -356,6 +359,7 @@ public class ReviewSubmitServlet extends HttpServlet {
 					ReviewRequestServlet.removeReviewFromDatastore(reviewer.getLogin(), writerLogin, repoName);
 					
 				} catch(IOException e) {
+				    e.printStackTrace();
 					System.err.println("Error processing Pdf.");
 				}
 		}
