@@ -47,14 +47,14 @@ public class ReviewRequestServlet extends HttpServlet {
     private Repository repo;
     private transient CollaboratorService collaboratorService;
     private User reviewRequester;
+    private String access_token;
 
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		try {
-			String body = HttpUtils.getRequestBody(req);		
-			List<User> reviewers = parseInputJSON(body);
-			
-			setupGitClient(req.getParameter("access_token"));
+			String body = HttpUtils.getRequestBody(req);
+			access_token = req.getParameter("access_token");
+			List<User> reviewers = parseRequest(body);	
             
 			boolean isOrg = "Organization".equals(reviewRequester.getType());
 
@@ -108,13 +108,17 @@ public class ReviewRequestServlet extends HttpServlet {
         return link;
     }
 
-    private List<User> parseInputJSON(String body) throws JSONException, IOException {
+    private List<User> parseRequest(String body) throws JSONException, IOException {
         JSONObject data = new JSONObject(body);
         JSONArray reviewersJson = data.getJSONArray("reviewers");
         repoName = data.getString("repo");
         pathToPaper = data.getString("pathToPaper");
         paper = data.getString("paper");
         login = data.getString("login");
+        
+        setupGitClient(access_token);
+        
+        
         List<User> reviewers = new ArrayList<>();
         
         for(int i=0; i<reviewersJson.length(); i++) {
