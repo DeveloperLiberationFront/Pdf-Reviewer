@@ -55,9 +55,7 @@ public class ReviewRequestServlet extends HttpServlet {
 			String body = HttpUtils.getRequestBody(req);
 			access_token = req.getParameter("access_token");
 			List<User> reviewers = parseRequest(body);	
-            
-			System.out.println("Parsed 1");
-			
+
 			boolean isOrg = "Organization".equals(reviewRequester.getType());
 
 			addCommentsToPDF(pathToPaper, paper);
@@ -67,13 +65,10 @@ public class ReviewRequestServlet extends HttpServlet {
 				    try {
 				        collaboratorService.addCollaborator(repo, reviewer.getLogin());
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        //TODO warn user
                         System.out.println("Could not add collaborator, maybe you don't own the repo?");
                     }
-					
-					System.out.println("Parsed 2");
 				}
-				System.out.println("Parsed 3");
 				try {
 					String downloadLink = makeReviewRequestLabel(reviewer);
 					
@@ -135,7 +130,6 @@ public class ReviewRequestServlet extends HttpServlet {
         for(int i=0; i<reviewersJson.length(); i++) {
             reviewers.add(userService.getUser(reviewersJson.getString(i)));
         }
-        System.out.println(reviewers);
         return reviewers;
     }
 
