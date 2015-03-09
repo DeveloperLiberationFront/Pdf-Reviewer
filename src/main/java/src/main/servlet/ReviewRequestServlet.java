@@ -72,7 +72,7 @@ public class ReviewRequestServlet extends HttpServlet {
 				try {
 					String downloadLink = makeReviewRequestLabel(reviewer);
 					
-					addReviewToDatastore(reviewer.getLogin(), reviewRequester.getLogin(), userService.getUser().getLogin(), repoName, paper, downloadLink);
+					addReviewToDatastore(reviewer.getLogin(), repoOwner, userService.getUser().getLogin(), repoName, paper, downloadLink);
 				} catch(IOException e) {
 					resp.setStatus(417);
 				}
@@ -100,12 +100,12 @@ public class ReviewRequestServlet extends HttpServlet {
         issue.setAssignee(reviewer);
         
         paper = pathToPaper + "/" + paper;
-        String link = "http://pdfreviewhub.appspot.com/?repoName=" + repoName + "&writer=" + reviewRequester.getLogin() + "&paper=" + paper;
+        String link = "http://pdfreviewhub.appspot.com/?repoName=" + repoName + "&writer=" + repoOwner + "&paper=" + paper;
         
         
         
         String downloadLink = "https://github.com/" + repoOwner + "/" + repoName + "/raw/master/" + paper;
-        issue.setBody("@" + reviewer.getLogin() + " has been requested to review this paper.\n" +
+        issue.setBody("@" + reviewer.getLogin() + " has been requested to review this paper by @"+reviewRequester.getLogin()+".\n" +
         			  "Click [here](" + downloadLink + ") to download the paper\n" +
         			  "Click [here](" + link + ") to upload your review.");
         
