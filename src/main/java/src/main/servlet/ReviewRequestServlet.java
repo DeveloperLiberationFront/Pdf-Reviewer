@@ -43,11 +43,11 @@ public class ReviewRequestServlet extends HttpServlet {
     private transient GitHubClient client;
     private transient UserService userService;
     private transient IssueService issueService;
-    private transient RepositoryService repoService;
     private Repository repo;
     private transient CollaboratorService collaboratorService;
     private User reviewRequester;
     private String access_token;
+    private String repoOwner;
 
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -56,14 +56,24 @@ public class ReviewRequestServlet extends HttpServlet {
 			access_token = req.getParameter("access_token");
 			List<User> reviewers = parseRequest(body);	
             
+			System.out.println("Parsed 1");
+			
 			boolean isOrg = "Organization".equals(reviewRequester.getType());
 
 			addCommentsToPDF(pathToPaper, paper);
 
 			for(User reviewer : reviewers) {
 				if(!isOrg) {
-					collaboratorService.addCollaborator(repo, reviewer.getLogin());
+				    try {
+				        collaboratorService.addCollaborator(repo, reviewer.getLogin());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        System.out.println("Could not add collaborator, maybe you don't own the repo?");
+                    }
+					
+					System.out.println("Parsed 2");
 				}
+				System.out.println("Parsed 3");
 				try {
 					String downloadLink = makeReviewRequestLabel(reviewer);
 					
@@ -82,7 +92,7 @@ public class ReviewRequestServlet extends HttpServlet {
         
         try {
         	LabelService labelService = new LabelService(client);
-        	labelService.createLabel(reviewRequester.getLogin(), repoName, reviewRequestLabel);
+        	labelService.createLabel(repoOwner, repoName, reviewRequestLabel);
         } catch(IOException e) {
             e.printStackTrace();
         }
@@ -99,18 +109,19 @@ public class ReviewRequestServlet extends HttpServlet {
         
         
         
-        String downloadLink = "https://github.com/" + reviewRequester.getLogin() + "/" + repoName + "/raw/master/" + paper;
+        String downloadLink = "https://github.com/" + repoOwner + "/" + repoName + "/raw/master/" + paper;
         issue.setBody("@" + reviewer.getLogin() + " has been requested to review this paper.\n" +
         			  "Click [here](" + downloadLink + ") to download the paper\n" +
         			  "Click [here](" + link + ") to upload your review.");
         
-        issueService.createIssue(reviewRequester.getLogin(), repoName, issue);
+        issueService.createIssue(repoOwner, repoName, issue);
         return link;
     }
 
     private List<User> parseRequest(String body) throws JSONException, IOException {
         JSONObject data = new JSONObject(body);
         JSONArray reviewersJson = data.getJSONArray("reviewers");
+        repoOwner = data.getString("owner");
         repoName = data.getString("repo");
         pathToPaper = data.getString("pathToPaper");
         paper = data.getString("paper");
@@ -124,6 +135,7 @@ public class ReviewRequestServlet extends HttpServlet {
         for(int i=0; i<reviewersJson.length(); i++) {
             reviewers.add(userService.getUser(reviewersJson.getString(i)));
         }
+        System.out.println(reviewers);
         return reviewers;
     }
 
@@ -134,8 +146,8 @@ public class ReviewRequestServlet extends HttpServlet {
         userService = new UserService(client);	
         reviewRequester = userService.getUser(login);
         issueService = new IssueService(client);
-        repoService = new RepositoryService(client);
-        repo = repoService.getRepository(reviewRequester.getLogin(), repoName);
+        RepositoryService repoService = new RepositoryService(client);
+        repo = repoService.getRepository(repoOwner, repoName);
         collaboratorService = new CollaboratorService(client);
     }
 	

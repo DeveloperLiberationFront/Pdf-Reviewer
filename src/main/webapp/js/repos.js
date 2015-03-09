@@ -67,6 +67,14 @@ function getRepos(login) {
     })
 }
 
+function getOwnerOfSelected() {
+  var active = $("#repoList .list-group-item.active");
+  if(active.length > 0)
+    return active.data("owner");
+  else
+    return null;
+}
+
 function getSelectedInList(list) {
   var active = $(list + " .list-group-item.active");
   if(active.length > 0)

@@ -5,6 +5,7 @@ function setupWriterBtns() {
 
     var data = {
       login: getSelectedLogin(),
+      owner: getOwnerOfSelected(),
       repo: getSelectedRepo(),
       pathToPaper: pathToPaper,
       paper: getSelectedFile(),
