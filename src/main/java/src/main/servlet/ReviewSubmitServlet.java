@@ -167,11 +167,6 @@ public class ReviewSubmitServlet extends HttpServlet {
 	
 	public void createIssues(GitHubClient client, String writerLogin, String repoName, List<PdfComment> comments) throws IOException {
 		for(PdfComment comment : comments) {
-		    try {
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
 			createIssue(client, writerLogin, repoName, comment);
 		}
 	}
