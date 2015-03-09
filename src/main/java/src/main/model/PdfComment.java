@@ -55,8 +55,8 @@ public class PdfComment {
 	private int issueNumber;
 	
 	public PdfComment(String string) {
+		string = setIssueNumberAndRepairBrokenTags(string);
 		setTags(string);
-		setIssueNumber(string);
 		setComment(string);
 	}
 	
@@ -102,15 +102,28 @@ public class PdfComment {
 		comment = comment.trim();
 	}
 	
-	public final void setIssueNumber(String str) {
-		int issueStartPos = str.indexOf("[[");
-		int issueEndPos = str.indexOf("]]");
-		if(issueStartPos != -1 && issueEndPos != -1) {
-			String issueAreaStr = str.substring(issueStartPos + 1, issueEndPos);
-			String issueStr = issueAreaStr.substring(issueAreaStr.lastIndexOf('/') + 1);
-			issueNumber = Integer.parseInt(issueStr);
-		}
-	}
+    public final String setIssueNumberAndRepairBrokenTags(String originalString) {
+
+        int issueStartPos = originalString.indexOf("[[");
+        int issueEndPos = originalString.indexOf("]]");
+        if (issueStartPos != -1 && issueEndPos != -1) {
+            String issueAreaStr = originalString.substring(issueStartPos, issueEndPos + 2);
+            System.out.println(issueAreaStr);
+            String issueStr = issueAreaStr.substring(issueAreaStr.lastIndexOf('/') + 1);
+            try {
+                issueNumber = Integer.parseInt(issueStr);
+            } catch (NumberFormatException e) {
+                //Hmmm... Someone probably tried to tag something using [[]] instead of {{}}
+                //We will try to repair it
+                System.out.println("Broken string: "+originalString);
+                String fixedString = issueAreaStr.replace("[[", "{{");
+                fixedString = fixedString.replace("]]", "}}");
+                originalString = originalString.replace(issueAreaStr, fixedString);
+                System.out.println("Fixed string: "+originalString);
+            }
+        }
+        return originalString;
+    }
 	
 	public void setIssueNumber(int issueNumber) {
 		this.issueNumber = issueNumber;
