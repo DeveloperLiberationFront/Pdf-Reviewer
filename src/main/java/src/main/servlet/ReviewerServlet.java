@@ -33,6 +33,7 @@ public class ReviewerServlet extends HttpServlet {
 		boolean isOrg = "Organization".equals(user.getType());
 		
 		List<User> reviewers = new ArrayList<>();
+		reviewers.add(user);      //adds myself
 		
 		if(!isOrg) {
 			List<User> followers = userService.getFollowers();
@@ -65,7 +66,16 @@ public class ReviewerServlet extends HttpServlet {
 				u = userService.getUser(u.getLogin());
 				JSONObject uJson = new JSONObject();
 				uJson.put("login", u.getLogin());
-				uJson.put("name", u.getName());
+				
+				String name = u.getName();
+				name = name == null? "" : name;
+                if (user.getLogin().equals(u.getLogin())) {
+				    uJson.put("name", name + " (Myself)");
+				} else {
+				    uJson.put("name", name);
+				}
+				
+				
 				uJson.put("email", u.getEmail());
 				json.put(uJson);
 			}
