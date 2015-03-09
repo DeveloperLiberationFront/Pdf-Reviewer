@@ -108,8 +108,7 @@ public class PdfComment {
         int issueEndPos = originalString.indexOf("]]");
         if (issueStartPos != -1 && issueEndPos != -1) {
             String issueAreaStr = originalString.substring(issueStartPos, issueEndPos + 2);
-            System.out.println(issueAreaStr);
-            String issueStr = issueAreaStr.substring(issueAreaStr.lastIndexOf('/') + 1);
+            String issueStr = issueAreaStr.substring(issueAreaStr.lastIndexOf('/') + 1, issueAreaStr.indexOf("]]"));
             try {
                 issueNumber = Integer.parseInt(issueStr);
             } catch (NumberFormatException e) {
