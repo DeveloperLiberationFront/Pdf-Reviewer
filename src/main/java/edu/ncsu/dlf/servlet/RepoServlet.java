@@ -1,4 +1,4 @@
-package src.main.servlet;
+package edu.ncsu.dlf.servlet;
 
 import java.io.IOException;
 import java.util.List;

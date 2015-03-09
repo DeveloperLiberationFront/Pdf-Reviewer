@@ -1,4 +1,4 @@
-package src.main.servlet;
+package edu.ncsu.dlf.servlet;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -18,6 +18,8 @@ import com.google.appengine.api.datastore.Query.CompositeFilterOperator;
 import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
 
+import edu.ncsu.dlf.HttpUtils;
+
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.Repository;
@@ -31,8 +33,6 @@ import org.eclipse.egit.github.core.service.UserService;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import src.main.HttpUtils;
 
 public class ReviewRequestServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;

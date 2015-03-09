@@ -1,4 +1,4 @@
-package src.main;
+package edu.ncsu.dlf;
 
 /**
  * Contains the client IDs and scopes for allowed clients consuming your API.

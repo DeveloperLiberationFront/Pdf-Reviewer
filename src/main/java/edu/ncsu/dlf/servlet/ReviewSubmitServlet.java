@@ -1,4 +1,4 @@
-package src.main.servlet;
+package edu.ncsu.dlf.servlet;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
@@ -22,6 +22,10 @@ import com.google.appengine.api.taskqueue.Queue;
 import com.google.appengine.api.taskqueue.QueueFactory;
 import com.google.appengine.api.taskqueue.TaskOptions;
 
+import edu.ncsu.dlf.model.Pdf;
+import edu.ncsu.dlf.model.PdfComment;
+import edu.ncsu.dlf.model.PdfComment.Tag;
+
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.FileUploadException;
@@ -43,10 +47,6 @@ import org.eclipse.egit.github.core.service.RepositoryService;
 import org.eclipse.egit.github.core.service.UserService;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import src.main.model.Pdf;
-import src.main.model.PdfComment;
-import src.main.model.PdfComment.Tag;
 
 public class ReviewSubmitServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;

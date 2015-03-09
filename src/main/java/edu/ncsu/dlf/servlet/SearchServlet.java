@@ -1,4 +1,4 @@
-package src.main.servlet;
+package edu.ncsu.dlf.servlet;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -10,6 +10,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import edu.ncsu.dlf.HttpUtils;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -18,8 +20,6 @@ import org.apache.http.impl.client.HttpClients;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import src.main.HttpUtils;
 
 public class SearchServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;

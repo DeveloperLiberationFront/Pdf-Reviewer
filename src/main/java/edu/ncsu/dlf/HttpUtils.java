@@ -1,4 +1,4 @@
-package src.main;
+package edu.ncsu.dlf;
 
 import java.io.BufferedReader;
 import java.io.IOException;

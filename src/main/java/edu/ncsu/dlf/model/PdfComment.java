@@ -1,4 +1,4 @@
-package src.main.model;
+package edu.ncsu.dlf.model;
 
 import java.util.ArrayList;
 import java.util.HashMap;

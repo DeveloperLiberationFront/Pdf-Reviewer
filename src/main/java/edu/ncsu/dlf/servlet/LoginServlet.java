@@ -1,4 +1,4 @@
-package src.main.servlet;
+package edu.ncsu.dlf.servlet;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -8,14 +8,14 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import edu.ncsu.dlf.HttpUtils;
+import edu.ncsu.dlf.SecretKeys;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.HttpClients;
-
-import src.main.HttpUtils;
-import src.main.SecretKeys;
 
 
 public class LoginServlet extends HttpServlet {

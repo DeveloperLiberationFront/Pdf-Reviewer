@@ -1,17 +1,17 @@
-package src.main.model;
+package edu.ncsu.dlf.model;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.ncsu.dlf.model.PdfComment.Tag;
+
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.graphics.color.PDGamma;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationTextMarkup;
-
-import src.main.model.PdfComment.Tag;
 
 
 /** 

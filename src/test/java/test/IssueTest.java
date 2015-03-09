@@ -8,8 +8,8 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-import src.main.model.PdfComment;
-import src.main.model.PdfComment.Tag;
+import edu.ncsu.dlf.model.PdfComment;
+import edu.ncsu.dlf.model.PdfComment.Tag;
 
 public class IssueTest {
 	String aS;

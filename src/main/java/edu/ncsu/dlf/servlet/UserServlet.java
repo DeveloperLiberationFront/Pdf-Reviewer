@@ -1,7 +1,6 @@
-package src.main.servlet;
+package edu.ncsu.dlf.servlet;
 
 import java.io.IOException;
-import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -10,31 +9,35 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.client.GitHubClient;
-import org.eclipse.egit.github.core.service.OrganizationService;
 import org.eclipse.egit.github.core.service.UserService;
-import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-public class RepoSourceServlet extends HttpServlet {
+public class UserServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+
 	
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		GitHubClient client = new GitHubClient();
 		client.setOAuth2Token(req.getParameter("access_token"));
-		
 		UserService userService = new UserService(client);
-		User user = userService.getUser();
-		OrganizationService orgService = new OrganizationService(client);
-		List<User> users = orgService.getOrganizations(user.getLogin());
 		
-		JSONArray logins = new JSONArray();
-		logins.put(user.getLogin());
-		for(User u : users) {
-			logins.put(u.getLogin());
-		}
+		String login = req.getParameter("user");
 		
-		resp.setContentType("application/json");
-		resp.getWriter().write(logins.toString());
-	}
+		User user = userService.getUser(login);
+		
+		JSONObject userJ = new JSONObject();
 
+		try {
+			userJ.put("login", user.getLogin());
+			userJ.put("email", user.getEmail());
+			userJ.put("name", user.getName());
+			
+			resp.setContentType("application/json");
+			resp.getWriter().write(userJ.toString());
+		} catch(JSONException e) {
+			e.printStackTrace();
+		}
+	}
 }
