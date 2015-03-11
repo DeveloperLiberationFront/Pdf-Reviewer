@@ -1,5 +1,6 @@
 package edu.ncsu.dlf.database;
 
+import java.util.Collections;
 import java.util.List;
 
 import edu.ncsu.dlf.model.Review;
@@ -12,13 +13,13 @@ public class MongoDB implements DBAbstraction {
     @Override
     public List<Review> getPendingReviews(User user, UserService userService) {
         // TODO Auto-generated method stub
-        return null;
+        return Collections.emptyList();
     }
 
     @Override
     public List<Review> getPendingReviewRequests(User user, UserService userService) {
         // TODO Auto-generated method stub
-        return null;
+        return Collections.emptyList();
     }
 
     @Override
