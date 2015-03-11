@@ -9,7 +9,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import edu.ncsu.dlf.HttpUtils;
-import edu.ncsu.dlf.SecretKeys;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -29,7 +28,7 @@ public class LoginServlet extends HttpServlet {
 		try {
 			URIBuilder builder = new URIBuilder("https://github.com/login/oauth/access_token");
 			builder.addParameter("client_id", CLIENT_ID);
-			builder.addParameter("client_secret", SecretKeys.GitHub);
+			builder.addParameter("client_secret", System.getenv("GITHUB_API"));
 			builder.addParameter("code", req.getParameter("code"));
 			
 			request = new HttpPost(builder.build());
