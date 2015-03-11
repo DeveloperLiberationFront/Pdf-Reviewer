@@ -1,6 +1,8 @@
 PDF-Reviewer
 ============
 
+This is the (deprecated) Google App Engine branch.  It requires pdf-box 2.0, which lacks a lot of features (presently), due to GAE not supporting SWT
+
 # Building
 
   1. Install [Maven](http://maven.apache.org/download.cgi).  You will not need to explicitly install AppEngine, Maven will do that for you.
