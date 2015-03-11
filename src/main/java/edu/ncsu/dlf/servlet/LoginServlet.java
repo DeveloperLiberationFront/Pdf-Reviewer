@@ -19,15 +19,12 @@ import org.apache.http.impl.client.HttpClients;
 
 public class LoginServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	
-	private static final String CLIENT_ID = "b08a834d3b797794e83f"; //The GitHub "public key"
-
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		HttpPost request = null;
 		try {
 			URIBuilder builder = new URIBuilder("https://github.com/login/oauth/access_token");
-			builder.addParameter("client_id", CLIENT_ID);
+			builder.addParameter("client_id", System.getenv("GITHUB_ID"));
 			builder.addParameter("client_secret", System.getenv("GITHUB_API"));
 			builder.addParameter("code", req.getParameter("code"));
 			
