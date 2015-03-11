@@ -5,7 +5,7 @@ function setupLogin(afterLogin) {
   accessToken = localStorage.githubAccessToken;
 
   var code = getQueryParams("code");
-  var clientId = escape("b08a834d3b797794e83f");
+  var clientId = escape("d6f1b88552bb1a2da275");
 
   $("#login").on("click", function(e) {
     e.preventDefault();
