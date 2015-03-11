@@ -9,16 +9,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.google.appengine.api.datastore.DatastoreService;
-import com.google.appengine.api.datastore.DatastoreServiceFactory;
-import com.google.appengine.api.datastore.Entity;
-import com.google.appengine.api.datastore.PreparedQuery;
-import com.google.appengine.api.datastore.Query;
-import com.google.appengine.api.datastore.Query.CompositeFilterOperator;
-import com.google.appengine.api.datastore.Query.FilterOperator;
-import com.google.appengine.api.datastore.Query.FilterPredicate;
-
 import edu.ncsu.dlf.HttpUtils;
+import edu.ncsu.dlf.database.DBAbstraction;
+import edu.ncsu.dlf.database.DatabaseFactory;
+import edu.ncsu.dlf.model.Review;
 
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
@@ -71,8 +65,11 @@ public class ReviewRequestServlet extends HttpServlet {
 				}
 				try {
 					String downloadLink = makeReviewRequestLabel(reviewer);
+					DBAbstraction database = DatabaseFactory.getDatabase();
+		        
+					Review newReview = new Review(reviewer.getLogin(), repoOwner, userService.getUser().getLogin(), repoName, paper, downloadLink, new UserService(client));
 					
-					addReviewToDatastore(reviewer.getLogin(), repoOwner, userService.getUser().getLogin(), repoName, paper, downloadLink);
+					database.addReviewToDatastore(newReview);
 				} catch(IOException e) {
 					resp.setStatus(417);
 				}
@@ -150,23 +147,24 @@ public class ReviewRequestServlet extends HttpServlet {
         // Should add a comment to the front of the pdf with a memo about tags
     }
 
-    void addReviewToDatastore(String reviewer, String writer, String requester, String repo, String paper, String link) {
-		Entity request = new Entity("request");
-		request.setProperty("reviewer", reviewer);
-		request.setProperty("writer", writer);
-		request.setProperty("requester", requester);
-		request.setProperty("repo", repo);
-		request.setProperty("paper", paper);
-		request.setUnindexedProperty("link", link);
-		
-		DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-		
-		datastore.put(request);
-	}
+//    void addReviewToDatastore(String reviewer, String writer, String requester, String repo, String paper, String link) {
+//		Entity request = new Entity("request");
+//		request.setProperty("reviewer", reviewer);
+//		request.setProperty("writer", writer);
+//		request.setProperty("requester", requester);
+//		request.setProperty("repo", repo);
+//		request.setProperty("paper", paper);
+//		request.setUnindexedProperty("link", link);
+//		
+//		DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+//		
+//		datastore.put(request);
+//	}
 	
 	@Override
 	protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		GitHubClient client = new GitHubClient();
+		// handle the DELETE request
+	    GitHubClient client = new GitHubClient();
 		client.setOAuth2Token(req.getParameter("access_token"));
 		String writer = req.getParameter("writer");
 		String reviewer = req.getParameter("reviewer");
@@ -175,20 +173,21 @@ public class ReviewRequestServlet extends HttpServlet {
 		String closeComment = "@" + reviewer + " is no longer reviewing this paper.";
 		ReviewSubmitServlet.closeReviewIssue(client, writer, repo, reviewer, closeComment);
 		
-		removeReviewFromDatastore(reviewer, writer, repo);
+		DBAbstraction database = DatabaseFactory.getDatabase();
+		database.removeReviewFromDatastore(reviewer, writer, repo);
 	}
 	
-	static void removeReviewFromDatastore(String reviewer, String writer, String repo) {
-		DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-
-		Query query = new Query("request");
-		FilterPredicate filterReviewer = new FilterPredicate("reviewer", FilterOperator.EQUAL, reviewer);
-		FilterPredicate filterWriter = new FilterPredicate("writer", FilterOperator.EQUAL, writer);
-		FilterPredicate filterRepo = new FilterPredicate("repo", FilterOperator.EQUAL, repo);
-		query.setFilter(CompositeFilterOperator.and(filterReviewer, filterWriter, filterRepo));
-		PreparedQuery preparedQuery = datastore.prepare(query);
-		for(Entity e : preparedQuery.asIterable()) {
-			datastore.delete(e.getKey());
-		}
-	}
+//	static void removeReviewFromDatastore(String reviewer, String writer, String repo) {
+//		DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+//
+//		Query query = new Query("request");
+//		FilterPredicate filterReviewer = new FilterPredicate("reviewer", FilterOperator.EQUAL, reviewer);
+//		FilterPredicate filterWriter = new FilterPredicate("writer", FilterOperator.EQUAL, writer);
+//		FilterPredicate filterRepo = new FilterPredicate("repo", FilterOperator.EQUAL, repo);
+//		query.setFilter(CompositeFilterOperator.and(filterReviewer, filterWriter, filterRepo));
+//		PreparedQuery preparedQuery = datastore.prepare(query);
+//		for(Entity e : preparedQuery.asIterable()) {
+//			datastore.delete(e.getKey());
+//		}
+//	}
 }

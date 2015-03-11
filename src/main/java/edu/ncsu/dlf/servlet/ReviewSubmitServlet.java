@@ -17,11 +17,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.bind.DatatypeConverter;
 
-import com.google.appengine.api.taskqueue.DeferredTask;
-import com.google.appengine.api.taskqueue.Queue;
-import com.google.appengine.api.taskqueue.QueueFactory;
-import com.google.appengine.api.taskqueue.TaskOptions;
-
+import edu.ncsu.dlf.database.DBAbstraction;
+import edu.ncsu.dlf.database.DatabaseFactory;
 import edu.ncsu.dlf.model.Pdf;
 import edu.ncsu.dlf.model.PdfComment;
 import edu.ncsu.dlf.model.PdfComment.Tag;
@@ -100,9 +97,9 @@ public class ReviewSubmitServlet extends HttpServlet {
         }
 
         resp.getWriter().write(pdfUrl);
-
-        Queue taskQueue = QueueFactory.getDefaultQueue();
-        taskQueue.add(TaskOptions.Builder.withPayload(task));
+        
+        Thread thread = new Thread(task);
+        thread.start();
     }
 	
 	public void createIssue(GitHubClient client, String writerLogin, String repoName, PdfComment comment) throws IOException {
@@ -322,12 +319,12 @@ public class ReviewSubmitServlet extends HttpServlet {
         
     }
 	
-	private final class SubmitTask implements DeferredTask {
-		private static final long serialVersionUID = -603761725725342674L;
+	private final class SubmitTask implements Runnable {
 		private String accessToken;
 		private List<String> commentStrs;
 		private String writerLogin;
 		private String repoName;
+        private DBAbstraction database;
 		
 		public void setter(List<String> comments, String accessToken, String writerLogin, String repoName) {
 			this.commentStrs = comments;
@@ -342,6 +339,7 @@ public class ReviewSubmitServlet extends HttpServlet {
 					GitHubClient client = new GitHubClient();
 					client.setOAuth2Token(accessToken);
 					
+					database = DatabaseFactory.getDatabase();
 					UserService userService = new UserService(client);
 					User reviewer = userService.getUser();
 					
@@ -351,7 +349,7 @@ public class ReviewSubmitServlet extends HttpServlet {
 					
 					String closeComment = "@" + reviewer.getLogin() + " has reviewed this paper.";
 					closeReviewIssue(client, writerLogin, repoName, reviewer.getLogin(), closeComment);
-					ReviewRequestServlet.removeReviewFromDatastore(reviewer.getLogin(), writerLogin, repoName);
+					database.removeReviewFromDatastore(reviewer.getLogin(), writerLogin, repoName);
 					
 				} catch(IOException e) {
 				    e.printStackTrace();
