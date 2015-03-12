@@ -37,28 +37,15 @@ public class MongoDB implements DBAbstraction {
     
     @Override
     public List<Review> getPendingReviews(User user, UserService userService) {
-        List<Review> retVal = new ArrayList<>();
-        DB db = mongoClient.getDB(DB_NAME);
-        DBCollection coll = db.getCollection(DB_NAME);
-        coll.setObjectClass(Review.class);
-        DBCursor cursor = coll.find();
-        try {
-            while (cursor.hasNext()) {
-                DBObject element = cursor.next();
-                Object reviewer = element.get("Reviewer");
-                if (element instanceof Review && reviewer instanceof PDFUser &&
-                        user.getLogin().equals(((PDFUser) reviewer).getLogin())) {
-                    retVal.add((Review) element);
-                }
-            }
-        } finally {
-           cursor.close();
-        }
-        return retVal;
+        return findRequests(user, "Reviewer");
     }
 
     @Override
     public List<Review> getPendingReviewRequests(User user, UserService userService) {
+        return findRequests(user, "Requester");
+    }
+
+    private List<Review> findRequests(User userToLookFor, String whichUser) {
         List<Review> retVal = new ArrayList<>();
         DB db = mongoClient.getDB(DB_NAME);
         DBCollection coll = db.getCollection(DB_NAME);
@@ -67,9 +54,9 @@ public class MongoDB implements DBAbstraction {
         try {
             while (cursor.hasNext()) {
                 DBObject element = cursor.next();
-                Object requester = element.get("Requester");
-                if (element instanceof Review && requester instanceof PDFUser &&
-                        user.getLogin().equals(((PDFUser) requester).getLogin())) {
+                Object user = element.get(whichUser);
+                if (element instanceof Review && user instanceof PDFUser &&
+                        userToLookFor.getLogin().equals(((PDFUser) user).getLogin())) {
                     retVal.add((Review) element);
                 }
             }
