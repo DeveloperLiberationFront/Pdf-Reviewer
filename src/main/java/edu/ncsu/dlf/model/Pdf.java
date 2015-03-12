@@ -92,7 +92,7 @@ public class Pdf {
 			} catch(IOException e) {
 			    e.printStackTrace();
 			} finally {
-			    page.clearCache();
+			    page.clear();
 			    page.updateLastModified();
 			}
 		}

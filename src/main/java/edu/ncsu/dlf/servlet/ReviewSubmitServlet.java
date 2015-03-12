@@ -32,6 +32,7 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.pdfbox.exceptions.COSVisitorException;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.Repository;
@@ -188,7 +189,7 @@ public class ReviewSubmitServlet extends HttpServlet {
 	}
 	
 	@SuppressWarnings("unused")
-    private static void main(String[] args) throws IOException {
+    private static void main(String[] args) throws IOException, COSVisitorException {
         Pdf pdf = new Pdf(new FileInputStream("C:\\Users\\KevinLubick\\Downloads\\test_anno.pdf"));
         ReviewSubmitServlet servlet = new ReviewSubmitServlet();
         List<String> comments = pdf.getComments();
@@ -282,7 +283,7 @@ public class ReviewSubmitServlet extends HttpServlet {
             request.setEntity(entity);
 
             httpClient.execute(request);
-        } catch(JSONException e) {
+        } catch(JSONException | COSVisitorException e) {
             e.printStackTrace();
         } finally {
             request.releaseConnection();
