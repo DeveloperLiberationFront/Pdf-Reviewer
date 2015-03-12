@@ -44,9 +44,11 @@ public class MongoDB implements DBAbstraction {
             while (cursor.hasNext()) {
                 DBObject element = cursor.next();
                 System.out.println(element);
-                Object reviewer = element.get("reviewer");
+                Object reviewer = element.get("Reviewer");
                 System.out.println(reviewer);
-                if (reviewer instanceof Review && user.getLogin().equals(((DBObject) reviewer).get("login"))) {
+                if (reviewer != null)
+                    System.out.println(reviewer.getClass());
+                if (reviewer instanceof Review && user.getLogin().equals(((DBObject) reviewer).get("Login"))) {
                     retVal.add((Review) reviewer);
                 }
             }
@@ -66,9 +68,11 @@ public class MongoDB implements DBAbstraction {
             while (cursor.hasNext()) {
                 DBObject element = cursor.next();
                 System.out.println(element);
-                Object requester = element.get("requester");
+                Object requester = element.get("Requester");
                 System.out.println(requester);
-                if (requester instanceof Review && user.getLogin().equals(((DBObject) requester).get("login"))) {
+                if (requester != null)
+                    System.out.println(requester.getClass());
+                if (requester instanceof Review && user.getLogin().equals(((DBObject) requester).get("Login"))) {
                     retVal.add((Review) requester);
                 }
             }
