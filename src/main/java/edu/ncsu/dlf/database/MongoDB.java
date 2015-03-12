@@ -52,7 +52,7 @@ public class MongoDB implements DBAbstraction {
                     System.out.println(reviewer.getClass());
                 if (element instanceof Review && reviewer instanceof PDFUser &&
                         user.getLogin().equals(((PDFUser) reviewer).getLogin())) {
-                    retVal.add((Review) reviewer);
+                    retVal.add((Review) element);
                 }
             }
         } finally {
@@ -78,7 +78,7 @@ public class MongoDB implements DBAbstraction {
                     System.out.println(requester.getClass());
                 if (element instanceof Review && requester instanceof PDFUser &&
                         user.getLogin().equals(((PDFUser) requester).getLogin())) {
-                    retVal.add((Review) requester);
+                    retVal.add((Review) element);
                 }
             }
         } finally {

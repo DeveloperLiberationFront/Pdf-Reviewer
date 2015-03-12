@@ -22,20 +22,20 @@ function showPendingReviews(reviews) {
 }
 
 function showReviews(writerOrReviewer, reviews) {
-  if(reviews.length == 0) {
+  if(!reviews || reviews.length === 0) {
     showEmptyReviews(writerOrReviewer);
   }
 
-  var isReviewer = writerOrReviewer == "reviewer";
+  var isReviewer = writerOrReviewer === "reviewer";
   var wrText = isReviewer ? "Account of Repository:" : "Reviewer:";
-  var div = isReviewer ? "#reviewRequests" : "#pendingReviews"
+  var div = isReviewer ? "#reviewRequests" : "#pendingReviews";
 
 
   function getOtherUser(r) {
     if(isReviewer)
       return r.writer;
     else
-      return r.reviewer
+      return r.reviewer;
   }
 
   function requesterOrReviewer(r) {
@@ -89,7 +89,7 @@ function showReviews(writerOrReviewer, reviews) {
       cancelReviewBtn.text("Decline Request");
     }
     else {
-      cancelReviewBtn.text("Remove Request")
+      cancelReviewBtn.text("Remove Request");
     }
     
     reviewDiv.find(".panel-body").append(cancelReviewBtn);
@@ -101,8 +101,8 @@ function showReviews(writerOrReviewer, reviews) {
 
 function showEmptyReviews(writerOrReviewer) {
   var isReviewer = writerOrReviewer == "reviewer";
-  var div = isReviewer ? "#reviewRequests" : "#pendingReviews"
-  $(div).append("<h5>No Reviews</h5>")
+  var div = isReviewer ? "#reviewRequests" : "#pendingReviews";
+  $(div).append("<h5>No Reviews</h5>");
 }
 
 function cancelReview(writer, reviewer, repo) {
