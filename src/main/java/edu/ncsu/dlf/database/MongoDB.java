@@ -13,6 +13,7 @@ import com.mongodb.MongoClient;
 import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
 
+import edu.ncsu.dlf.model.PDFUser;
 import edu.ncsu.dlf.model.Review;
 
 import org.eclipse.egit.github.core.User;
@@ -49,7 +50,7 @@ public class MongoDB implements DBAbstraction {
                 System.out.println(reviewer);
                 if (reviewer != null)
                     System.out.println(reviewer.getClass());
-                if (reviewer instanceof Review && user.getLogin().equals(((DBObject) reviewer).get("Login"))) {
+                if (reviewer instanceof Review && user.getLogin().equals(((PDFUser) reviewer).getLogin())) {
                     retVal.add((Review) reviewer);
                 }
             }
@@ -74,7 +75,7 @@ public class MongoDB implements DBAbstraction {
                 System.out.println(requester);
                 if (requester != null)
                     System.out.println(requester.getClass());
-                if (requester instanceof Review && user.getLogin().equals(((DBObject) requester).get("Login"))) {
+                if (requester instanceof Review && user.getLogin().equals(((PDFUser) requester).getLogin())) {
                     retVal.add((Review) requester);
                 }
             }

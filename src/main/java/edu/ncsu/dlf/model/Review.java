@@ -52,6 +52,12 @@ public class Review extends ReflectionDBObject {
         return requester;
     }
 
+    @Override
+    public String toString() {
+        return "Review [requester=" + requester + ", writer=" + writer + ", reviewer=" + reviewer + ", repo=" + repo + ", paper="
+                + paper + ", link=" + link + "]";
+    }
+
     public void setRequester(PDFUser requester) {
         this.requester = requester;
     }
