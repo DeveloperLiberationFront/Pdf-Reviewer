@@ -33,6 +33,10 @@ public class MongoDB implements DBAbstraction {
         
         MongoCredential credential = MongoCredential.createCredential(user, DB_NAME, password.toCharArray());
         this.mongoClient = new MongoClient(address, Arrays.asList(credential));
+        
+        DB db = mongoClient.getDB(DB_NAME);
+        DBCollection coll = db.getCollection(DB_NAME);
+        coll.drop();
     }
     
     @Override
