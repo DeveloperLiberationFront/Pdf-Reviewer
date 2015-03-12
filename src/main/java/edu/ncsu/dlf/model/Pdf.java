@@ -57,31 +57,7 @@ public class Pdf {
 		doc = PDDocument.load(input);
 	}
 	
-	@Deprecated
-	public List<String> getComments() {
-		List<String> comments = new ArrayList<>();
-		 
-		@SuppressWarnings("unchecked")
-		List<PDPage> pages = doc.getDocumentCatalog().getAllPages();
-		 
-		 for(PDPage page : pages) {
-			 try {
-				 for(PDAnnotation anno : page.getAnnotations()) {
-					 if(anno instanceof PDAnnotationTextMarkup) {
-						 PDAnnotationTextMarkup comment = (PDAnnotationTextMarkup) anno;
-						 
-						 if(comment.getContents() != null) {
-							 comments.add(comment.getContents());
-						 }
-					 }
-				 }
-			 } catch(IOException e) {}
-		 }
-		 
-		 return comments;
-	}
-	
-	public List<PdfComment> getPDFComments() {
+    public List<PdfComment> getPDFComments() {
         List<PdfComment> comments = new ArrayList<>();
 
         @SuppressWarnings("unchecked")

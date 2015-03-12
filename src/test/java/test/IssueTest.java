@@ -117,18 +117,18 @@ public class IssueTest {
 	
 	@Test
 	public void testGettingFromString() {
-		List<String> commentStrL = new ArrayList<>();
-		commentStrL.add(aS);
-		commentStrL.add(bS);
-		commentStrL.add(cS);
-		commentStrL.add(dS);
-		commentStrL.add(eS);
-		commentStrL.add(fS);
-		commentStrL.add(gS);
-		commentStrL.add(hS);
-		commentStrL.add(iS);
+		List<String> commentStrList = new ArrayList<>();
+		commentStrList.add(aS);
+		commentStrList.add(bS);
+		commentStrList.add(cS);
+		commentStrList.add(dS);
+		commentStrList.add(eS);
+		commentStrList.add(fS);
+		commentStrList.add(gS);
+		commentStrList.add(hS);
+		commentStrList.add(iS);
 		
-		List<PdfComment> allComments = PdfComment.getComments(commentStrL);
+		List<PdfComment> allComments = convertStringsToPDFComments(commentStrList);
 		
 		boolean containsPositive = false;
 		for(PdfComment com : allComments) {
@@ -137,7 +137,7 @@ public class IssueTest {
 		}
 		assertTrue(containsPositive);
 		
-		List<PdfComment> negComments = PdfComment.getNegComments(commentStrL);
+		List<PdfComment> negComments = PdfComment.getNegComments(commentStrList);
 		
 		for(PdfComment com : negComments) {
 			assertFalse(com.getTags().contains("Positive"));
@@ -145,7 +145,16 @@ public class IssueTest {
 		
 	}
 	
-	@Test
+	private List<PdfComment> convertStringsToPDFComments(List<String> comments) {
+	    List<PdfComment> retVal = new ArrayList<>();
+        for(String comment : comments) {
+            retVal.add(new PdfComment(comment));
+        }
+        
+        return retVal;
+    }
+
+    @Test
 	public void testIssueNumber() {
 		assertEquals(1, a.getIssueNumber());
 		assertEquals(2, b.getIssueNumber());

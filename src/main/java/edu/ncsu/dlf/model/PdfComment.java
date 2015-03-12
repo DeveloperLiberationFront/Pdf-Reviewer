@@ -73,15 +73,6 @@ public class PdfComment {
 		return retVal;
 	}
 	
-	public static List<PdfComment> getComments(List<String> comments) {
-		List<PdfComment> retVal = new ArrayList<>();
-		for(String comment : comments) {
-			retVal.add(new PdfComment(comment));
-		}
-		
-		return retVal;
-	}
-	
 	private void setComment(String s) {
 		comment = s;
 		

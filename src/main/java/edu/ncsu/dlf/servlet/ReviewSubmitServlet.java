@@ -87,7 +87,7 @@ public class ReviewSubmitServlet extends HttpServlet {
             UserService userService = new UserService(client);
             User reviewer = userService.getUser();
 
-            List<String> comments = updatePdf(pdf);
+            List<PdfComment> comments = updatePdf(pdf);
             pdfUrl = addPdfToRepo(pdf, reviewer);
             task.setter(comments, accessToken, writerLogin, repoName);
 
@@ -169,10 +169,9 @@ public class ReviewSubmitServlet extends HttpServlet {
 		}
 	}
 	
-	public List<String> updatePdf(Pdf pdf) throws IOException {
-	    List<String> comments = pdf.getComments();
-		if(!comments.isEmpty()) {
-			List<PdfComment> pdfComments = PdfComment.getComments(comments);
+	public List<PdfComment> updatePdf(Pdf pdf) throws IOException {
+	    List<PdfComment> pdfComments = pdf.getPDFComments();
+		if(!pdfComments.isEmpty()) {
 			
 			// Set the issue numbers
 			int issueNumber = getNumTotalIssues() + 1;
@@ -185,15 +184,14 @@ public class ReviewSubmitServlet extends HttpServlet {
 			// Update the comments
 			pdf.updateComments(pdfComments, this.writerLogin, this.repoName);
 		}
-		return comments;
+		return pdfComments;
 	}
 	
 	@SuppressWarnings("unused")
     private static void main(String[] args) throws IOException, COSVisitorException {
         Pdf pdf = new Pdf(new FileInputStream("C:\\Users\\KevinLubick\\Downloads\\test_anno.pdf"));
         ReviewSubmitServlet servlet = new ReviewSubmitServlet();
-        List<String> comments = pdf.getComments();
-        List<PdfComment> pdfComments = PdfComment.getComments(comments);
+        List<PdfComment> pdfComments = pdf.getPDFComments();
 
         // Set the issue numbers
         int issueNumber = 1;
@@ -322,13 +320,13 @@ public class ReviewSubmitServlet extends HttpServlet {
 	
 	private final class SubmitTask implements Runnable {
 		private String accessToken;
-		private List<String> commentStrs;
+		private List<PdfComment> comments;
 		private String repoOwnerLogin;
 		private String repoName;
         private DBAbstraction database;
 		
-		public void setter(List<String> comments, String accessToken, String writerLogin, String repoName) {
-			this.commentStrs = comments;
+		public void setter(List<PdfComment> comments, String accessToken, String writerLogin, String repoName) {
+			this.comments = comments;
 			this.accessToken = accessToken;
 			this.repoOwnerLogin = writerLogin;
 			this.repoName = repoName;
@@ -343,8 +341,6 @@ public class ReviewSubmitServlet extends HttpServlet {
 					database = DatabaseFactory.getDatabase();
 					UserService userService = new UserService(client);
 					User reviewer = userService.getUser();
-					
-					List<PdfComment> comments = PdfComment.getComments(commentStrs);
 					
 					createIssues(client, repoOwnerLogin, repoName, comments);
 					
