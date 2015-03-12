@@ -89,7 +89,7 @@ public class Pdf {
          
          for(PDPage page : pages) {
              try {
-                 BufferedImage img = null;
+                 BufferedImage pageImage = null;
 
                  List<PDAnnotation> annotations = page.getAnnotations();
                  
@@ -97,8 +97,8 @@ public class Pdf {
                 page.setAnnotations(Collections.<PDAnnotation>emptyList());
                  
                 for(PDAnnotation anno : annotations) {              
-                     if (img == null) {
-                         img = page.convertToImage(BufferedImage.TYPE_INT_RGB, DEFAULT_SIZE * SCALE_UP_FACTOR);
+                     if (pageImage == null) {
+                         pageImage = page.convertToImage(BufferedImage.TYPE_INT_RGB, DEFAULT_SIZE * SCALE_UP_FACTOR);
                      }
                     if (anno instanceof PDAnnotationTextMarkup) {
                         PDAnnotationTextMarkup comment = (PDAnnotationTextMarkup) anno;
@@ -108,7 +108,7 @@ public class Pdf {
                             if (comment.getContents() != null) {
                                 PdfComment pdfComment = new PdfComment(comment.getContents());
 
-                                pdfComment.setImage(makeSubImage(img, comment.getQuadPoints()));
+                                pdfComment.setImage(makeSubImage(pageImage, comment.getQuadPoints()));
                                 comments.add(pdfComment);
                             }
                         }
