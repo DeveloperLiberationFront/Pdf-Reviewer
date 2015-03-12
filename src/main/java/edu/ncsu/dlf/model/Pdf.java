@@ -1,11 +1,15 @@
 package edu.ncsu.dlf.model;
 
+import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -24,7 +28,9 @@ import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationTextMarkup;
  *
  */
 public class Pdf {
-    private static final int BORDER_WIDTH = 10;
+    private static final int BORDER_WIDTH = 30;
+    private static final int SCALE_UP_FACTOR = 2;
+    private static final int DEFAULT_SIZE = 72;
     
 	private static final PDGamma ORANGE = new PDGamma();
 	private static final PDGamma GREEN = new PDGamma();
@@ -44,6 +50,7 @@ public class Pdf {
 	    YELLOW.setB(0);
 	}
     private PDDocument doc;
+    private Color highlightColor = new Color(234, 249, 35, 140);
 	
 	
 	public Pdf(InputStream input) throws IOException {
@@ -76,27 +83,36 @@ public class Pdf {
 	
 	public List<PdfComment> getPDFComments() {
         List<PdfComment> comments = new ArrayList<>();
-         
+        
         @SuppressWarnings("unchecked")
         List<PDPage> pages = doc.getDocumentCatalog().getAllPages();
          
          for(PDPage page : pages) {
              try {
                  BufferedImage img = null;
-                 for(PDAnnotation anno : page.getAnnotations()) {
+
+                 List<PDAnnotation> annotations = page.getAnnotations();
+                 
+                 //erase annotations from page to avoid them blotting out text
+                page.setAnnotations(Collections.<PDAnnotation>emptyList());
+                 
+                for(PDAnnotation anno : annotations) {              
                      if (img == null) {
-                         img = page.convertToImage();
+                         img = page.convertToImage(BufferedImage.TYPE_INT_RGB, DEFAULT_SIZE * SCALE_UP_FACTOR);
                      }
-                     if(anno instanceof PDAnnotationTextMarkup) {
-                         PDAnnotationTextMarkup comment = (PDAnnotationTextMarkup) anno;
-                         
-                         if(comment.getContents() != null) {
-                            PdfComment pdfComment = new PdfComment(comment.getContents());
-                            
-                            pdfComment.setImage(makeSubImage(img,comment.getQuadPoints()));
-                            comments.add(pdfComment);
-                         }
-                     }
+                    if (anno instanceof PDAnnotationTextMarkup) {
+                        PDAnnotationTextMarkup comment = (PDAnnotationTextMarkup) anno;
+                        if (comment != null) {
+                            System.out.println(comment.getContents());
+
+                            if (comment.getContents() != null) {
+                                PdfComment pdfComment = new PdfComment(comment.getContents());
+
+                                pdfComment.setImage(makeSubImage(img, comment.getQuadPoints()));
+                                comments.add(pdfComment);
+                            }
+                        }
+                    }
                      
                  }
              } catch(IOException e) {
@@ -107,34 +123,112 @@ public class Pdf {
          return comments;
     }
 	
-	   /* adapted the specs of a pdf tool http://www.pdf-technologies.com/api/html/P_PDFTech_PDFMarkupAnnotation_QuadPoints.htm
+    /* adapted the specs of a pdf tool http://www.pdf-technologies.com/api/html/P_PDFTech_PDFMarkupAnnotation_QuadPoints.htm
      * The QuadPoints array must contain 8*n elements specifying the coordinates of n quadrilaterals. 
      * Each quadrilateral encompasses a word or group of continuous words in the text underlying the annotation. 
      * The coordinates for each quadrilateral are given in the order x4 y4 x3 y3 x1 y1 x2 y2 specifying the quadrilateral's 
      * four vertices  x1 is upper left and numbering goes clockwise. 
+     * 
+     * I assume all quadrilaterals are rectangles.  No guarantees on multi-column selects
      * 
      */
     private BufferedImage makeSubImage(BufferedImage img, float[] quadPoints) {
         if (quadPoints.length < 8) {
             return null;
         }
-        int x = (int) (quadPoints[4]-BORDER_WIDTH) * 2;
-        int y = (int) (quadPoints[5]-BORDER_WIDTH) * 2;
-        
-        int width = (int) (quadPoints[2] - quadPoints[4] + 2* BORDER_WIDTH) * 2;
-        int height = (int) (quadPoints[3] - quadPoints[5] + 2* BORDER_WIDTH) * 2;
-        
-        
-        //for debugging
+
+        //we find the upper left corner
+        int minX = getMinXFromQuadPoints(quadPoints);
+        int minY = getMinYFromQuadPoints(quadPoints);
+
+        int width = (getMaxXFromQuadPoints(quadPoints) - minX + 2* BORDER_WIDTH) * SCALE_UP_FACTOR;
+        int height = (getMaxYFromQuadPoints(quadPoints) - minY + 2* BORDER_WIDTH) * SCALE_UP_FACTOR;
+
+        int x = (minX-BORDER_WIDTH) * SCALE_UP_FACTOR;  
+        int y = (minY-BORDER_WIDTH) * SCALE_UP_FACTOR;
+
+        BufferedImage subImage = null;
+
+        // the y is counted from the bottom, so we have to flip our coordinate
+        subImage = img.getSubimage(x, (img.getHeight() - y - height), width, height);
+
+        Graphics2D g2 = subImage.createGraphics();
+        for (int n = 0; n < quadPoints.length; n += 8) {
+            float[] oneQuad = Arrays.copyOfRange(quadPoints, n, n + 8);
+            paintHighlight(g2, oneQuad, x, y);
+        }
+
         try {
-            ImageIO.write(img.getSubimage(x, (img.getHeight() - y - height), width, height), "png", new File("test.png"));
+            // for debugging
+            ImageIO.write(subImage, "png", new File("test"+Math.random()+".png"));
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        return subImage;
+    }
+    
+    private void paintHighlight(Graphics2D g2, float[] oneQuad, int xOffset, int yOffset) {
+        int x = getMinXFromQuadPoints(oneQuad);
+        int y = getMinYFromQuadPoints(oneQuad);
+
+        int width = (getMaxXFromQuadPoints(oneQuad) - x) * SCALE_UP_FACTOR;
+        int height = (getMaxYFromQuadPoints(oneQuad) - y) * SCALE_UP_FACTOR;
+
+        x *= SCALE_UP_FACTOR;
+        y *= SCALE_UP_FACTOR;
         
-        return img.getSubimage(x, y, width, height);
+        x -= xOffset;
+        y -= yOffset;
+        
+        g2.setColor(highlightColor);
+        g2.fillRect(x, y, width, height);
 
-
+    }
+    
+    
+    //x values are on the even integers
+    private static int getMinXFromQuadPoints(float[] quadPoints) {
+        int min = Integer.MAX_VALUE;
+        for(int i = 0; i< quadPoints.length; i += 2) {
+            if (quadPoints[i] < min) {
+                min = (int)quadPoints[i];
+            }
+        }
+        return min;
+    }
+    
+    //y values are on the even integers
+    private static int getMinYFromQuadPoints(float[] quadPoints) {
+        int min = Integer.MAX_VALUE;
+        for(int i = 1; i< quadPoints.length; i += 2) {
+            if (quadPoints[i] < min) {
+                min = (int)quadPoints[i];
+            }
+        }
+        return min;
+    }
+    
+    //x values are on the even integers
+    private static int getMaxXFromQuadPoints(float[] quadPoints) {
+        int max = 0;
+        for(int i = 0; i< quadPoints.length; i += 2) {
+            if (quadPoints[i] > max) {
+                max = (int)quadPoints[i];
+            }
+        }
+        return max;
+    }
+    
+    //y values are on the even integers
+    private static int getMaxYFromQuadPoints(float[] quadPoints) {
+        int max = 0;
+        for(int i = 1; i< quadPoints.length; i += 2) {
+            if (quadPoints[i] > max) {
+                max = (int)quadPoints[i];
+            }
+        }
+        return max;
     }
 	
 	public void updateComments(List<PdfComment> comments, String repoOwner, String repo) {
