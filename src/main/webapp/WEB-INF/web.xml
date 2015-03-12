@@ -2,7 +2,7 @@
 
     <servlet>
         <servlet-name>Login</servlet-name>
-        <servlet-class>src.main.servlet.LoginServlet</servlet-class>
+        <servlet-class>edu.ncsu.dlf.servlet.LoginServlet</servlet-class>
     </servlet>
 
     <servlet-mapping>
@@ -12,7 +12,7 @@
 
     <servlet>
         <servlet-name>Repo</servlet-name>
-        <servlet-class>src.main.servlet.RepoServlet</servlet-class>
+        <servlet-class>edu.ncsu.dlf.servlet.RepoServlet</servlet-class>
     </servlet>
 
     <servlet-mapping>
@@ -22,7 +22,7 @@
 
     <servlet>
         <servlet-name>Reviewer</servlet-name>
-        <servlet-class>src.main.servlet.ReviewerServlet</servlet-class>
+        <servlet-class>edu.ncsu.dlf.servlet.ReviewerServlet</servlet-class>
     </servlet>
 
     <servlet-mapping>
@@ -32,7 +32,7 @@
 
     <servlet>
         <servlet-name>ReviewRequest</servlet-name>
-        <servlet-class>src.main.servlet.ReviewRequestServlet</servlet-class>
+        <servlet-class>edu.ncsu.dlf.servlet.ReviewRequestServlet</servlet-class>
     </servlet>
 
     <servlet-mapping>
@@ -42,7 +42,7 @@
 
     <servlet>
         <servlet-name>Files</servlet-name>
-        <servlet-class>src.main.servlet.FilesServlet</servlet-class>
+        <servlet-class>edu.ncsu.dlf.servlet.FilesServlet</servlet-class>
     </servlet>
 
     <servlet-mapping>
@@ -52,7 +52,7 @@
 
     <servlet>
         <servlet-name>Avatar</servlet-name>
-        <servlet-class>src.main.servlet.AvatarServlet</servlet-class>
+        <servlet-class>edu.ncsu.dlf.servlet.AvatarServlet</servlet-class>
     </servlet>
 
     <servlet-mapping>
@@ -62,7 +62,7 @@
 
     <servlet>
         <servlet-name>ReviewSubmit</servlet-name>
-        <servlet-class>src.main.servlet.ReviewSubmitServlet</servlet-class>
+        <servlet-class>edu.ncsu.dlf.servlet.ReviewSubmitServlet</servlet-class>
     </servlet>
 
     <servlet-mapping>
@@ -72,7 +72,7 @@
 
     <servlet>
         <servlet-name>Status</servlet-name>
-        <servlet-class>src.main.servlet.StatusServlet</servlet-class>
+        <servlet-class>edu.ncsu.dlf.servlet.StatusServlet</servlet-class>
     </servlet>
 
     <servlet-mapping>
@@ -82,7 +82,7 @@
 
     <servlet>
         <servlet-name>User</servlet-name>
-        <servlet-class>src.main.servlet.UserServlet</servlet-class>
+        <servlet-class>edu.ncsu.dlf.servlet.UserServlet</servlet-class>
     </servlet>
 
     <servlet-mapping>
@@ -92,7 +92,7 @@
 
     <servlet>
         <servlet-name>Search</servlet-name>
-        <servlet-class>src.main.servlet.SearchServlet</servlet-class>
+        <servlet-class>edu.ncsu.dlf.servlet.SearchServlet</servlet-class>
     </servlet>
 
     <servlet-mapping>
@@ -102,7 +102,7 @@
 
     <servlet>
         <servlet-name>RepoSource</servlet-name>
-        <servlet-class>src.main.servlet.RepoSourceServlet</servlet-class>
+        <servlet-class>edu.ncsu.dlf.servlet.RepoSourceServlet</servlet-class>
     </servlet>
 
     <servlet-mapping>
