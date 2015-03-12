@@ -1,9 +1,14 @@
 package edu.ncsu.dlf.model;
 
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.imageio.ImageIO;
 
 import edu.ncsu.dlf.model.PdfComment.Tag;
 
@@ -19,6 +24,8 @@ import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationTextMarkup;
  *
  */
 public class Pdf {
+    private static final int BORDER_WIDTH = 10;
+    
 	private static final PDGamma ORANGE = new PDGamma();
 	private static final PDGamma GREEN = new PDGamma();
     private static final PDGamma YELLOW = new PDGamma();
@@ -43,6 +50,7 @@ public class Pdf {
 		doc = PDDocument.load(input);
 	}
 	
+	@Deprecated
 	public List<String> getComments() {
 		List<String> comments = new ArrayList<>();
 		 
@@ -65,6 +73,69 @@ public class Pdf {
 		 
 		 return comments;
 	}
+	
+	public List<PdfComment> getPDFComments() {
+        List<PdfComment> comments = new ArrayList<>();
+         
+        @SuppressWarnings("unchecked")
+        List<PDPage> pages = doc.getDocumentCatalog().getAllPages();
+         
+         for(PDPage page : pages) {
+             try {
+                 BufferedImage img = null;
+                 for(PDAnnotation anno : page.getAnnotations()) {
+                     if (img == null) {
+                         img = page.convertToImage();
+                     }
+                     if(anno instanceof PDAnnotationTextMarkup) {
+                         PDAnnotationTextMarkup comment = (PDAnnotationTextMarkup) anno;
+                         
+                         if(comment.getContents() != null) {
+                            PdfComment pdfComment = new PdfComment(comment.getContents());
+                            
+                            pdfComment.setImage(makeSubImage(img,comment.getQuadPoints()));
+                            comments.add(pdfComment);
+                         }
+                     }
+                     
+                 }
+             } catch(IOException e) {
+                 e.printStackTrace();
+             }
+         }
+         
+         return comments;
+    }
+	
+	   /* adapted the specs of a pdf tool http://www.pdf-technologies.com/api/html/P_PDFTech_PDFMarkupAnnotation_QuadPoints.htm
+     * The QuadPoints array must contain 8*n elements specifying the coordinates of n quadrilaterals. 
+     * Each quadrilateral encompasses a word or group of continuous words in the text underlying the annotation. 
+     * The coordinates for each quadrilateral are given in the order x4 y4 x3 y3 x1 y1 x2 y2 specifying the quadrilateral's 
+     * four vertices  x1 is upper left and numbering goes clockwise. 
+     * 
+     */
+    private BufferedImage makeSubImage(BufferedImage img, float[] quadPoints) {
+        if (quadPoints.length < 8) {
+            return null;
+        }
+        int x = (int) (quadPoints[4]-BORDER_WIDTH) * 2;
+        int y = (int) (quadPoints[5]-BORDER_WIDTH) * 2;
+        
+        int width = (int) (quadPoints[2] - quadPoints[4] + 2* BORDER_WIDTH) * 2;
+        int height = (int) (quadPoints[3] - quadPoints[5] + 2* BORDER_WIDTH) * 2;
+        
+        
+        //for debugging
+        try {
+            ImageIO.write(img.getSubimage(x, (img.getHeight() - y - height), width, height), "png", new File("test.png"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        
+        return img.getSubimage(x, y, width, height);
+
+
+    }
 	
 	public void updateComments(List<PdfComment> comments, String repoOwner, String repo) {
 		@SuppressWarnings("unchecked")
@@ -118,6 +189,8 @@ public class Pdf {
         newComment.setTitlePopup(comment.getTitlePopup());    //author name
         return newComment;
     }
+    
+    
 
 	public PDDocument getDoc() {
 		return doc;
@@ -125,5 +198,12 @@ public class Pdf {
 	
 	public void close() throws IOException {
 		doc.close();
+	}
+	
+	public static void main(String[] args) throws Exception{
+	    FileInputStream fos = new FileInputStream("test.pdf");
+	    Pdf pdf = new Pdf(fos);
+
+	    System.out.println(pdf.getPDFComments());
 	}
 }

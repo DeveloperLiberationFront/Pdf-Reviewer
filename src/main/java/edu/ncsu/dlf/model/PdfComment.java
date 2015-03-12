@@ -1,5 +1,6 @@
 package edu.ncsu.dlf.model;
 
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -53,6 +54,7 @@ public class PdfComment {
 	private List<Tag> tags;
 	private String comment;
 	private int issueNumber;
+	private BufferedImage image;
 	
 	public PdfComment(String string) {
 		string = setIssueNumberAndRepairBrokenTags(string);
@@ -209,4 +211,12 @@ public class PdfComment {
 		
 		return (tagStr + issueLinkStr + getComment()).trim();
 	}
+
+    public BufferedImage getImage() {
+        return image;
+    }
+
+    public void setImage(BufferedImage image) {
+        this.image = image;
+    }
 }
