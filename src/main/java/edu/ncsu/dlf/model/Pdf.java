@@ -29,7 +29,7 @@ import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationTextMarkup;
  */
 public class Pdf {
     private static final int BORDER_WIDTH = 30;
-    private static final int SCALE_UP_FACTOR = 2;
+    private static final float SCALE_UP_FACTOR = 1.5f;
     private static final int DEFAULT_SIZE = 72;
     
 	private static final PDGamma ORANGE = new PDGamma();
@@ -74,7 +74,8 @@ public class Pdf {
 
                 for (PDAnnotation anno : annotations) {
                     if (pageImage == null) {
-                        pageImage = page.convertToImage(BufferedImage.TYPE_INT_RGB, DEFAULT_SIZE * SCALE_UP_FACTOR);
+                        int size = Math.round(DEFAULT_SIZE * SCALE_UP_FACTOR);
+                        pageImage = page.convertToImage(BufferedImage.TYPE_INT_RGB, size);
                     }
                     if (anno instanceof PDAnnotationTextMarkup) {
                         PDAnnotationTextMarkup comment = (PDAnnotationTextMarkup) anno;
@@ -117,11 +118,11 @@ public class Pdf {
         int minX = getMinXFromQuadPoints(quadPoints);
         int minY = getMinYFromQuadPoints(quadPoints);
 
-        int width = (getMaxXFromQuadPoints(quadPoints) - minX + 2* BORDER_WIDTH) * SCALE_UP_FACTOR;
-        int height = (getMaxYFromQuadPoints(quadPoints) - minY + 2* BORDER_WIDTH) * SCALE_UP_FACTOR;
+        int width = Math.round((getMaxXFromQuadPoints(quadPoints) - minX + 2* BORDER_WIDTH) * SCALE_UP_FACTOR);
+        int height = Math.round((getMaxYFromQuadPoints(quadPoints) - minY + 2* BORDER_WIDTH) * SCALE_UP_FACTOR);
 
-        int x = (minX-BORDER_WIDTH) * SCALE_UP_FACTOR;  
-        int y = (minY-BORDER_WIDTH) * SCALE_UP_FACTOR;
+        int x = Math.round((minX-BORDER_WIDTH) * SCALE_UP_FACTOR);  
+        int y = Math.round((minY-BORDER_WIDTH) * SCALE_UP_FACTOR);
 
         BufferedImage subImage = null;
 
@@ -148,8 +149,8 @@ public class Pdf {
         int x = getMinXFromQuadPoints(oneQuad);
         int y = getMinYFromQuadPoints(oneQuad);
 
-        int width = (getMaxXFromQuadPoints(oneQuad) - x) * SCALE_UP_FACTOR;
-        int height = (getMaxYFromQuadPoints(oneQuad) - y) * SCALE_UP_FACTOR;
+        int width = Math.round((getMaxXFromQuadPoints(oneQuad) - x) * SCALE_UP_FACTOR);
+        int height = Math.round((getMaxYFromQuadPoints(oneQuad) - y) * SCALE_UP_FACTOR);
 
         x *= SCALE_UP_FACTOR;
         y *= SCALE_UP_FACTOR;
