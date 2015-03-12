@@ -55,8 +55,8 @@ function showReviews(writerOrReviewer, reviews) {
 
     var html = "<table>"
              + "<tr><td><label>" + wrText + "</label></td><td><a href='https://github.com/" + getOtherUser(review).login + "'>" + otherUser + "</a></td></tr>"
-             + "<tr><td><label>Repository:</label></td><td><a href='https://github.com/" + getOtherUser(review).login + "/" + review.repo + "'>" + review.repo + "</a></td></tr>"
-             + "<tr><td><label>Paper:</label></td><td><a href='https://github.com/" + getOtherUser(review).login + "/" + review.repo + "/blob/master/" + review.paper + "'>" + paper + "</a></td></tr>"
+             + "<tr><td><label>Repository:</label></td><td><a href='https://github.com/" + review.writer.login + "/" + review.repo + "'>" + review.repo + "</a></td></tr>"
+             + "<tr><td><label>Paper:</label></td><td><a href='https://github.com/" + review.writer.login + "/" + review.repo + "/blob/master/" + review.paper + "'>" + paper + "</a></td></tr>"
              + "</table>";
 
     var reviewDiv = $("<div />")
