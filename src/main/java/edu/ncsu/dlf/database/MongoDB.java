@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
@@ -50,15 +51,12 @@ public class MongoDB implements DBAbstraction {
         DB db = mongoClient.getDB(DB_NAME);
         DBCollection coll = db.getCollection(DB_NAME);
         coll.setObjectClass(Review.class);
-        DBCursor cursor = coll.find();
+        BasicDBObject query = new BasicDBObject(whichUser +".Login", userToLookFor);
+        DBCursor cursor = coll.find(query);
         try {
             while (cursor.hasNext()) {
                 DBObject element = cursor.next();
-                Object user = element.get(whichUser);
-                if (element instanceof Review && user instanceof PDFUser &&
-                        userToLookFor.getLogin().equals(((PDFUser) user).getLogin())) {
-                    retVal.add((Review) element);
-                }
+                retVal.add((Review) element);
             }
         } finally {
            cursor.close();
