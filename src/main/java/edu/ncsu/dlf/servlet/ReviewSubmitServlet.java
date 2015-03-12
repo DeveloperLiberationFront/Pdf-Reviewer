@@ -257,7 +257,6 @@ public class ReviewSubmitServlet extends HttpServlet {
 		private List<PdfComment> comments;
 		private String repoOwnerLogin;
 		private String repoName;
-        private DBAbstraction database;
 		
 		public void setter(List<PdfComment> comments, String accessToken, String writerLogin, String repoName) {
 			this.comments = comments;
@@ -272,7 +271,7 @@ public class ReviewSubmitServlet extends HttpServlet {
 					GitHubClient client = new GitHubClient();
 					client.setOAuth2Token(accessToken);
 					
-					database = DatabaseFactory.getDatabase();
+					DBAbstraction database = DatabaseFactory.getDatabase();
 					UserService userService = new UserService(client);
 					User reviewer = userService.getUser();
 					
@@ -291,68 +290,80 @@ public class ReviewSubmitServlet extends HttpServlet {
 
         public void createIssues(GitHubClient client, String writerLogin, String repoName, List<PdfComment> comments) throws IOException {
         	for(PdfComment comment : comments) {
-        		createIssue(client, writerLogin, repoName, comment);
+        		createOrUpdateIssue(client, writerLogin, repoName, comment);
         	}
         }
 
-        public void createIssue(GitHubClient client, String writerLogin, String repoName, PdfComment comment) throws IOException {
+        public void createOrUpdateIssue(GitHubClient client, String writerLogin, String repoName, PdfComment comment) throws IOException {
         	IssueService issueService = new IssueService(client);
         	
         	// If the issue does not already exist
         	if(comment.getIssueNumber() == 0) { 
-        		Issue issue = new Issue();
-        		issue.setTitle(comment.getTitle());
-        		issue.setBody(comment.getComment());
-        		
-        		List<Label> labels = new ArrayList<>();
-        		
-        		for(Tag tag : comment.getTags()) {
-        			Label label = new Label();
-        			label.setName(tag.name());
-        			labels.add(label);
-        		}
-        		
-        		issue.setLabels(labels);
-        		//creates an issue remotely
-        		issue = issueService.createIssue(writerLogin, repoName, issue);
-        		comment.setIssueNumber(issue.getNumber());
+        		createIssue(writerLogin, repoName, comment, issueService);
         	}
-        	// If the issue already exists
+        	// If the issue already exists, update it
         	else {
-        		Issue issue = issueService.getIssue(writerLogin, repoName, comment.getIssueNumber());
-        		String issueText = comment.getComment();
-        		if(!issue.getBody().equals(issueText)) {
-        			issueService.createComment(writerLogin, repoName, comment.getIssueNumber(), issueText);
-        		}
-        		
-        		List<Label> existingLabels = issue.getLabels();
-        		List<Label> labels = new ArrayList<>();
-        		for(Tag tag : comment.getTags()) {
-        			Label l = new Label();
-        			l.setName(tag.name());
-        			labels.add(l);
-        		}
-        		
-        		boolean updateLabels = labels.size() != existingLabels.size();
-        		if(!updateLabels) {
-        			for(Label l1 : labels) {
-        				updateLabels = true;
-        				for(Label l2 : existingLabels) {
-        					if(l1.getName().equals(l2.getName())) {
-        						updateLabels = false;
-        						break;
-        					}
-        				}
-        				if(updateLabels)
-        					break;
-        			}
-        		}
-        		
-        		if(updateLabels) {
-        			issue.setLabels(labels);
-        			issueService.editIssue(writerLogin, repoName, issue);
-        		}
+        		updateIssue(writerLogin, repoName, comment, issueService);
         	}
+        }
+
+        private void createIssue(String writerLogin, String repoName, PdfComment comment, IssueService issueService)
+                throws IOException {
+            Issue issue = new Issue();
+            issue.setTitle(comment.getTitle());
+            //TODO upload image and set the link here
+            issue.setBody(comment.getComment());
+            
+            List<Label> labels = new ArrayList<>();
+            
+            for(Tag tag : comment.getTags()) {
+            	Label label = new Label();
+            	label.setName(tag.name());
+            	labels.add(label);
+            }
+            
+            issue.setLabels(labels);
+            //creates an issue remotely
+            issue = issueService.createIssue(writerLogin, repoName, issue);
+            comment.setIssueNumber(issue.getNumber());
+        }
+
+        private void updateIssue(String writerLogin, String repoName, PdfComment comment, IssueService issueService)
+                throws IOException {
+            Issue issue = issueService.getIssue(writerLogin, repoName, comment.getIssueNumber());
+            String issueText = comment.getComment();
+            if(!issue.getBody().equals(issueText)) {
+                // makes a comment if the text has changed
+            	issueService.createComment(writerLogin, repoName, comment.getIssueNumber(), issueText);
+            }
+            
+            List<Label> existingLabels = issue.getLabels();
+            List<Label> labels = new ArrayList<>();
+            for(Tag tag : comment.getTags()) {
+            	Label l = new Label();
+            	l.setName(tag.name());
+            	labels.add(l);
+            }
+            
+            boolean shouldUpdateLabels = labels.size() != existingLabels.size();
+            if(!shouldUpdateLabels) {
+            	for(Label l1 : labels) {
+            		shouldUpdateLabels = true;
+            		for(Label l2 : existingLabels) {
+            			if(l1.getName().equals(l2.getName())) {
+            				shouldUpdateLabels = false;
+            				break;
+            			}
+            		}
+            		if(shouldUpdateLabels)
+            			break;
+            	}
+            }
+            
+            if(shouldUpdateLabels) {
+            	issue.setLabels(labels);
+            	issueService.editIssue(writerLogin, repoName, issue);
+            }
         }
 	}
 }
