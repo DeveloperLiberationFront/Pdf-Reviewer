@@ -103,73 +103,7 @@ public class ReviewSubmitServlet extends HttpServlet {
         thread.start();
     }
 	
-	public void createIssue(GitHubClient client, String writerLogin, String repoName, PdfComment comment) throws IOException {
-		IssueService issueService = new IssueService(client);
-		
-		// If the issue does not already exist
-		if(comment.getIssueNumber() == 0) { 
-			Issue issue = new Issue();
-			issue.setTitle(comment.getTitle());
-			issue.setBody(comment.getComment());
-			
-			List<Label> labels = new ArrayList<>();
-			
-			for(Tag tag : comment.getTags()) {
-				Label label = new Label();
-				label.setName(tag.name());
-				labels.add(label);
-			}
-			
-			issue.setLabels(labels);
-			//creates an issue remotely
-			issue = issueService.createIssue(writerLogin, repoName, issue);
-			comment.setIssueNumber(issue.getNumber());
-		}
-		// If the issue already exists
-		else {
-			Issue issue = issueService.getIssue(writerLogin, repoName, comment.getIssueNumber());
-			String issueText = comment.getComment();
-			if(!issue.getBody().equals(issueText)) {
-				issueService.createComment(writerLogin, repoName, comment.getIssueNumber(), issueText);
-			}
-			
-			List<Label> existingLabels = issue.getLabels();
-			List<Label> labels = new ArrayList<>();
-			for(Tag tag : comment.getTags()) {
-				Label l = new Label();
-				l.setName(tag.name());
-				labels.add(l);
-			}
-			
-			boolean updateLabels = labels.size() != existingLabels.size();
-			if(!updateLabels) {
-				for(Label l1 : labels) {
-					updateLabels = true;
-					for(Label l2 : existingLabels) {
-						if(l1.getName().equals(l2.getName())) {
-							updateLabels = false;
-							break;
-						}
-					}
-					if(updateLabels)
-						break;
-				}
-			}
-			
-			if(updateLabels) {
-				issue.setLabels(labels);
-				issueService.editIssue(writerLogin, repoName, issue);
-			}
-		}
-	}
-	
-	public void createIssues(GitHubClient client, String writerLogin, String repoName, List<PdfComment> comments) throws IOException {
-		for(PdfComment comment : comments) {
-			createIssue(client, writerLogin, repoName, comment);
-		}
-	}
-	
-	public List<PdfComment> updatePdf(Pdf pdf) throws IOException {
+	private List<PdfComment> updatePdf(Pdf pdf) throws IOException {
 	    List<PdfComment> pdfComments = pdf.getPDFComments();
 		if(!pdfComments.isEmpty()) {
 			
@@ -236,7 +170,7 @@ public class ReviewSubmitServlet extends HttpServlet {
 		}
 	}
 	
-    public String addPdfToRepo(Pdf pdf, User reviewer) throws IOException {
+    private String addPdfToRepo(Pdf pdf, User reviewer) throws IOException {
         String filePath = "reviews/" + reviewer.getLogin() + ".pdf";
         String sha = null;
         
@@ -354,5 +288,71 @@ public class ReviewSubmitServlet extends HttpServlet {
 					System.err.println("Error processing Pdf.");
 				}
 		}
+
+        public void createIssues(GitHubClient client, String writerLogin, String repoName, List<PdfComment> comments) throws IOException {
+        	for(PdfComment comment : comments) {
+        		createIssue(client, writerLogin, repoName, comment);
+        	}
+        }
+
+        public void createIssue(GitHubClient client, String writerLogin, String repoName, PdfComment comment) throws IOException {
+        	IssueService issueService = new IssueService(client);
+        	
+        	// If the issue does not already exist
+        	if(comment.getIssueNumber() == 0) { 
+        		Issue issue = new Issue();
+        		issue.setTitle(comment.getTitle());
+        		issue.setBody(comment.getComment());
+        		
+        		List<Label> labels = new ArrayList<>();
+        		
+        		for(Tag tag : comment.getTags()) {
+        			Label label = new Label();
+        			label.setName(tag.name());
+        			labels.add(label);
+        		}
+        		
+        		issue.setLabels(labels);
+        		//creates an issue remotely
+        		issue = issueService.createIssue(writerLogin, repoName, issue);
+        		comment.setIssueNumber(issue.getNumber());
+        	}
+        	// If the issue already exists
+        	else {
+        		Issue issue = issueService.getIssue(writerLogin, repoName, comment.getIssueNumber());
+        		String issueText = comment.getComment();
+        		if(!issue.getBody().equals(issueText)) {
+        			issueService.createComment(writerLogin, repoName, comment.getIssueNumber(), issueText);
+        		}
+        		
+        		List<Label> existingLabels = issue.getLabels();
+        		List<Label> labels = new ArrayList<>();
+        		for(Tag tag : comment.getTags()) {
+        			Label l = new Label();
+        			l.setName(tag.name());
+        			labels.add(l);
+        		}
+        		
+        		boolean updateLabels = labels.size() != existingLabels.size();
+        		if(!updateLabels) {
+        			for(Label l1 : labels) {
+        				updateLabels = true;
+        				for(Label l2 : existingLabels) {
+        					if(l1.getName().equals(l2.getName())) {
+        						updateLabels = false;
+        						break;
+        					}
+        				}
+        				if(updateLabels)
+        					break;
+        			}
+        		}
+        		
+        		if(updateLabels) {
+        			issue.setLabels(labels);
+        			issueService.editIssue(writerLogin, repoName, issue);
+        		}
+        	}
+        }
 	}
 }
