@@ -37,13 +37,13 @@ public class MongoDB implements DBAbstraction {
     }
     
     @Override
-    public List<Review> getPendingReviews(User user, UserService userService) {
-        return findRequests(user, "Reviewer");
+    public List<Review> getReviewsWhereUserIsRequester(User user, UserService userService) {
+        return findRequests(user, "Requester");
     }
 
     @Override
-    public List<Review> getPendingReviewRequests(User user, UserService userService) {
-        return findRequests(user, "Requester");
+    public List<Review> getReviewsWhereUserIsReviewer(User user, UserService userService) {
+        return findRequests(user, "Reviewer");
     }
 
     private List<Review> findRequests(User userToLookFor, String whichUser) {

@@ -9,9 +9,9 @@ import org.eclipse.egit.github.core.service.UserService;
 
 public interface DBAbstraction {
     
-    public List<Review> getPendingReviews(User user, UserService userService);
+    public List<Review> getReviewsWhereUserIsRequester(User user, UserService userService);
 
-    public List<Review> getPendingReviewRequests(User user, UserService userService);
+    public List<Review> getReviewsWhereUserIsReviewer(User user, UserService userService);
 
     public void addReviewToDatastore(Review newReview);
 

@@ -8,8 +8,8 @@ function getReviews() {
   $.get("/status?access_token=" + accessToken)
     .done(function(data) {
       $("#reviewRequests, #pendingReviews").empty();
-      showPendingRequests(data.requests);
-      showPendingReviews(data.reviews);
+      showPendingRequests(data.reviewsWhereUserIsReviewer);
+      showPendingReviews(data.reviewsWhereUserIsRequester);
     });
 }
 

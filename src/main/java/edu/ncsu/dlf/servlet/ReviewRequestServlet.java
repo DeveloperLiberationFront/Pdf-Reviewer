@@ -67,7 +67,7 @@ public class ReviewRequestServlet extends HttpServlet {
 					String downloadLink = makeReviewRequestLabel(reviewer);
 					DBAbstraction database = DatabaseFactory.getDatabase();
 		        
-					Review newReview = new Review(reviewer.getLogin(), repoOwner, userService.getUser().getLogin(), repoName, paper, downloadLink, new UserService(client));
+					Review newReview = new Review(userService.getUser().getLogin(), repoOwner, reviewer.getLogin() , repoName, paper, downloadLink, new UserService(client));
 					
 					database.addReviewToDatastore(newReview);
 				} catch(IOException e) {

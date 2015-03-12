@@ -16,6 +16,7 @@ import edu.ncsu.dlf.model.Review;
 import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.UserService;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -32,19 +33,31 @@ public class StatusServlet extends HttpServlet {
 		UserService userService = new UserService(client);
 		User user = userService.getUser();
 			
+		resp.setContentType("application/json");
 		try {
 			JSONObject json = new JSONObject();
 			
-			List<Review> pendingReviews = database.getPendingReviews(user, userService);
-			List<Review> pendingReviewRequests = database.getPendingReviewRequests(user, userService);
+			List<Review> reviewsWhereUserIsRequester = database.getReviewsWhereUserIsRequester(user, userService);
+			List<Review> reviewsWhereUserIsReviewer = database.getReviewsWhereUserIsReviewer(user, userService);
 
-			json.put("requests", JSONUtils.toJSON(pendingReviewRequests));
-			json.put("reviews", JSONUtils.toJSON(pendingReviews));
+			json.put("reviewsWhereUserIsReviewer", JSONUtils.toJSON(reviewsWhereUserIsReviewer));
+			json.put("reviewsWhereUserIsRequester", JSONUtils.toJSON(reviewsWhereUserIsRequester));
 			
-			resp.setContentType("application/json");
 			resp.getWriter().write(json.toString(2));
 		} catch(Exception e) {
 			e.printStackTrace();
+			System.out.println("Trying to recover and send empty arrays");
+			try {
+                JSONObject json = new JSONObject();
+
+                json.put("reviewsWhereUserIsReviewer", new JSONArray());
+                json.put("reviewsWhereUserIsRequester", new JSONArray());
+
+                resp.getWriter().write(json.toString(2));
+            } catch (JSONException je) {
+                je.printStackTrace();
+                resp.sendError(500);
+			}
 		}
 	}
 	
