@@ -39,6 +39,7 @@ public class MongoDB implements DBAbstraction {
         List<Review> retVal = new ArrayList<>();
         DB db = mongoClient.getDB(DB_NAME);
         DBCollection coll = db.getCollection(DB_NAME);
+        coll.setObjectClass(Review.class);
         DBCursor cursor = coll.find();
         try {
             while (cursor.hasNext()) {
@@ -63,6 +64,7 @@ public class MongoDB implements DBAbstraction {
         List<Review> retVal = new ArrayList<>();
         DB db = mongoClient.getDB(DB_NAME);
         DBCollection coll = db.getCollection(DB_NAME);
+        coll.setObjectClass(Review.class);
         DBCursor cursor = coll.find();
         try {
             while (cursor.hasNext()) {
