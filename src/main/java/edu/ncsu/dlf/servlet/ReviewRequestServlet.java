@@ -29,7 +29,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class ReviewRequestServlet extends HttpServlet {
-	private static final long serialVersionUID = 1L;
+	private static final String SERVICE_URL = "http://pdfreview-ncsudlf.rhcloud.com/";
+    private static final long serialVersionUID = 1L;
     private String repoName;
     private String pathToPaper;
     private String paper;
@@ -101,7 +102,7 @@ public class ReviewRequestServlet extends HttpServlet {
         issue.setAssignee(reviewer);
         
         paper = pathToPaper + "/" + paper;
-        String link = "http://pdfreviewhub.appspot.com/?repoName=" + repoName + "&writer=" + repoOwner + "&paper=" + paper;
+        String link = SERVICE_URL + "?repoName=" + repoName + "&writer=" + repoOwner + "&paper=" + paper;
         
         
         
@@ -150,20 +151,6 @@ public class ReviewRequestServlet extends HttpServlet {
         // TODO Auto-generated method stub
         // Should add a comment to the front of the pdf with a memo about tags
     }
-
-//    void addReviewToDatastore(String reviewer, String writer, String requester, String repo, String paper, String link) {
-//		Entity request = new Entity("request");
-//		request.setProperty("reviewer", reviewer);
-//		request.setProperty("writer", writer);
-//		request.setProperty("requester", requester);
-//		request.setProperty("repo", repo);
-//		request.setProperty("paper", paper);
-//		request.setUnindexedProperty("link", link);
-//		
-//		DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-//		
-//		datastore.put(request);
-//	}
 	
 	@Override
 	protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -180,18 +167,5 @@ public class ReviewRequestServlet extends HttpServlet {
 		DBAbstraction database = DatabaseFactory.getDatabase();
 		database.removeReviewFromDatastore(reviewer, writer, repo);
 	}
-	
-//	static void removeReviewFromDatastore(String reviewer, String writer, String repo) {
-//		DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-//
-//		Query query = new Query("request");
-//		FilterPredicate filterReviewer = new FilterPredicate("reviewer", FilterOperator.EQUAL, reviewer);
-//		FilterPredicate filterWriter = new FilterPredicate("writer", FilterOperator.EQUAL, writer);
-//		FilterPredicate filterRepo = new FilterPredicate("repo", FilterOperator.EQUAL, repo);
-//		query.setFilter(CompositeFilterOperator.and(filterReviewer, filterWriter, filterRepo));
-//		PreparedQuery preparedQuery = datastore.prepare(query);
-//		for(Entity e : preparedQuery.asIterable()) {
-//			datastore.delete(e.getKey());
-//		}
-//	}
+
 }
