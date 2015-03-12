@@ -46,6 +46,9 @@ public class ImageUtils {
      * @return
      */
     public static String uploadPhoto(BufferedImage image) throws IOException {
+        if (image == null) {
+            throw new IOException("image was null", new NullPointerException());
+        }
         String publicLinkToPhoto = null;
         synchronized (singleton) {
             if (singleton.photoService == null) {

@@ -22,6 +22,7 @@ import edu.ncsu.dlf.database.DatabaseFactory;
 import edu.ncsu.dlf.model.Pdf;
 import edu.ncsu.dlf.model.PdfComment;
 import edu.ncsu.dlf.model.PdfComment.Tag;
+import edu.ncsu.dlf.utils.ImageUtils;
 
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
@@ -311,8 +312,17 @@ public class ReviewSubmitServlet extends HttpServlet {
                 throws IOException {
             Issue issue = new Issue();
             issue.setTitle(comment.getTitle());
-            //TODO upload image and set the link here
-            issue.setBody(comment.getComment());
+            
+            String body = comment.getComment();
+            try {
+                String imageURL = ImageUtils.uploadPhoto(comment.getImage());
+                body = String.format("![snippet](%s)%n%n%s", imageURL, body);
+            } catch (IOException e) {
+                e.printStackTrace();
+                // could not upload image, but carry on anyway
+            }
+            
+            issue.setBody(body); 
             
             List<Label> labels = new ArrayList<>();
             
