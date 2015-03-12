@@ -8,10 +8,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import edu.ncsu.dlf.JSONUtils;
 import edu.ncsu.dlf.database.DBAbstraction;
 import edu.ncsu.dlf.database.DatabaseFactory;
 import edu.ncsu.dlf.model.Review;
+import edu.ncsu.dlf.utils.JSONUtils;
 
 import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.client.GitHubClient;

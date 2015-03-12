@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import edu.ncsu.dlf.HttpUtils;
+import edu.ncsu.dlf.utils.HttpUtils;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;

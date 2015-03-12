@@ -9,10 +9,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import edu.ncsu.dlf.HttpUtils;
 import edu.ncsu.dlf.database.DBAbstraction;
 import edu.ncsu.dlf.database.DatabaseFactory;
 import edu.ncsu.dlf.model.Review;
+import edu.ncsu.dlf.utils.HttpUtils;
 
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
