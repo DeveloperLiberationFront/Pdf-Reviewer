@@ -9,7 +9,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import edu.ncsu.dlf.HttpUtils;
-import edu.ncsu.dlf.database.DatabaseFactory;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -23,8 +22,6 @@ public class LoginServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		HttpPost request = null;
-		DatabaseFactory.getDatabase();        //test database
-		
 		try {
 			URIBuilder builder = new URIBuilder("https://github.com/login/oauth/access_token");
 			builder.addParameter("client_id", System.getenv("GITHUB_ID"));
