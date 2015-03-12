@@ -32,8 +32,8 @@ public class Review extends ReflectionDBObject {
 
     public Review(String requesterLogin, String writerLogin, String reviewerLogin, String repo, String paper, String link, UserService userService) throws IOException {
         this(PDFUser.userFromLogin(requesterLogin, userService),
-                PDFUser.userFromLogin(requesterLogin, userService),
-                PDFUser.userFromLogin(requesterLogin, userService),
+                PDFUser.userFromLogin(writerLogin, userService),
+                PDFUser.userFromLogin(reviewerLogin, userService),
                 repo, paper, link);
     }
     
