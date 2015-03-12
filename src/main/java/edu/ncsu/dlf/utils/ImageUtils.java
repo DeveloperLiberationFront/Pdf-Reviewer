@@ -4,19 +4,40 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 import javax.imageio.ImageIO;
 
 import com.google.gdata.client.photos.PicasawebService;
 import com.google.gdata.data.media.MediaByteArraySource;
-import com.google.gdata.data.media.MediaFileSource;
-import com.google.gdata.data.media.MediaSource;
 import com.google.gdata.data.photos.PhotoEntry;
+import com.google.gdata.util.AuthenticationException;
 import com.google.gdata.util.ServiceException;
 
 public class ImageUtils {
+    
+    private PicasawebService photoService;
+    private URL pdfAlbumUrl;
+    private static ImageUtils singleton = new ImageUtils();
+    
+    private ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    
+    private ImageUtils() {
+        photoService = new PicasawebService("ncsu-pdfreviewer-0.1");
+        
+        String username = System.getenv("PICASSA_USER");
+        String password = System.getenv("PICASSA_PASSWORD");
+        String pdfAlbumId = System.getenv("PICASSA_PDF_ALBUM_ID");
+        
+        try {
+            pdfAlbumUrl = new URL("https://picasaweb.google.com/data/feed/api/user/default/albumid/"+pdfAlbumId);
+            photoService.setUserCredentials(username, password);
+        } catch (AuthenticationException | MalformedURLException e) {
+            e.printStackTrace();
+            photoService = null;
+        } 
+    }
     
     /**
      * Uploads a photo to a hosting service and returns the publicly-accessable URI to be used
@@ -24,12 +45,33 @@ public class ImageUtils {
      * @param img
      * @return
      */
-    public URI uploadPhoto(BufferedImage img) {
-        // TODO
-        return null;
+    public static String uploadPhoto(BufferedImage image) throws IOException {
+        String publicLinkToPhoto = null;
+        synchronized (singleton) {
+            if (singleton.photoService == null) {
+                throw new IOException("Could not authenticate with Picassa");
+            }
+            
+            singleton.baos.reset(); 
+            ImageIO.write(image, "png", singleton.baos);
+            MediaByteArraySource myMedia = new MediaByteArraySource(singleton.baos.toByteArray(), "image/png");
+
+            PhotoEntry returnedPhoto;
+            try {
+                returnedPhoto = singleton.photoService.insert(singleton.pdfAlbumUrl, PhotoEntry.class, myMedia);
+            } catch (ServiceException e) {
+                e.printStackTrace();
+                throw new IOException("Problem uploading photo", e);
+            }
+            
+            publicLinkToPhoto = returnedPhoto.getMediaContents().get(0).getUrl();
+        }
+        return publicLinkToPhoto;
     }
     
-    public static void main(String[] args) throws IOException, ServiceException {
+    
+    @SuppressWarnings("unused")
+    private static void main(String[] args) throws IOException, ServiceException {
         PicasawebService photoService = new PicasawebService("ncsu-pdfreviewer-0.1");
         
         String username = System.getenv("PICASSA_USER");
