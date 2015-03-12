@@ -84,7 +84,11 @@ public class ReviewRequestServlet extends HttpServlet {
         
         try {
         	LabelService labelService = new LabelService(client);
-        	labelService.createLabel(repoOwner, repoName, reviewRequestLabel);
+        	Label label = labelService.getLabel(repoOwner, repoName, "Review Request");
+        	if (label == null) {
+        	    labelService.createLabel(repoOwner, repoName, reviewRequestLabel);
+        	}
+        	
         } catch(IOException e) {
             e.printStackTrace();
         }
