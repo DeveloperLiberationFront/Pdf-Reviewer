@@ -1,11 +1,14 @@
 package edu.ncsu.dlf.database;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import com.mongodb.DB;
+import com.mongodb.DBCollection;
+import com.mongodb.DBCursor;
+import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
@@ -29,27 +32,57 @@ public class MongoDB implements DBAbstraction {
         
         MongoCredential credential = MongoCredential.createCredential(user, DB_NAME, password.toCharArray());
         this.mongoClient = new MongoClient(address, Arrays.asList(credential));
-
-        DB db = mongoClient.getDB(DB_NAME);
-        System.out.println("DB checked out: "+db.getName());
     }
     
     @Override
     public List<Review> getPendingReviews(User user, UserService userService) {
-        // TODO Auto-generated method stub
-        return Collections.emptyList();
+        List<Review> retVal = new ArrayList<>();
+        DB db = mongoClient.getDB(DB_NAME);
+        DBCollection coll = db.getCollection(DB_NAME);
+        DBCursor cursor = coll.find();
+        try {
+            while (cursor.hasNext()) {
+                DBObject element = cursor.next();
+                System.out.println(element);
+                Object reviewer = element.get("reviewer");
+                System.out.println(reviewer);
+                if (reviewer instanceof Review && user.getLogin().equals(((DBObject) reviewer).get("login"))) {
+                    retVal.add((Review) reviewer);
+                }
+            }
+        } finally {
+           cursor.close();
+        }
+        return retVal;
     }
 
     @Override
     public List<Review> getPendingReviewRequests(User user, UserService userService) {
-        // TODO Auto-generated method stub
-        return Collections.emptyList();
+        List<Review> retVal = new ArrayList<>();
+        DB db = mongoClient.getDB(DB_NAME);
+        DBCollection coll = db.getCollection(DB_NAME);
+        DBCursor cursor = coll.find();
+        try {
+            while (cursor.hasNext()) {
+                DBObject element = cursor.next();
+                System.out.println(element);
+                Object requester = element.get("requester");
+                System.out.println(requester);
+                if (requester instanceof Review && user.getLogin().equals(((DBObject) requester).get("login"))) {
+                    retVal.add((Review) requester);
+                }
+            }
+        } finally {
+           cursor.close();
+        }
+        return retVal;
     }
 
     @Override
     public void addReviewToDatastore(Review newReview) {
-        // TODO Auto-generated method stub
-        
+        DB db = mongoClient.getDB(DB_NAME);
+        DBCollection coll = db.getCollection(DB_NAME);
+        coll.save(newReview);
     }
 
     @Override
