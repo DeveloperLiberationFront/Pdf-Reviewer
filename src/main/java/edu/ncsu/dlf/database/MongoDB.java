@@ -51,7 +51,7 @@ public class MongoDB implements DBAbstraction {
         DB db = mongoClient.getDB(DB_NAME);
         DBCollection coll = db.getCollection(DB_NAME);
         coll.setObjectClass(Review.class);
-        BasicDBObject query = new BasicDBObject(whichUser +".Login", userToLookFor);
+        BasicDBObject query = new BasicDBObject(whichUser +".Login", userToLookFor.getLogin());
         DBCursor cursor = coll.find(query);
         try {
             while (cursor.hasNext()) {
