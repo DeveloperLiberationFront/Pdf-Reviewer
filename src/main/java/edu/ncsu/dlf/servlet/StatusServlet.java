@@ -37,9 +37,7 @@ public class StatusServlet extends HttpServlet {
 			
 			List<Review> pendingReviews = database.getPendingReviews(user, userService);
 			List<Review> pendingReviewRequests = database.getPendingReviewRequests(user, userService);
-			
-			System.out.println(pendingReviews);
-			
+
 			json.put("requests", JSONUtils.toJSON(pendingReviewRequests));
 			json.put("reviews", JSONUtils.toJSON(pendingReviews));
 			
