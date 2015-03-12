@@ -83,44 +83,44 @@ public class Pdf {
 	
 	public List<PdfComment> getPDFComments() {
         List<PdfComment> comments = new ArrayList<>();
-        
+
         @SuppressWarnings("unchecked")
         List<PDPage> pages = doc.getDocumentCatalog().getAllPages();
-         
-         for(PDPage page : pages) {
-             try {
-                 BufferedImage pageImage = null;
 
-                 List<PDAnnotation> annotations = page.getAnnotations();
-                 
-                 //erase annotations from page to avoid them blotting out text
-                page.setAnnotations(Collections.<PDAnnotation>emptyList());
-                 
-                for(PDAnnotation anno : annotations) {              
-                     if (pageImage == null) {
-                         pageImage = page.convertToImage(BufferedImage.TYPE_INT_RGB, DEFAULT_SIZE * SCALE_UP_FACTOR);
-                     }
+        for (PDPage page : pages) {
+            try {
+                BufferedImage pageImage = null;
+
+                List<PDAnnotation> annotations = page.getAnnotations();
+
+                // erase annotations from page to avoid them blotting out text
+                page.setAnnotations(Collections.<PDAnnotation> emptyList());
+
+                for (PDAnnotation anno : annotations) {
+                    if (pageImage == null) {
+                        pageImage = page.convertToImage(BufferedImage.TYPE_INT_RGB, DEFAULT_SIZE * SCALE_UP_FACTOR);
+                    }
                     if (anno instanceof PDAnnotationTextMarkup) {
                         PDAnnotationTextMarkup comment = (PDAnnotationTextMarkup) anno;
                         if (comment != null) {
-                            System.out.println(comment.getContents());
-
-                            if (comment.getContents() != null) {
-                                PdfComment pdfComment = new PdfComment(comment.getContents());
-
-                                pdfComment.setImage(makeSubImage(pageImage, comment.getQuadPoints()));
-                                comments.add(pdfComment);
+                            String writtenComment = comment.getContents();
+                            if (writtenComment == null) {
+                                writtenComment = "[blank]";
                             }
+                            PdfComment pdfComment = new PdfComment(writtenComment);
+
+                            pdfComment.setImage(makeSubImage(pageImage, comment.getQuadPoints()));
+                            comments.add(pdfComment);
                         }
                     }
-                     
-                 }
-             } catch(IOException e) {
-                 e.printStackTrace();
-             }
-         }
-         
-         return comments;
+
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return comments;
     }
 	
     /* adapted the specs of a pdf tool http://www.pdf-technologies.com/api/html/P_PDFTech_PDFMarkupAnnotation_QuadPoints.htm
