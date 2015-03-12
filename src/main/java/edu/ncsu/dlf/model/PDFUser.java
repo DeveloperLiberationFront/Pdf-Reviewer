@@ -2,18 +2,22 @@ package edu.ncsu.dlf.model;
 
 import java.io.IOException;
 
+import com.mongodb.ReflectionDBObject;
+
 import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.service.UserService;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class PDFUser {
+public class PDFUser extends ReflectionDBObject {
     
-    public final String login;
-    public final String email;
-    public final String name;
+    public String login;
+    public String email;
+    public String name;
     
-    
+    public PDFUser() {
+        // For MongoDB
+    }
 
     public PDFUser(String login, String email, String name) {
         this.login = login;
@@ -35,4 +39,30 @@ public class PDFUser {
         return json;
     }
 
+    public String getLogin() {
+        return login;
+    }
+
+    public void setLogin(String login) {
+        this.login = login;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    
+    
 }
