@@ -13,8 +13,8 @@ import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
+import com.mongodb.WriteResult;
 
-import edu.ncsu.dlf.model.PDFUser;
 import edu.ncsu.dlf.model.Review;
 
 import org.eclipse.egit.github.core.User;
@@ -46,12 +46,12 @@ public class MongoDB implements DBAbstraction {
         return findRequests(user, "Reviewer");
     }
 
-    private List<Review> findRequests(User userToLookFor, String whichUser) {
+    private List<Review> findRequests(User userToLookFor, String roleOfUser) {
         List<Review> retVal = new ArrayList<>();
         DB db = mongoClient.getDB(DB_NAME);
         DBCollection coll = db.getCollection(DB_NAME);
         coll.setObjectClass(Review.class);
-        BasicDBObject query = new BasicDBObject(whichUser +".Login", userToLookFor.getLogin());
+        BasicDBObject query = new BasicDBObject(roleOfUser +".Login", userToLookFor.getLogin());
         DBCursor cursor = coll.find(query);
         try {
             while (cursor.hasNext()) {
@@ -73,8 +73,13 @@ public class MongoDB implements DBAbstraction {
 
     @Override
     public void removeReviewFromDatastore(String reviewer, String writer, String repo) {
-        // TODO Auto-generated method stub
-        
+        DB db = mongoClient.getDB(DB_NAME);
+        DBCollection coll = db.getCollection(DB_NAME);
+        BasicDBObject query = new BasicDBObject("Reviewer.Login", reviewer).
+                append("Writer.Login", writer).
+                append("Repo", repo);
+        WriteResult result = coll.remove(query);
+        System.out.println(result.getN() +" documents removed");
     }
 
 }

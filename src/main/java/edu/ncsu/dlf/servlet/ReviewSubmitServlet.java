@@ -322,14 +322,14 @@ public class ReviewSubmitServlet extends HttpServlet {
 	private final class SubmitTask implements Runnable {
 		private String accessToken;
 		private List<String> commentStrs;
-		private String writerLogin;
+		private String repoOwnerLogin;
 		private String repoName;
         private DBAbstraction database;
 		
 		public void setter(List<String> comments, String accessToken, String writerLogin, String repoName) {
 			this.commentStrs = comments;
 			this.accessToken = accessToken;
-			this.writerLogin = writerLogin;
+			this.repoOwnerLogin = writerLogin;
 			this.repoName = repoName;
 		}
 
@@ -345,11 +345,12 @@ public class ReviewSubmitServlet extends HttpServlet {
 					
 					List<PdfComment> comments = PdfComment.getComments(commentStrs);
 					
-					createIssues(client, writerLogin, repoName, comments);
+					createIssues(client, repoOwnerLogin, repoName, comments);
 					
 					String closeComment = "@" + reviewer.getLogin() + " has reviewed this paper.";
-					closeReviewIssue(client, writerLogin, repoName, reviewer.getLogin(), closeComment);
-					database.removeReviewFromDatastore(reviewer.getLogin(), writerLogin, repoName);
+					closeReviewIssue(client, repoOwnerLogin, repoName, reviewer.getLogin(), closeComment);
+					
+					database.removeReviewFromDatastore(reviewer.getLogin(), repoOwnerLogin, repoName);
 					
 				} catch(IOException e) {
 				    e.printStackTrace();

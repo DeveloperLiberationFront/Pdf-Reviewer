@@ -11,7 +11,7 @@ import org.json.JSONObject;
 public class Review extends ReflectionDBObject {
     
     public PDFUser requester;
-    public PDFUser writer;
+    public PDFUser writer;      //owner of the repository (can't change w/o big changes in database)
     public PDFUser reviewer;
     public String repo;
     public String paper;
