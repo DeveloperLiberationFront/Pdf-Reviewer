@@ -15,13 +15,29 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.HttpClients;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 
 public class LoginServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		HttpPost request = null;
+		if (req.getParameter("code") == null) {
+		    resp.setContentType("application/json");
+		    JSONObject jobj = new JSONObject();
+		    try {
+		        jobj.put("client_id", System.getenv("GITHUB_ID"));
+	            jobj.write(resp.getWriter()); 
+		    } catch (JSONException e) {
+		        e.printStackTrace();
+		        resp.sendError(500);
+		    }
+		    return;
+		}
+	    
+	    
+	    HttpPost request = null;
 		try {
 			URIBuilder builder = new URIBuilder("https://github.com/login/oauth/access_token");
 			builder.addParameter("client_id", System.getenv("GITHUB_ID"));

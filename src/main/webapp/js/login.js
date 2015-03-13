@@ -5,12 +5,27 @@ function setupLogin(afterLogin) {
   accessToken = localStorage.githubAccessToken;
 
   var code = getQueryParams("code");
-  var clientId = escape("d6f1b88552bb1a2da275");
+  var clientId;
 
   $("#login").on("click", function(e) {
     e.preventDefault();
-    window.location = "https://github.com/login/oauth/authorize?" + "client_id=" + clientId + "&scope=repo&state=totallyrandomstring";
-  });
+    $.get("/login")
+    .done(function(data) {
+      clientId = escape(data.client_id);
+      
+      if(data.client_id === undefined) {
+        showAlert("danger", "<strong>Failed</strong> to login.");
+        $("#login").fadeIn();
+        return;
+      }
+      window.location = "https://github.com/login/oauth/authorize?" + "client_id=" + clientId + "&scope=repo&state=totallyrandomstring";
+    })
+    .fail(function() {
+      showAlert("danger", "<strong>Failed</strong> to login.");
+      $("#login").fadeIn();
+    });
+    return;
+     });
 
   // If there is no code or accessToken, have the user login.
   if(code === null && accessToken === undefined) {
