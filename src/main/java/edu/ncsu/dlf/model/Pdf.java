@@ -29,7 +29,7 @@ import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationTextMarkup;
  */
 public class Pdf {
     private static final int BORDER_WIDTH = 30;
-    private static final float SCALE_UP_FACTOR = 1.5f;
+    private static final float SCALE_UP_FACTOR = 2.0f;
     private static final int DEFAULT_SIZE = 72;
     
 	private static final PDGamma ORANGE = new PDGamma();
