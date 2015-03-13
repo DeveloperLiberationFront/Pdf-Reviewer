@@ -120,11 +120,13 @@ public class Pdf {
         int minX = getMinXFromQuadPoints(quadPoints);
         int minY = getMinYFromQuadPoints(quadPoints);
 
-        int width = Math.round((getMaxXFromQuadPoints(quadPoints) - minX + 2* BORDER_WIDTH) * SCALE_UP_FACTOR);
-        int height = Math.round((getMaxYFromQuadPoints(quadPoints) - minY + 2* BORDER_WIDTH) * SCALE_UP_FACTOR);
-
         int x = Math.round((minX-BORDER_WIDTH) * SCALE_UP_FACTOR);  
         int y = Math.round((minY-BORDER_WIDTH) * SCALE_UP_FACTOR);
+        
+        int width = Math.round((getMaxXFromQuadPoints(quadPoints) - minX + 2* BORDER_WIDTH) * SCALE_UP_FACTOR);
+        width = Math.min(width, img.getWidth() - x);  //clamp width
+        int height = Math.round((getMaxYFromQuadPoints(quadPoints) - minY + 2* BORDER_WIDTH) * SCALE_UP_FACTOR);
+        height = Math.min(height, img.getHeight() - y);  //clamp height
 
         BufferedImage subImage = null;
 
