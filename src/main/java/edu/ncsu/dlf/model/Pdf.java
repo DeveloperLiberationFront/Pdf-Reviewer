@@ -3,6 +3,7 @@ package edu.ncsu.dlf.model;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,12 +12,16 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import javax.imageio.ImageIO;
+
 import edu.ncsu.dlf.model.PdfComment.Tag;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.graphics.color.PDGamma;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
+import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationText;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationTextMarkup;
 
 
@@ -82,8 +87,19 @@ public class Pdf {
                         }
                         PdfComment pdfComment = new PdfComment(writtenComment);
 
-                        pdfComment.setImage(makeSubImage(pageImage, comment.getQuadPoints()));
+                        pdfComment.setImage(makeHighlightedSubImage(pageImage, comment.getQuadPoints()));
                         comments.add(pdfComment);
+                    } else if (anno instanceof PDAnnotationText ){
+                        String writtenComment = anno.getContents();
+                        if (writtenComment == null) {
+                            writtenComment = "[blank]";
+                        }
+                        PdfComment pdfComment = new PdfComment(writtenComment);
+
+                        pdfComment.setImage(makePopupSubImage(pageImage, anno.getRectangle()));
+                        comments.add(pdfComment);
+                    } else {
+                        System.out.println(anno);
                     }
 
                 }
@@ -97,6 +113,17 @@ public class Pdf {
         return comments;
     }
 	
+    private BufferedImage makeHighlightedSubImage(BufferedImage img, float[] quadPoints) {
+        return makeSubImage(img, quadPoints, PostExtractMarkup.HIGHLIGHTS);
+    }
+
+    private BufferedImage makePopupSubImage(BufferedImage img, PDRectangle r) {
+        float[] convertedQuadPoints = new float[]{r.getLowerLeftX(),r.getLowerLeftY(),
+                r.getUpperRightX(), r.getLowerLeftY(), r.getLowerLeftX(), r.getUpperRightY(),
+                r.getUpperRightX(), r.getUpperRightY()};
+        return makeSubImage(img, convertedQuadPoints, PostExtractMarkup.POPUP);
+    }
+
     /* adapted the specs of a pdf tool http://www.pdf-technologies.com/api/html/P_PDFTech_PDFMarkupAnnotation_QuadPoints.htm
      * The QuadPoints array must contain 8*n elements specifying the coordinates of n quadrilaterals. 
      * Each quadrilateral encompasses a word or group of continuous words in the text underlying the annotation. 
@@ -106,7 +133,7 @@ public class Pdf {
      * I assume all quadrilaterals are rectangles.  No guarantees on multi-column selects
      * 
      */
-    private BufferedImage makeSubImage(BufferedImage img, float[] quadPoints) {
+    private BufferedImage makeSubImage(BufferedImage img, float[] quadPoints, PostExtractMarkup markup) {
         if (quadPoints.length < 8) {
             return null;
         }
@@ -130,22 +157,29 @@ public class Pdf {
         // the y is counted from the bottom, so we have to flip our coordinate
         g2.drawImage(subImage, 0, 0, null);
        
-
-        for (int n = 0; n < quadPoints.length; n += 8) {
-            float[] oneQuad = Arrays.copyOfRange(quadPoints, n, n + 8);
-            paintHighlight(g2, oneQuad, x, y, height);
+        if (markup == PostExtractMarkup.HIGHLIGHTS) {
+            for (int n = 0; n < quadPoints.length; n += 8) {
+                float[] oneQuad = Arrays.copyOfRange(quadPoints, n, n + 8);
+                paintHighlight(g2, oneQuad, x, y, height);
+            }
+        } else if (markup == PostExtractMarkup.POPUP) {
+            // TODO use image in resources/comment_box.png
         }
         
         g2.dispose();
 
-//        try {
-//            // for debugging
-//            ImageIO.write(newImage, "png", new File("test"+Math.random()+".png"));
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
+        try {
+            // for debugging
+            ImageIO.write(newImage, "png", new File("test"+Math.random()+".png"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         return newImage;
+    }
+    
+    private enum PostExtractMarkup {
+        NONE, HIGHLIGHTS, POPUP
     }
     
     private void paintHighlight(Graphics2D g2, float[] oneQuad, int xOffset, int yOffset, int imageHeight) {
@@ -276,7 +310,7 @@ public class Pdf {
 	}
 	
 	@SuppressWarnings("unused")
-    private static void main(String[] args) throws Exception{
+    public static void main(String[] args) throws Exception{
 	    FileInputStream fos = new FileInputStream("test.pdf");
 	    Pdf pdf = new Pdf(fos);
 
