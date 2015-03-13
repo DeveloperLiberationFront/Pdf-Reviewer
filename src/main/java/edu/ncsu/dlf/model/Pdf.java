@@ -134,7 +134,7 @@ public class Pdf {
         Graphics2D g2 = subImage.createGraphics();
         for (int n = 0; n < quadPoints.length; n += 8) {
             float[] oneQuad = Arrays.copyOfRange(quadPoints, n, n + 8);
-            paintHighlight(g2, oneQuad, x, y);
+            paintHighlight(g2, oneQuad, x, y, height);
         }
 
         try {
@@ -147,7 +147,7 @@ public class Pdf {
         return subImage;
     }
     
-    private void paintHighlight(Graphics2D g2, float[] oneQuad, int xOffset, int yOffset) {
+    private void paintHighlight(Graphics2D g2, float[] oneQuad, int xOffset, int yOffset, int imageHeight) {
         int x = getMinXFromQuadPoints(oneQuad);
         int y = getMinYFromQuadPoints(oneQuad);
 
@@ -161,7 +161,8 @@ public class Pdf {
         y -= yOffset;
         
         g2.setColor(highlightColor);
-        g2.fillRect(x, y, width, height);
+        //again, invert the y axis
+        g2.fillRect(x, imageHeight - y - height, width, height);
 
     }
     
