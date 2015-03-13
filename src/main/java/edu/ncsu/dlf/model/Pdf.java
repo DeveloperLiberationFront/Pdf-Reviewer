@@ -221,17 +221,17 @@ public class Pdf {
 				for(int i=0; i<annotations.size(); i++) {
 					PDAnnotation anno = annotations.get(i);
 					
-					if(anno instanceof PDAnnotationTextMarkup) {
-					    if(anno.getContents() != null) {
-					        PdfComment userComment = comments.get(commentOn);
-					        commentOn++;
-					        String newMessage = userComment.getMessageWithLink(repoOwner, repo);
-                            PDAnnotationTextMarkup newComment = makeNewAnnotation((PDAnnotationTextMarkup) anno, userComment, newMessage);
-					        
-                            newList.add(newComment);
-                        }
-					}
-				}			
+                    if (anno instanceof PDAnnotationTextMarkup) {
+                        PdfComment userComment = comments.get(commentOn);
+                        commentOn++;
+                        String newMessage = userComment.getMessageWithLink(repoOwner, repo);
+                        PDAnnotationTextMarkup newComment = makeNewAnnotation((PDAnnotationTextMarkup) anno, userComment, newMessage);
+
+                        newList.add(newComment);
+                    } else {
+                        newList.add(anno);
+                    }
+                }		
 				page.setAnnotations(newList);
 			} catch(IOException e) {
 			    e.printStackTrace();
