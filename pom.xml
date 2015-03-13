@@ -110,6 +110,7 @@
                   <port>9090</port>
                   <!-- application path always starts with /-->
                   <path>/</path>
+                  <contextReloadable>true</contextReloadable>
                   <!-- optional path to a context file 
                   <contextFile>${tomcatContextXml}</contextFile>-->
                   <!-- optional system properties you want to add 
