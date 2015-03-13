@@ -128,25 +128,29 @@ public class Pdf {
         int height = Math.round((getMaxYFromQuadPoints(quadPoints) - minY + 2* BORDER_WIDTH) * SCALE_UP_FACTOR);
         height = Math.min(height, img.getHeight() - y);  //clamp height
 
-        BufferedImage subImage = null;
-
+        BufferedImage subImage = img.getSubimage(x, (img.getHeight() - y - height), width, height);
+        
+        BufferedImage newImage = new BufferedImage(subImage.getWidth(), subImage.getHeight(), img.getType());
+        Graphics2D g2 = newImage.createGraphics();
         // the y is counted from the bottom, so we have to flip our coordinate
-        subImage = img.getSubimage(x, (img.getHeight() - y - height), width, height);
+        g2.drawImage(subImage, 0, 0, null);
+       
 
-        Graphics2D g2 = subImage.createGraphics();
         for (int n = 0; n < quadPoints.length; n += 8) {
             float[] oneQuad = Arrays.copyOfRange(quadPoints, n, n + 8);
             paintHighlight(g2, oneQuad, x, y, height);
         }
+        
+        g2.dispose();
 
-        try {
-            // for debugging
-            ImageIO.write(subImage, "png", new File("test"+Math.random()+".png"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            // for debugging
+//            ImageIO.write(newImage, "png", new File("test"+Math.random()+".png"));
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
 
-        return subImage;
+        return newImage;
     }
     
     private void paintHighlight(Graphics2D g2, float[] oneQuad, int xOffset, int yOffset, int imageHeight) {
