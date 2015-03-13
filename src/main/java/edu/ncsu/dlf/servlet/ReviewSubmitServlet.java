@@ -122,21 +122,22 @@ public class ReviewSubmitServlet extends HttpServlet {
 	}
 	
 	@SuppressWarnings("unused")
-    private static void main(String[] args) throws IOException, COSVisitorException {
+    public static void main(String[] args) throws IOException, COSVisitorException {
         Pdf pdf = new Pdf(new FileInputStream("C:\\Users\\KevinLubick\\Downloads\\test_anno.pdf"));
-        ReviewSubmitServlet servlet = new ReviewSubmitServlet();
+
         List<PdfComment> pdfComments = pdf.getPDFComments();
 
         // Set the issue numbers
         int issueNumber = 1;
         for (PdfComment com : pdfComments) {
+            System.out.println(com);
             if (com.getIssueNumber() == 0) {
                 com.setIssueNumber(issueNumber++);
             }
         }
 
         // Update the comments
-        pdf.updateComments(pdfComments, servlet.writerLogin, servlet.repoName);
+        pdf.updateComments(pdfComments, "kjlubick", "testing-review-pdf");
 
         pdf.getDoc().save("C:\\Users\\KevinLubick\\Downloads\\test_anno_1.pdf");
         
@@ -290,6 +291,7 @@ public class ReviewSubmitServlet extends HttpServlet {
 
         public void createIssues(GitHubClient client, String writerLogin, String repoName, List<PdfComment> comments) throws IOException {
         	for(PdfComment comment : comments) {
+        	    System.out.println(comment);
         		createOrUpdateIssue(client, writerLogin, repoName, comment);
         	}
         }

@@ -92,6 +92,8 @@ public class Pdf {
                     }
 
                 }
+                // restore annotations
+                page.setAnnotations(annotations);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -234,7 +236,7 @@ public class Pdf {
 			} catch(IOException e) {
 			    e.printStackTrace();
 			} finally {
-			    page.clear();
+			    //page.clear();
 			    page.updateLastModified();
 			}
 		}

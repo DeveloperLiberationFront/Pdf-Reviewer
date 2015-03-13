@@ -179,9 +179,9 @@ public class PdfComment {
 	}
 	
 	@Override
-	public String toString() {
-		return getTitle() + " {" + getTags() + "} " + "[" + getIssueNumber() + "]" + getComment();
-	}
+    public String toString() {
+        return "PdfComment [tags=" + tags + ", comment=" + comment + ", issueNumber=" + issueNumber + ", image=" + image.getWidth() +"x"+ image.getHeight() + "px]";
+    }
 	
 	public String getMessageWithLink(String repoOwner, String repo) {
 		String tagStr = "";
