@@ -28,12 +28,12 @@ public class ReviewerServlet extends HttpServlet {
 		client.setOAuth2Token(req.getParameter("access_token"));
 		
 		UserService userService = new UserService(client);
-		
 		User user = userService.getUser(login);
 		boolean isOrg = "Organization".equals(user.getType());
 		
 		List<User> reviewers = new ArrayList<>();
-		reviewers.add(user);      //adds myself
+		User loggedInUser = userService.getUser();
+        reviewers.add(loggedInUser);      //adds myself
 		
 		if(!isOrg) {
 			List<User> followers = userService.getFollowers();
@@ -44,12 +44,13 @@ public class ReviewerServlet extends HttpServlet {
 			both.addAll(following);
 			
 			u1: for(User u : both) {
+			    //avoid duplicates
 				for(User u2 : reviewers) {
+				    //compare by login because object equality can't be trusted
 					if(u2.getLogin().equals(u.getLogin())) {
 						continue u1;
 					}
 				}
-				
 				reviewers.add(u);
 			}
 		}
@@ -63,13 +64,12 @@ public class ReviewerServlet extends HttpServlet {
 		
 		try {
 			for(User u : reviewers) {
-				u = userService.getUser(u.getLogin());
 				JSONObject uJson = new JSONObject();
 				uJson.put("login", u.getLogin());
 				
 				String name = u.getName();
 				name = name == null? "" : name;
-                if (user.getLogin().equals(u.getLogin())) {
+                if (loggedInUser.getLogin().equals(u.getLogin())) {
 				    uJson.put("name", name + " (Myself)");
 				} else {
 				    uJson.put("name", name);
