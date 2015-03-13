@@ -26,7 +26,6 @@ import edu.ncsu.dlf.utils.ImageUtils;
 
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
-import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPut;
@@ -74,39 +73,41 @@ public class ReviewSubmitServlet extends HttpServlet {
             return;
         }
 
-        SubmitTask task = new SubmitTask();
-        String pdfUrl = "";
-
+        UploadIssuesRunnable task = new UploadIssuesRunnable();
+        String urlToPdfInRepo = "";
+        Pdf pdf = null;
         try {
             FileItemIterator iter = upload.getItemIterator(req);
             FileItemStream file = iter.next();
-            Pdf pdf = new Pdf(file.openStream());
+            pdf = new Pdf(file.openStream());
 
             this.client = new GitHubClient();
             client.setOAuth2Token(accessToken);
             UserService userService = new UserService(client);
             User reviewer = userService.getUser();
 
-            List<PdfComment> comments = updatePdf(pdf);
-            pdfUrl = addPdfToRepo(pdf, reviewer);
+            List<PdfComment> comments = updatePdfWithNumberedAndColoredAnnotations(pdf);
+            urlToPdfInRepo = addPdfToRepo(pdf, reviewer);
             task.setter(comments, accessToken, writerLogin, repoName);
-
-            pdf.close();
-        } catch (FileUploadException e) {
+            
+        } catch (Exception e) {
             e.printStackTrace();
             resp.sendError(500, "There has been an error uploading your Pdf.");
+            return;
+        } finally {
+            if (pdf != null) {
+                pdf.close();
+            }
         }
 
-        resp.getWriter().write(pdfUrl);
-        
+        resp.getWriter().write(urlToPdfInRepo);
         Thread thread = new Thread(task);
         thread.start();
     }
 	
-	private List<PdfComment> updatePdf(Pdf pdf) throws IOException {
+	private List<PdfComment> updatePdfWithNumberedAndColoredAnnotations(Pdf pdf) throws IOException {
 	    List<PdfComment> pdfComments = pdf.getPDFComments();
 		if(!pdfComments.isEmpty()) {
-			
 			// Set the issue numbers
 			int issueNumber = getNumTotalIssues() + 1;
 			for(PdfComment com : pdfComments) {
@@ -115,34 +116,11 @@ public class ReviewSubmitServlet extends HttpServlet {
 				}
 			}
 			
-			// Update the comments
+			// Update the comments to link to the repository and their newly assigned issue number
 			pdf.updateComments(pdfComments, this.writerLogin, this.repoName);
 		}
 		return pdfComments;
 	}
-	
-	@SuppressWarnings("unused")
-    public static void main(String[] args) throws IOException, COSVisitorException {
-        Pdf pdf = new Pdf(new FileInputStream("C:\\Users\\KevinLubick\\Downloads\\test_anno.pdf"));
-
-        List<PdfComment> pdfComments = pdf.getPDFComments();
-
-        // Set the issue numbers
-        int issueNumber = 1;
-        for (PdfComment com : pdfComments) {
-            System.out.println(com);
-            if (com.getIssueNumber() == 0) {
-                com.setIssueNumber(issueNumber++);
-            }
-        }
-
-        // Update the comments
-        pdf.updateComments(pdfComments, "kjlubick", "testing-review-pdf");
-
-        pdf.getDoc().save("C:\\Users\\KevinLubick\\Downloads\\test_anno_1.pdf");
-        
-        pdf.close();
-    }
 	
 	private int getNumTotalIssues() throws IOException {
 	    IssueService issueService = new IssueService(client);
@@ -156,7 +134,7 @@ public class ReviewSubmitServlet extends HttpServlet {
         return issues.size();
     }
 
-    public static void closeReviewIssue(GitHubClient client, String writerLogin, String repoName, String reviewer, String comment) throws IOException {
+    static void closeReviewIssue(GitHubClient client, String writerLogin, String repoName, String reviewer, String comment) throws IOException {
 		IssueService issueService = new IssueService(client);
 		
 		for(Issue issue : issueService.getIssues(writerLogin, repoName, null)) {
@@ -252,8 +230,8 @@ public class ReviewSubmitServlet extends HttpServlet {
         }
         
     }
-	
-	private final class SubmitTask implements Runnable {
+
+    private final class UploadIssuesRunnable implements Runnable {
 		private String accessToken;
 		private List<PdfComment> comments;
 		private String repoOwnerLogin;
@@ -381,4 +359,28 @@ public class ReviewSubmitServlet extends HttpServlet {
             }
         }
 	}
+    
+    
+    @SuppressWarnings("unused")
+    private static void main(String[] args) throws IOException, COSVisitorException {
+        Pdf pdf = new Pdf(new FileInputStream("C:\\Users\\KevinLubick\\Downloads\\test_anno.pdf"));
+    
+        List<PdfComment> pdfComments = pdf.getPDFComments();
+    
+        // Set the issue numbers
+        int issueNumber = 1;
+        for (PdfComment com : pdfComments) {
+            System.out.println(com);
+            if (com.getIssueNumber() == 0) {
+                com.setIssueNumber(issueNumber++);
+            }
+        }
+    
+        // Update the comments
+        pdf.updateComments(pdfComments, "kjlubick", "testing-review-pdf");
+    
+        pdf.getDoc().save("C:\\Users\\KevinLubick\\Downloads\\test_anno_1.pdf");
+        
+        pdf.close();
+    }
 }

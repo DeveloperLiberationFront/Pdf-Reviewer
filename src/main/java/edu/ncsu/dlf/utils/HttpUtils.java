@@ -37,7 +37,7 @@ public class HttpUtils {
     	StringBuilder sb = new StringBuilder();
 		BufferedReader reader;
 	    try {
-	    	reader = new BufferedReader(new InputStreamReader(request.getInputStream()));
+	    	reader = new BufferedReader(new InputStreamReader(request.getInputStream(), StandardCharsets.UTF_8.name()));
 	        String line;
 	        while ((line = reader.readLine()) != null) {
 	            sb.append(line).append('\n');

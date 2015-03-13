@@ -3,7 +3,6 @@ package edu.ncsu.dlf.model;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,8 +10,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
-import javax.imageio.ImageIO;
 
 import edu.ncsu.dlf.model.PdfComment.Tag;
 
@@ -79,16 +76,14 @@ public class Pdf {
                     }
                     if (anno instanceof PDAnnotationTextMarkup) {
                         PDAnnotationTextMarkup comment = (PDAnnotationTextMarkup) anno;
-                        if (comment != null) {
-                            String writtenComment = comment.getContents();
-                            if (writtenComment == null) {
-                                writtenComment = "[blank]";
-                            }
-                            PdfComment pdfComment = new PdfComment(writtenComment);
-
-                            pdfComment.setImage(makeSubImage(pageImage, comment.getQuadPoints()));
-                            comments.add(pdfComment);
+                        String writtenComment = comment.getContents();
+                        if (writtenComment == null) {
+                            writtenComment = "[blank]";
                         }
+                        PdfComment pdfComment = new PdfComment(writtenComment);
+
+                        pdfComment.setImage(makeSubImage(pageImage, comment.getQuadPoints()));
+                        comments.add(pdfComment);
                     }
 
                 }
@@ -280,7 +275,8 @@ public class Pdf {
 		doc.close();
 	}
 	
-	public static void main(String[] args) throws Exception{
+	@SuppressWarnings("unused")
+    private static void main(String[] args) throws Exception{
 	    FileInputStream fos = new FileInputStream("test.pdf");
 	    Pdf pdf = new Pdf(fos);
 
