@@ -126,14 +126,14 @@
                     <additionalClasspathDir></additionalClasspathDir>
                   </additionalClasspathDirs>
                 </configuration>
-                <!-- For any extra dependencies needed when running embedded Tomcat (not WAR dependencies) add them below -->
+                <!-- For any extra dependencies needed when running embedded Tomcat (not WAR dependencies) add them below 
                 <dependencies>
                    <dependency>
                     <groupId>javax.servlet</groupId>
                     <artifactId>javax.servlet-api</artifactId>
                     <version>3.0.1</version>
                 </dependency>
-                </dependencies>
+                </dependencies>-->
               </plugin>
         </plugins>
     </build>

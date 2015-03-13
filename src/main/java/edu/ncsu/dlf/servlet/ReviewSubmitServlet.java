@@ -67,7 +67,6 @@ public class ReviewSubmitServlet extends HttpServlet {
         this.repoName = req.getParameter("repoName");
         this.writerLogin = req.getParameter("writer");
         this.accessToken = req.getParameter("access_token");
-        System.out.println("Hello " + repoName + " " + writerLogin);
 
         if (repoName == null || writerLogin == null || accessToken == null) {
             System.out.println("Something blank");
@@ -340,6 +339,7 @@ public class ReviewSubmitServlet extends HttpServlet {
 
         private void updateIssue(String writerLogin, String repoName, PdfComment comment, IssueService issueService)
                 throws IOException {
+            System.out.println("Looking for "+writerLogin+"/"+repoName);
             Issue issue = issueService.getIssue(writerLogin, repoName, comment.getIssueNumber());
             String issueText = comment.getComment();
             if(!issue.getBody().equals(issueText)) {
