@@ -205,8 +205,7 @@ public class ReviewSubmitServlet extends HttpServlet {
 
     private Repository getRepo(GitHubClient client) throws IOException {
         RepositoryService repoService = new RepositoryService(client);
-        Repository repo = repoService.getRepository(writerLogin, repoName);
-        return repo;
+        return repoService.getRepository(writerLogin, repoName);
     }
 	
 	private void readObject(ObjectInputStream inputStream) throws IOException, ClassNotFoundException
@@ -220,11 +219,10 @@ public class ReviewSubmitServlet extends HttpServlet {
 
     private URI buildURIForFileUpload(String accessToken, String writerLogin, String repoName, String filePath) throws IOException {
         try {
-            URIBuilder builder = new URIBuilder("https://api.github.com/repos/" + writerLogin + "/" + repoName + "/contents/" + filePath);
+            URIBuilder builder = new URIBuilder("https://api.github.com/repos/" + writerLogin + '/' + repoName + "/contents/" + filePath);
             builder.addParameter("access_token", accessToken);
 
-            URI build = builder.build();
-            return build;
+            return builder.build();
         } catch (URISyntaxException e) {
             throw new IOException("Could not build uri", e);
         }
@@ -322,7 +320,7 @@ public class ReviewSubmitServlet extends HttpServlet {
 
         private void updateIssue(String writerLogin, String repoName, PdfComment comment, IssueService issueService)
                 throws IOException {
-            System.out.println("Looking for "+writerLogin+"/"+repoName);
+            System.out.println("Looking for "+writerLogin+'/'+repoName);
             Issue issue = issueService.getIssue(writerLogin, repoName, comment.getIssueNumber());
             String issueText = comment.getComment();
             if(!issue.getBody().equals(issueText)) {

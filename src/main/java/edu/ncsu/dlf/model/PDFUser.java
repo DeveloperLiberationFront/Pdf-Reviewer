@@ -65,7 +65,7 @@ public class PDFUser extends ReflectionDBObject {
 
     @Override
     public String toString() {
-        return "PDFUser [login=" + login + ", email=" + email + ", name=" + name + "]";
+        return "PDFUser [login=" + login + ", email=" + email + ", name=" + name + ']';
     }
 
     

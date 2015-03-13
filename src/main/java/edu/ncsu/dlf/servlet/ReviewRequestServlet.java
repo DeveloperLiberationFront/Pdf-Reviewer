@@ -101,12 +101,12 @@ public class ReviewRequestServlet extends HttpServlet {
         issue.setLabels(labels);
         issue.setAssignee(reviewer);
         
-        paper = pathToPaper + "/" + paper;
+        paper = pathToPaper + '/' + paper;
         String link = SERVICE_URL + "?repoName=" + repoName + "&writer=" + repoOwner + "&paper=" + paper;
         
         
         
-        String downloadLink = "https://github.com/" + repoOwner + "/" + repoName + "/raw/master/" + paper;
+        String downloadLink = "https://github.com/" + repoOwner + '/' + repoName + "/raw/master/" + paper;
         issue.setBody("@" + reviewer.getLogin() + " has been requested to review this paper by @"+reviewRequester.getLogin()+".\n" +
         			  "Click [here](" + downloadLink + ") to download the paper\n" +
         			  "Click [here](" + link + ") to upload your review.");

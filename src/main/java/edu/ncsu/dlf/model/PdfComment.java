@@ -81,7 +81,7 @@ public class PdfComment {
 		if(tagsStartPos != -1 && tagsEndPos != -1) {
 			String fHalf = comment.substring(0, tagsStartPos).trim();
 			String sHalf = comment.substring(tagsEndPos + 2, comment.length()).trim();
-			comment = fHalf + " " + sHalf;
+			comment = fHalf + ' ' + sHalf;
 		}
 		
 		int issueStartPos = comment.indexOf("[[");
@@ -89,7 +89,7 @@ public class PdfComment {
 		if(issueStartPos != -1 && issueEndPos != -1) {
 			String fHalf = comment.substring(0, issueStartPos).trim();
 			String sHalf = comment.substring(issueEndPos + 2, comment.length()).trim();
-			comment = fHalf + " " + sHalf;
+			comment = fHalf + ' ' + sHalf;
 		}
 		
 		comment = comment.trim();
@@ -162,10 +162,10 @@ public class PdfComment {
 	}
 	
 	public String buildLink(String repoOwner, String repoName) {
-		return "https://github.com/" + repoOwner + "/" + repoName + "/issues/" + getIssueNumber();
+		return "https://github.com/" + repoOwner + '/' + repoName + "/issues/" + getIssueNumber();
 	}
 	
-	public JSONObject toJson() {
+	public JSONObject toJSON() {
 		JSONObject json = new JSONObject();
 		
 		try {
@@ -180,7 +180,7 @@ public class PdfComment {
 	
 	@Override
     public String toString() {
-        return "PdfComment [tags=" + tags + ", comment=" + comment + ", issueNumber=" + issueNumber + ", image=" + image.getWidth() +"x"+ image.getHeight() + "px]";
+        return "PdfComment [tags=" + tags + ", comment=" + comment + ", issueNumber=" + issueNumber + ", image=" + image.getWidth() +'x'+ image.getHeight() + "px]";
     }
 	
 	public String getMessageWithLink(String repoOwner, String repo) {
