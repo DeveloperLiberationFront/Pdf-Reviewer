@@ -64,6 +64,8 @@ public class ReviewerServlet extends HttpServlet {
 		
 		try {
 			for(User u : reviewers) {
+			    //required to fill out email
+				u = userService.getUser(u.getLogin());
 				JSONObject uJson = new JSONObject();
 				uJson.put("login", u.getLogin());
 				
