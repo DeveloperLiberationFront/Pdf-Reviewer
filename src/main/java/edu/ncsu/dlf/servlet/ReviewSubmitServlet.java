@@ -150,7 +150,7 @@ public class ReviewSubmitServlet extends HttpServlet {
 	    Map<String, String> prefs = new HashMap<String, String>();
 	    //By default, only open issues are shown
 	    prefs.put(IssueService.FILTER_STATE, "all");
-	    //get all issus for this repo
+	    //get all issues for this repo
 	    List<Issue> issues = issueService.getIssues(getRepo(client), prefs);
 	    
         return issues.size();
@@ -258,6 +258,7 @@ public class ReviewSubmitServlet extends HttpServlet {
 		private List<PdfComment> comments;
 		private String repoOwnerLogin;
 		private String repoName;
+        private int issueCount;
 		
 		public void setter(List<PdfComment> comments, String accessToken, String writerLogin, String repoName) {
 			this.comments = comments;
@@ -275,6 +276,8 @@ public class ReviewSubmitServlet extends HttpServlet {
 					DBAbstraction database = DatabaseFactory.getDatabase();
 					UserService userService = new UserService(client);
 					User reviewer = userService.getUser();
+					
+					issueCount = getNumTotalIssues();      //helps us to differentiate new issues from old
 					
 					createIssues(client, repoOwnerLogin, repoName, comments);
 					
@@ -300,7 +303,7 @@ public class ReviewSubmitServlet extends HttpServlet {
         	IssueService issueService = new IssueService(client);
         	
         	// If the issue does not already exist
-        	if(comment.getIssueNumber() == 0) { 
+        	if(comment.getIssueNumber() > issueCount) { 
         		createIssue(writerLogin, repoName, comment, issueService);
         	}
         	// If the issue already exists, update it

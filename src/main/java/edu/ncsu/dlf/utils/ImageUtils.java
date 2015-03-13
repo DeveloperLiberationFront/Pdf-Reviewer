@@ -40,7 +40,7 @@ public class ImageUtils {
     }
     
     /**
-     * Uploads a photo to a hosting service and returns the publicly-accessable URI to be used
+     * Uploads a photo to a hosting service and returns the publicly-accessible URI to be used
      * in the markdown of a new issue.
      * @param img
      * @return
