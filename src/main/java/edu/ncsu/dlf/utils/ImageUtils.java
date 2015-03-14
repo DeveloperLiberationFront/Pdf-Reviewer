@@ -67,7 +67,10 @@ public class ImageUtils {
                 throw new IOException("Problem uploading photo", e);
             }
             
-            publicLinkToPhoto = returnedPhoto.getMediaContents().get(0).getUrl();
+            publicLinkToPhoto = returnedPhoto.getMediaThumbnails().get(0).getUrl();
+            
+            //scale it up to 800 px, which is the largest we can hotlink to
+            publicLinkToPhoto = publicLinkToPhoto.replace("/s72/", "/s800/").replace("/s144/", "/s800/").replace("/s288/", "/s800/");
         }
         return publicLinkToPhoto;
     }
@@ -85,7 +88,7 @@ public class ImageUtils {
         
         URL feedUrl = new URL("https://picasaweb.google.com/data/feed/api/user/default/albumid/"+pdfAlbumId);
 
-        BufferedImage image = ImageIO.read(new File("test.png"));
+        BufferedImage image = ImageIO.read(new File("test.jpg"));
         
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         
@@ -96,12 +99,6 @@ public class ImageUtils {
         PhotoEntry returnedPhoto = photoService.insert(feedUrl, PhotoEntry.class, myMedia);
         
         System.out.println(returnedPhoto);
-        System.out.println(returnedPhoto.getId());
-        System.out.println(returnedPhoto.getHtmlLink());
-        System.out.println(returnedPhoto.getHtmlLink().getHref());
-        System.out.println(returnedPhoto.getMediaContents());
-        System.out.println(returnedPhoto.getMediaContents().get(0));
-        System.out.println(returnedPhoto.getMediaContents().get(0).getUrl());   //this one works
         
     }
 
