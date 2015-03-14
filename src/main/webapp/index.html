@@ -17,7 +17,7 @@
   <script src="js/login.js"></script>
   <script src="js/repos.js"></script>
   <script src="js/status.js"></script>
-  <script src="js/writer.js"></script>
+  <script src="js/request_review.js"></script>
   <script src="js/reviewer.js"></script>
   <script src="js/main.js"></script>
 </head>
@@ -93,8 +93,16 @@
         <button class="btn btn-default" id="addOtherReviewerBtn">Add</button>
       </div>
 
-      <button id="submitReview" class="btn btn-primary btn-lg">4. Submit Review Request</button>
+      <div id="selectRepo">
+        <h3>4. [Optional] Add additional tags to these reviewers' comments</h3>
+        <label for="Tags">Tags (in square brackets)</label>
+        <input type="text" class="form-control" id="customTags" placeholder="[ICSE] [unprocessed]">
+      </div>
+
+      <button id="submitReview" class="btn btn-primary btn-lg">5. Submit Review Request</button>
     </div>
+
+    
 
     <div id="reviewerDiv">
       <a id="downloadPaper" class="btn btn-primary btn-lg">Download Paper</a>
