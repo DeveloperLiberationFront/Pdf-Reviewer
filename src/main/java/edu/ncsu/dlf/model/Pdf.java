@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -138,7 +139,13 @@ public class Pdf {
     }
 
     private enum PostExtractMarkup {
-        NONE, HIGHLIGHTS, POPUP
+        NONE(1), HIGHLIGHTS(1), POPUP(2);
+        
+        public final float subImageContextMultiplier;
+        
+        PostExtractMarkup(float subImageContextMultiplier) {
+            this.subImageContextMultiplier = subImageContextMultiplier;
+        }
     }
 
     /* adapted the specs of a pdf tool http://www.pdf-technologies.com/api/html/P_PDFTech_PDFMarkupAnnotation_QuadPoints.htm
@@ -154,35 +161,25 @@ public class Pdf {
         if (quadPoints.length < 8) {
             return null;
         }
-
-        //we find the upper left corner
-        int minX = getMinXFromQuadPoints(quadPoints);
-        int minY = getMinYFromQuadPoints(quadPoints);
-
-        int x = Math.round((minX-BORDER_WIDTH) * SCALE_UP_FACTOR);  
-        int y = Math.round((minY-BORDER_WIDTH) * SCALE_UP_FACTOR);
         
-        int width = Math.round((getMaxXFromQuadPoints(quadPoints) - minX + 2* BORDER_WIDTH) * SCALE_UP_FACTOR);
-        width = Math.min(width, img.getWidth() - x);  //clamp width
-        int height = Math.round((getMaxYFromQuadPoints(quadPoints) - minY + 2* BORDER_WIDTH) * SCALE_UP_FACTOR);
-        height = Math.min(height, img.getHeight() - y);  //clamp height
-
-        BufferedImage subImage = img.getSubimage(x, (img.getHeight() - y - height), width, height);
+        Rectangle subImageRect = scaleAndTransformSubImageQuad(quadPoints, img, markup);
+       
+        BufferedImage subImage = img.getSubimage(subImageRect.x, subImageRect.y, subImageRect.width, subImageRect.height);
         
         BufferedImage newImage = new BufferedImage(subImage.getWidth(), subImage.getHeight(), img.getType());
         Graphics2D g2 = newImage.createGraphics();
-        // the y is counted from the bottom, so we have to flip our coordinate
+        
         g2.drawImage(subImage, 0, 0, null);
        
         if (markup == PostExtractMarkup.HIGHLIGHTS) {
             for (int n = 0; n < quadPoints.length; n += 8) {
                 float[] oneQuad = Arrays.copyOfRange(quadPoints, n, n + 8);
                 
-                paintHighlight(g2, scaleAndTransformQuad(oneQuad, x, y, height));
+                paintHighlight(g2, scaleAndTransformAnnotationQuad(oneQuad, subImageRect, img.getHeight()));
             }
         } else if (markup == PostExtractMarkup.POPUP) {
             //we know quadPoints will be only one quad because that's how makePopupSubImage defines it.
-            paintCommentBox(g2, scaleAndTransformQuad(quadPoints, x, y, height));
+            paintCommentBox(g2, scaleAndTransformAnnotationQuad(quadPoints, subImageRect, img.getHeight()));
         }
         
         g2.dispose();
@@ -202,7 +199,30 @@ public class Pdf {
         return newImage;
     }
     
-    private Rectangle scaleAndTransformQuad(float[] oneQuad, int xOffset, int yOffset, int imageHeight) {
+    private Rectangle scaleAndTransformSubImageQuad(float[] quadPoints, RenderedImage img, PostExtractMarkup markup) {
+        // we find the upper left corner
+        int minX = getMinXFromQuadPoints(quadPoints);
+        int minY = getMinYFromQuadPoints(quadPoints);
+
+        // allows us to make
+        float scaledBorder = BORDER_WIDTH * markup.subImageContextMultiplier;
+
+        int x = Math.round((minX - scaledBorder) * SCALE_UP_FACTOR);
+        x = Math.max(x, 0); // keep subimage on screen
+        int y = Math.round((minY - scaledBorder) * SCALE_UP_FACTOR);
+        y = Math.max(y, 0); // keep subimage on screen
+
+        int width = Math.round((getMaxXFromQuadPoints(quadPoints) - minX + 2 * scaledBorder) * SCALE_UP_FACTOR);
+        width = Math.min(width, img.getWidth() - x); // clamp width
+        int height = Math.round((getMaxYFromQuadPoints(quadPoints) - minY + 2 * scaledBorder) * SCALE_UP_FACTOR);
+        height = Math.min(height, img.getHeight() - y); // clamp height
+
+        // the y is counted from the bottom, so we have to flip our coordinate
+        y = (img.getHeight() - y - height);
+        return new Rectangle(x, y, width, height);
+    }
+    
+    private Rectangle scaleAndTransformAnnotationQuad(float[] oneQuad, Rectangle boundingRect, int imageHeight) {
         int x = getMinXFromQuadPoints(oneQuad);
         int y = getMinYFromQuadPoints(oneQuad);
 
@@ -212,10 +232,9 @@ public class Pdf {
         x *= SCALE_UP_FACTOR;
         y *= SCALE_UP_FACTOR;
 
-        x -= xOffset;
-        y -= yOffset;
-        // again, invert the y axis
-        y = imageHeight - y - height;
+        x -= boundingRect.x;
+        // invert y again
+        y = imageHeight - y - boundingRect.y - height;
         
         return new Rectangle(x, y, width, height);
     }
@@ -347,9 +366,9 @@ public class Pdf {
 	}
 	
 	@SuppressWarnings("unused")
-    private static void main(String[] args) throws Exception{
+    public static void main(String[] args) throws Exception{
 	    FileInputStream fos = new FileInputStream("test.pdf");
-	    Pdf pdf = new Pdf(fos, new FileInputStream("src/main/resources/comment_box.PNG"));
+	    Pdf pdf = new Pdf(fos, new FileInputStream("src/main/webapp/images/comment_box.PNG"));
 
 	    System.out.println(pdf.getPDFComments());
 	}
