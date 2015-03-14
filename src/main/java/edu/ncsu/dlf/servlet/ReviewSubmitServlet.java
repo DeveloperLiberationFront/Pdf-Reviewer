@@ -79,7 +79,9 @@ public class ReviewSubmitServlet extends HttpServlet {
         try {
             FileItemIterator iter = upload.getItemIterator(req);
             FileItemStream file = iter.next();
-            pdf = new Pdf(file.openStream());
+
+            System.out.println(getServletContext().getRealPath(Pdf.pathToCommentBoxImage));
+            pdf = new Pdf(file.openStream(), getServletContext());
 
             this.client = new GitHubClient();
             client.setOAuth2Token(accessToken);
@@ -357,28 +359,4 @@ public class ReviewSubmitServlet extends HttpServlet {
             }
         }
 	}
-    
-    
-    @SuppressWarnings("unused")
-    private static void main(String[] args) throws IOException, COSVisitorException {
-        Pdf pdf = new Pdf(new FileInputStream("C:\\Users\\KevinLubick\\Downloads\\test_anno.pdf"));
-    
-        List<PdfComment> pdfComments = pdf.getPDFComments();
-    
-        // Set the issue numbers
-        int issueNumber = 1;
-        for (PdfComment com : pdfComments) {
-            System.out.println(com);
-            if (com.getIssueNumber() == 0) {
-                com.setIssueNumber(issueNumber++);
-            }
-        }
-    
-        // Update the comments
-        pdf.updateComments(pdfComments, "kjlubick", "testing-review-pdf");
-    
-        pdf.getDoc().save("C:\\Users\\KevinLubick\\Downloads\\test_anno_1.pdf");
-        
-        pdf.close();
-    }
 }

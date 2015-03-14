@@ -1,7 +1,9 @@
 package edu.ncsu.dlf.model;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
@@ -13,6 +15,7 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.imageio.ImageIO;
+import javax.servlet.ServletContext;
 
 import edu.ncsu.dlf.model.PdfComment.Tag;
 
@@ -37,7 +40,7 @@ public class Pdf {
 	private static final PDGamma ORANGE = new PDGamma();
 	private static final PDGamma GREEN = new PDGamma();
     private static final PDGamma YELLOW = new PDGamma();
-	
+
 	static {
 	    ORANGE.setR(0.9921568627f);
 	    ORANGE.setG(0.5333333333f);
@@ -53,10 +56,18 @@ public class Pdf {
 	}
     private PDDocument doc;
     private Color highlightColor = new Color(234, 249, 35, 140);
+    public static final String pathToCommentBoxImage = "/images/comment_box.PNG";
+    private BufferedImage commentBoxImage;
 	
+    
+    private Pdf(InputStream pdfInputStream, InputStream commentBoxInputStream) throws IOException {
+        this.doc = PDDocument.load(pdfInputStream);
+        if (commentBoxInputStream != null)
+            this.commentBoxImage = ImageIO.read(commentBoxInputStream);
+    }
 	
-	public Pdf(InputStream input) throws IOException {
-		doc = PDDocument.load(input);
+	public Pdf(InputStream input, ServletContext servletContext) throws IOException {
+		this(input, servletContext.getResourceAsStream(pathToCommentBoxImage));
 	}
 	
     public List<PdfComment> getPDFComments() {
@@ -124,6 +135,10 @@ public class Pdf {
         return makeSubImage(img, convertedQuadPoints, PostExtractMarkup.POPUP);
     }
 
+    private enum PostExtractMarkup {
+        NONE, HIGHLIGHTS, POPUP
+    }
+
     /* adapted the specs of a pdf tool http://www.pdf-technologies.com/api/html/P_PDFTech_PDFMarkupAnnotation_QuadPoints.htm
      * The QuadPoints array must contain 8*n elements specifying the coordinates of n quadrilaterals. 
      * Each quadrilateral encompasses a word or group of continuous words in the text underlying the annotation. 
@@ -160,10 +175,12 @@ public class Pdf {
         if (markup == PostExtractMarkup.HIGHLIGHTS) {
             for (int n = 0; n < quadPoints.length; n += 8) {
                 float[] oneQuad = Arrays.copyOfRange(quadPoints, n, n + 8);
-                paintHighlight(g2, oneQuad, x, y, height);
+                
+                paintHighlight(g2, scaleAndTransformQuad(oneQuad, x, y, height));
             }
         } else if (markup == PostExtractMarkup.POPUP) {
-            // TODO use image in resources/comment_box.png
+            //we know quadPoints will be only one quad because that's how makePopupSubImage defines it.
+            paintCommentBox(g2, scaleAndTransformQuad(quadPoints, x, y, height));
         }
         
         g2.dispose();
@@ -178,11 +195,7 @@ public class Pdf {
         return newImage;
     }
     
-    private enum PostExtractMarkup {
-        NONE, HIGHLIGHTS, POPUP
-    }
-    
-    private void paintHighlight(Graphics2D g2, float[] oneQuad, int xOffset, int yOffset, int imageHeight) {
+    private Rectangle scaleAndTransformQuad(float[] oneQuad, int xOffset, int yOffset, int imageHeight) {
         int x = getMinXFromQuadPoints(oneQuad);
         int y = getMinYFromQuadPoints(oneQuad);
 
@@ -191,13 +204,30 @@ public class Pdf {
 
         x *= SCALE_UP_FACTOR;
         y *= SCALE_UP_FACTOR;
-        
+
         x -= xOffset;
         y -= yOffset;
+        // again, invert the y axis
+        y = imageHeight - y - height;
         
+        return new Rectangle(x, y, width, height);
+    }
+    
+    private void paintCommentBox(Graphics2D g2, Rectangle rect) {
+        if (commentBoxImage != null) {
+            g2.drawImage(commentBoxImage, rect.x, rect.y, rect.width, rect.height, null);
+        } else {
+            g2.setColor(highlightColor);
+            g2.setStroke(new BasicStroke(2 * SCALE_UP_FACTOR));
+            g2.drawRect(rect.x, rect.y , rect.width, rect.height);
+        }
+        
+    }
+
+    private void paintHighlight(Graphics2D g2, Rectangle rect) {
         g2.setColor(highlightColor);
-        //again, invert the y axis
-        g2.fillRect(x, imageHeight - y - height, width, height);
+        
+        g2.fillRect(rect.x, rect.y , rect.width, rect.height);
 
     }
     
@@ -312,7 +342,7 @@ public class Pdf {
 	@SuppressWarnings("unused")
     public static void main(String[] args) throws Exception{
 	    FileInputStream fos = new FileInputStream("test.pdf");
-	    Pdf pdf = new Pdf(fos);
+	    Pdf pdf = new Pdf(fos, new FileInputStream("src/main/resources/comment_box.PNG"));
 
 	    System.out.println(pdf.getPDFComments());
 	}
