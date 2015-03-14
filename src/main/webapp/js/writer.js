@@ -1,7 +1,12 @@
+/*global showAlert, getSelectedLogin, getOwnerOfSelected, getSelectedRepo, pathToPaper, getSelectedFile, accessToken*/
+/*exported setupWriterBtns*/
 
 function setupWriterBtns() {
   $("#submitReview").on("click", function(e) {
     e.preventDefault();
+
+  $(this).attr("disabled", true);
+
 
     var data = {
       login: getSelectedLogin(),
@@ -12,17 +17,17 @@ function setupWriterBtns() {
       reviewers: getSelectedReviewers()
     };
 
-    if(data.repo == null) {
+    if(!data.repo) {
       showAlert("warning", "Please select a repository.");
       return;
     }
 
-    if(data.reviewers.length == 0) {
+    if(data.reviewers.length === 0) {
       showAlert("warning", "Please select at least one reviewer.");
       return;
     }
 
-    if(data.paper == null) {
+    if(!data.paper) {
       showAlert("warning", "Please select a paper to be reviewed.");
       return;
     }
@@ -35,7 +40,7 @@ function setupWriterBtns() {
     })
     .fail(function(data) {
       if(data.status == 417)
-        showAlert("danger", "Some reviewers could not be added for review. Only members of the organization can review papers in an organization.")
+        showAlert("danger", "Some reviewers could not be added for review. Only members of the organization can review papers in an organization.");
       else
         showAlert("danger", "There has been a problem submitting your review.");
     });
