@@ -11,9 +11,8 @@ import org.json.JSONObject;
 public class Review extends ReflectionDBObject {
     
     public PDFUser requester;
-    public PDFUser writer;      //owner of the repository (can't change w/o big changes in database)
     public PDFUser reviewer;
-    public String repo;
+    public Repo repo;
     public String paper;
     public String link;
     
@@ -21,13 +20,20 @@ public class Review extends ReflectionDBObject {
         // For Mongo
     }
     
-    public Review(PDFUser requester, PDFUser writer, PDFUser reviewer, String repo, String paper, String link) {
+    public Review(PDFUser requester, PDFUser reviewer, Repo repo, String paper, String link) {
         this.requester = requester;
-        this.writer = writer;
         this.reviewer = reviewer;
-        this.repo = repo;
         this.paper = paper;
         this.link = link;
+        this.repo = repo;
+    }
+    
+    public Review(PDFUser requester, PDFUser repoOwner, PDFUser reviewer, String repoName, String paper, String link) {
+        this.requester = requester;
+        this.reviewer = reviewer;
+        this.paper = paper;
+        this.link = link;
+        this.repo = new Repo(repoOwner.login, repoName);
     }
 
     public Review(String requesterLogin, String writerLogin, String reviewerLogin, String repo, String paper, String link, UserService userService) throws IOException {
@@ -40,9 +46,8 @@ public class Review extends ReflectionDBObject {
     public JSONObject toJSON() throws JSONException {
         JSONObject request = new JSONObject();
         request.put("requester", requester.toJSON());
-        request.put("writer", writer.toJSON());
         request.put("reviewer", reviewer.toJSON());
-        request.put("repo", repo);
+        request.put("repo", repo.toJSON());
         request.put("paper", paper);
         request.put("link", link);
         return request;
@@ -54,20 +59,12 @@ public class Review extends ReflectionDBObject {
 
     @Override
     public String toString() {
-        return "Review [requester=" + requester + ", writer=" + writer + ", reviewer=" + reviewer + ", repo=" + repo + ", paper="
-                + paper + ", link=" + link + ']';
+        return "Review [requester=" + requester + ", reviewer=" + reviewer + ", repo=" + repo + ", paper=" + paper + ", link="
+                + link + "]";
     }
 
     public void setRequester(PDFUser requester) {
         this.requester = requester;
-    }
-
-    public PDFUser getWriter() {
-        return writer;
-    }
-
-    public void setWriter(PDFUser writer) {
-        this.writer = writer;
     }
 
     public PDFUser getReviewer() {
@@ -78,11 +75,11 @@ public class Review extends ReflectionDBObject {
         this.reviewer = reviewer;
     }
 
-    public String getRepo() {
+    public Repo getRepo() {
         return repo;
     }
 
-    public void setRepo(String repo) {
+    public void setRepo(Repo repo) {
         this.repo = repo;
     }
 
