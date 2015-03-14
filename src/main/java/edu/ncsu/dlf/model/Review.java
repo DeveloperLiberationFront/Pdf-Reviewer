@@ -14,7 +14,7 @@ public class Review extends ReflectionDBObject {
     public PDFUser reviewer;
     public Repo repo;
     public String paper;
-    public String link;
+    public String link;     //don't know what this is for
     
     public Review() {
         // For Mongo

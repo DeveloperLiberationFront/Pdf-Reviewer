@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import edu.ncsu.dlf.database.DBAbstraction;
 import edu.ncsu.dlf.database.DatabaseFactory;
+import edu.ncsu.dlf.model.Repo;
 import edu.ncsu.dlf.model.Review;
 import edu.ncsu.dlf.utils.HttpUtils;
 
@@ -31,35 +32,35 @@ import org.json.JSONObject;
 public class ReviewRequestServlet extends HttpServlet {
 	private static final String SERVICE_URL = "http://pdfreview-ncsudlf.rhcloud.com/";
     private static final long serialVersionUID = 1L;
-    private String repoName;
-    private String pathToPaper;
-    private String paper;
-    private String login;
-    private transient GitHubClient client;
-    private transient UserService userService;
-    private transient IssueService issueService;
-    private Repository repo;
-    private transient CollaboratorService collaboratorService;
-    private User reviewRequester;
-    private String access_token;
-    private String repoOwner;
 
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		try {
 			String body = HttpUtils.getRequestBody(req);
-			access_token = req.getParameter("access_token");
-			List<User> reviewers = parseRequest(body);	
+			
+			GitHubClient client = new GitHubClient();
+            client.setOAuth2Token(req.getParameter("access_token"));
+            UserService userService = new UserService(client);
+            List<Review> newReviews = createNewReviews(body, userService);   
+            
+            IssueService issueService = new IssueService(client);
+            RepositoryService repoService = new RepositoryService(client);
+            CollaboratorService collaboratorService = new CollaboratorService(client);
+            
+            Review aReview = newReviews.get(0);
+            User reviewRequester = userService.getUser(aReview.requester.login);
+            Repo repo = aReview.repo;
+            Repository gitRepo = repoService.getRepository(repo.repoOwner, repo.repoName);
 
 			boolean isOrg = "Organization".equals(reviewRequester.getType());
 
-			addCommentsToPDF(pathToPaper, paper);
+			//addCommentsToPDF(pathToPaper, paper);
 			JSONObject returnJson = new JSONObject();
 
-			for(User reviewer : reviewers) {
+			for(Review review : newReviews) {
 				if(!isOrg) {
 				    try {
-				        collaboratorService.addCollaborator(repo, reviewer.getLogin());
+				        collaboratorService.addCollaborator(gitRepo, review.reviewer.login);
                     } catch (Exception e) {
                         if (!returnJson.has("message"))
                             returnJson.put("message", "However, we could not add the reviewer(s) as collaborator(s).  "
@@ -68,14 +69,14 @@ public class ReviewRequestServlet extends HttpServlet {
                     }
 				}
 				try {
-					String downloadLink = makeReviewRequestLabel(reviewer);
+				    Label reviewRequestLabel = makeOrGetReviewRequestLabel(client, review.repo);
+				    createReviewRequestIssue(reviewRequestLabel, review, issueService, userService);
 					DBAbstraction database = DatabaseFactory.getDatabase();
 		        
-					Review newReview = new Review(userService.getUser().getLogin(), repoOwner, reviewer.getLogin() , repoName, paper, downloadLink, new UserService(client));
-					
-					database.addReviewToDatastore(newReview);
+					database.addReviewToDatastore(review);
 				} catch(IOException e) {
-					resp.setStatus(417);
+					resp.sendError(417);
+					return;
 				}
 			}
 			resp.setStatus(200);
@@ -87,73 +88,60 @@ public class ReviewRequestServlet extends HttpServlet {
 		}
 	}
 
-    private String makeReviewRequestLabel(User reviewer) throws IOException {
+    private Label makeOrGetReviewRequestLabel(GitHubClient client, Repo repo) {
         Label reviewRequestLabel = new Label().setColor("009800").setName("Review Request");
         
         try {
-        	LabelService labelService = new LabelService(client);
-        	Label label = labelService.getLabel(repoOwner, repoName, "Review Request");
-        	if (label == null) {
-        	    labelService.createLabel(repoOwner, repoName, reviewRequestLabel);
-        	}
-        	
+            LabelService labelService = new LabelService(client);
+            Label label = labelService.getLabel(repo.repoOwner, repo.repoName, "Review Request");
+            if (label == null) {
+                labelService.createLabel(repo.repoOwner, repo.repoName, reviewRequestLabel);
+            }
         } catch(IOException e) {
             e.printStackTrace();
         }
-        
+        return reviewRequestLabel;
+    }
+
+    private String createReviewRequestIssue(Label reviewRequestLabel, Review review, IssueService issueService, UserService userService) throws IOException {
         Issue issue = new Issue();
-        issue.setTitle("Reviewer - " + reviewer.getLogin());
+        issue.setTitle("Reviewer - " + review.reviewer.login);
         List<Label> labels = new ArrayList<>();
         labels.add(reviewRequestLabel);
         issue.setLabels(labels);
-        issue.setAssignee(reviewer);
+        issue.setAssignee(userService.getUser(review.reviewer.login));
         
-        paper = pathToPaper + '/' + paper;
-        String link = SERVICE_URL + "?repoName=" + repoName + "&writer=" + repoOwner + "&paper=" + paper;
-        
+        String linkToRespondToReview = SERVICE_URL + "?repoName=" + review.repo.repoName + "&writer=" + review.repo.repoOwner + "&paper=" + review.paper;
         
         
-        String downloadLink = "https://github.com/" + repoOwner + '/' + repoName + "/raw/master/" + paper;
-        issue.setBody("@" + reviewer.getLogin() + " has been requested to review this paper by @"+reviewRequester.getLogin()+".\n" +
+        
+        String downloadLink = "https://github.com/" + review.repo.repoOwner + '/' + review.repo.repoName + "/raw/master/" + review.paper;
+        issue.setBody("@" + review.reviewer.login + " has been requested to review this paper by @"+review.requester.login+".\n" +
         			  "Click [here](" + downloadLink + ") to download the paper\n" +
-        			  "Click [here](" + link + ") to upload your review.");
+        			  "Click [here](" + linkToRespondToReview + ") to upload your review.");
         
-        issueService.createIssue(repoOwner, repoName, issue);
-        return link;
+        issueService.createIssue(review.repo.repoOwner, review.repo.repoName, issue);
+        return linkToRespondToReview;
     }
 
-    private List<User> parseRequest(String body) throws JSONException, IOException {
+    private List<Review> createNewReviews(String body, UserService userService) throws JSONException, IOException { 
         JSONObject data = new JSONObject(body);
         JSONArray reviewersJson = data.getJSONArray("reviewers");
-        repoOwner = data.getString("owner");
-        repoName = data.getString("repo");
-        pathToPaper = data.getString("pathToPaper");
-        paper = data.getString("paper");
-        login = data.getString("login");
+        String repoOwner = data.getString("owner");
+        String repoName = data.getString("repo");
+        String pathToPaper = data.getString("pathToPaper");
+        String paper = data.getString("paper");
+        String requesterLogin = data.getString("login");
         
-        setupGitClient(access_token);
-        
-        
-        List<User> reviewers = new ArrayList<>();
+        List<Review> newReviews = new ArrayList<>();
         
         for(int i=0; i<reviewersJson.length(); i++) {
-            reviewers.add(userService.getUser(reviewersJson.getString(i)));
+            String reviewerLogin = reviewersJson.getString(i);
+            newReviews.add(new Review(requesterLogin, repoOwner, reviewerLogin, repoName, paper, pathToPaper, userService));
         }
-        return reviewers;
+        return newReviews;
     }
 
-    private void setupGitClient(String authToken) throws IOException {
-        client = new GitHubClient();
-        
-        client.setOAuth2Token(authToken);	
-        userService = new UserService(client);	
-        reviewRequester = userService.getUser(login);
-        issueService = new IssueService(client);
-        RepositoryService repoService = new RepositoryService(client);
-        repo = repoService.getRepository(repoOwner, repoName);
-        collaboratorService = new CollaboratorService(client);
-    }
-	
 	private void addCommentsToPDF(String pathToPaper, String paper) {
         // TODO Auto-generated method stub
         // Should add a comment to the front of the pdf with a memo about tags

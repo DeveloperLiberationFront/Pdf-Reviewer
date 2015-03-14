@@ -73,9 +73,7 @@ public class PdfComment {
 		return retVal;
 	}
 	
-	private void setComment(String s) {
-		comment = s;
-		
+	private void setComment(String comment) {
 		int tagsStartPos = comment.indexOf("{{");
 		int tagsEndPos = comment.indexOf("}}");
 		if(tagsStartPos != -1 && tagsEndPos != -1) {
@@ -92,7 +90,7 @@ public class PdfComment {
 			comment = fHalf + ' ' + sHalf;
 		}
 		
-		comment = comment.trim();
+		this.comment = comment.trim();
 	}
 	
     public final String setIssueNumberAndRepairBrokenTags(String originalString) {
