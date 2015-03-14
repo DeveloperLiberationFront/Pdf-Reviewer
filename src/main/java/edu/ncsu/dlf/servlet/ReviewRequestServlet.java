@@ -54,13 +54,16 @@ public class ReviewRequestServlet extends HttpServlet {
 			boolean isOrg = "Organization".equals(reviewRequester.getType());
 
 			addCommentsToPDF(pathToPaper, paper);
+			JSONObject returnJson = new JSONObject();
 
 			for(User reviewer : reviewers) {
 				if(!isOrg) {
 				    try {
 				        collaboratorService.addCollaborator(repo, reviewer.getLogin());
                     } catch (Exception e) {
-                        //TODO warn user
+                        if (!returnJson.has("message"))
+                            returnJson.put("message", "However, we could not add the reviewer(s) as collaborator(s).  "
+                                + "This happens if you don't own the repo you are making a request for.");
                         System.out.println("Could not add collaborator, maybe you don't own the repo?");
                     }
 				}
@@ -75,8 +78,12 @@ public class ReviewRequestServlet extends HttpServlet {
 					resp.setStatus(417);
 				}
 			}
-		} catch (JSONException e) {
+			resp.setStatus(200);
+            resp.setContentType("application/json");
+            returnJson.write(resp.getWriter()); 
+		} catch (Exception e) {
 			e.printStackTrace();
+			resp.setStatus(500);
 		}
 	}
 

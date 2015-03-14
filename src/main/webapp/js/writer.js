@@ -36,7 +36,11 @@ function setupWriterBtns() {
 
     $.post("/reviewRequest?access_token=" + accessToken, JSON.stringify(data))
     .done(function(data) {
-      showAlert("success", "Your review request has been submitted.");
+      var message = "Your review request has been submitted.  ";
+      if (data.message) {
+        message += data.message;
+      }
+      showAlert("success", message);
     })
     .fail(function(data) {
       if(data.status == 417)
@@ -60,7 +64,7 @@ function getPossibleReviewers(login) {
   .done(function(data) {
     $("#reviewersList").empty();
 
-    if(data.length == 0) {
+    if(data.length === 0) {
       $("<h5 />")
         .text("No Reviewers")
         .appendTo($("#reviewersList"));
@@ -82,7 +86,7 @@ function showReviewer(r, selected) {
   var btn = $("<a />")
     .attr("class", "list-group-item")
     .text(getUserText(r))
-    .attr("data-login", r["login"])
+    .attr("data-login", r.login)
     .on("click", function() {
       btn.toggleClass("active");
       onSelectStuff();
@@ -137,7 +141,7 @@ function setupAddOtherReviewer() {
 function addReviewer() {
   var valA = $("#addOtherReviewer").val();
   var valB = $("#s2id_autogen1_search").val();
-  var login = valA != "" ? valA : valB;
+  var login = valA !== "" ? valA : valB;
 
   $.get("/user?access_token=" + accessToken + "&user=" + escape(login))
   .done(function(data) {
@@ -158,8 +162,7 @@ function getSelectedReviewers() {
 }
 
 function onSelectStuff() {
-  if(getSelectedLogin() != null && getSelectedFile() != null
-     && getSelectedRepo() != null && getSelectedReviewers().length > 0) {
+  if(!getSelectedLogin() && !getSelectedFile() && !getSelectedRepo() && getSelectedReviewers().length > 0) {
     $("#submitReview").attr("disabled", false);
   }
   else {
