@@ -18,7 +18,6 @@ import com.mongodb.WriteResult;
 import edu.ncsu.dlf.model.Review;
 
 import org.eclipse.egit.github.core.User;
-import org.eclipse.egit.github.core.service.UserService;
 
 public class MongoDB implements DBAbstraction {
 
@@ -37,12 +36,12 @@ public class MongoDB implements DBAbstraction {
     }
     
     @Override
-    public List<Review> getReviewsWhereUserIsRequester(User user, UserService userService) {
+    public List<Review> getReviewsWhereUserIsRequester(User user) {
         return findRequests(user, "Requester");
     }
 
     @Override
-    public List<Review> getReviewsWhereUserIsReviewer(User user, UserService userService) {
+    public List<Review> getReviewsWhereUserIsReviewer(User user) {
         return findRequests(user, "Reviewer");
     }
 

@@ -37,8 +37,8 @@ public class StatusServlet extends HttpServlet {
 		try {
 			JSONObject json = new JSONObject();
 			
-			List<Review> reviewsWhereUserIsRequester = database.getReviewsWhereUserIsRequester(user, userService);
-			List<Review> reviewsWhereUserIsReviewer = database.getReviewsWhereUserIsReviewer(user, userService);
+			List<Review> reviewsWhereUserIsRequester = database.getReviewsWhereUserIsRequester(user);
+			List<Review> reviewsWhereUserIsReviewer = database.getReviewsWhereUserIsReviewer(user);
 
 			json.put("reviewsWhereUserIsReviewer", JSONUtils.toJSON(reviewsWhereUserIsReviewer));
 			json.put("reviewsWhereUserIsRequester", JSONUtils.toJSON(reviewsWhereUserIsRequester));

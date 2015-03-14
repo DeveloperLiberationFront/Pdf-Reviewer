@@ -25,12 +25,12 @@ public class DatabaseFactory {
     private static class DummyDatabase implements DBAbstraction {
 
         @Override
-        public List<Review> getReviewsWhereUserIsRequester(User user, UserService userService) {
+        public List<Review> getReviewsWhereUserIsRequester(User user) {
             return Collections.emptyList();
         }
 
         @Override
-        public List<Review> getReviewsWhereUserIsReviewer(User user, UserService userService) {
+        public List<Review> getReviewsWhereUserIsReviewer(User user) {
             return Collections.emptyList();
         }
 
