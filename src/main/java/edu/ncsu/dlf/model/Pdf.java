@@ -58,6 +58,7 @@ public class Pdf {
     private Color highlightColor = new Color(234, 249, 35, 140);
     public static final String pathToCommentBoxImage = "/images/comment_box.PNG";
     private BufferedImage commentBoxImage;
+    private boolean DEBUG = Boolean.parseBoolean(System.getenv("DEBUG"));
 	
     
     private Pdf(InputStream pdfInputStream, InputStream commentBoxInputStream) throws IOException {
@@ -68,6 +69,9 @@ public class Pdf {
 	
 	public Pdf(InputStream input, ServletContext servletContext) throws IOException {
 		this(input, servletContext.getResourceAsStream(pathToCommentBoxImage));
+		if (this.commentBoxImage == null) {
+		    System.out.println(servletContext.getRealPath(pathToCommentBoxImage));
+		}
 	}
 	
     public List<PdfComment> getPDFComments() {
@@ -109,8 +113,6 @@ public class Pdf {
 
                         pdfComment.setImage(makePopupSubImage(pageImage, anno.getRectangle()));
                         comments.add(pdfComment);
-                    } else {
-                        System.out.println(anno);
                     }
 
                 }
@@ -185,12 +187,17 @@ public class Pdf {
         
         g2.dispose();
 
-        try {
-            // for debugging
-            ImageIO.write(newImage, "png", new File("test"+Math.random()+".png"));
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (DEBUG) {
+            try {
+                // for debugging                
+                File output = new File("test"+Math.random()+".png");
+                System.out.println("Saving image to disk "+output.getAbsolutePath());
+                ImageIO.write(newImage, "png", output);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
+        
 
         return newImage;
     }
@@ -340,7 +347,7 @@ public class Pdf {
 	}
 	
 	@SuppressWarnings("unused")
-    public static void main(String[] args) throws Exception{
+    private static void main(String[] args) throws Exception{
 	    FileInputStream fos = new FileInputStream("test.pdf");
 	    Pdf pdf = new Pdf(fos, new FileInputStream("src/main/resources/comment_box.PNG"));
 
