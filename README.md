@@ -12,7 +12,7 @@ Aids the paper writing cycle by processing pdfs containing highlights and commen
 - (Optional) Generate an Eclipse Project setup with  
 `mvn eclipse:eclipse -DdownloadSources=true -DdownloadJavadocs=true`  
 Then, import this project into Eclipse.
-- Run the app using `mvn tomcat7:run`.  This will run an embedded version of Apache Tomcat to run the server.  This is not a smooth integration, however and your milage may vary.  
+- Run the app using `mvn tomcat7:run`.  This will run an embedded version of Apache Tomcat to run the server.  
 - Congratulations, the app is now running on localhost:9090
 
 ## Deploying to OpenShift

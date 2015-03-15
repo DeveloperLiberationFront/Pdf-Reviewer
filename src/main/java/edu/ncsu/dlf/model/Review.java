@@ -1,6 +1,8 @@
 package edu.ncsu.dlf.model;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 
 import com.mongodb.ReflectionDBObject;
 
@@ -13,34 +15,35 @@ public class Review extends ReflectionDBObject {
     public PDFUser requester;
     public PDFUser reviewer;
     public Repo repo;
-    public String paper;
-    public String link;     //don't know what this is for
+    public String pathToPaperInRepo;
+    public String downloadPaperLink;
+    public List<String> customLabels = Collections.emptyList(); 
     
     public Review() {
         // For Mongo
     }
     
-    public Review(PDFUser requester, PDFUser reviewer, Repo repo, String paper, String link) {
+    public Review(PDFUser requester, PDFUser reviewer, Repo repo, String pathToPaperInRepo, String downloadPaperLink) {
         this.requester = requester;
         this.reviewer = reviewer;
-        this.paper = paper;
-        this.link = link;
+        this.pathToPaperInRepo = pathToPaperInRepo;
+        this.downloadPaperLink = downloadPaperLink;
         this.repo = repo;
     }
     
-    public Review(PDFUser requester, PDFUser repoOwner, PDFUser reviewer, String repoName, String paper, String link) {
+    public Review(PDFUser requester, PDFUser repoOwner, PDFUser reviewer, String repoName, String pathToPaperInRepo, String downloadPaperLink) {
         this.requester = requester;
         this.reviewer = reviewer;
-        this.paper = paper;
-        this.link = link;
+        this.pathToPaperInRepo = pathToPaperInRepo;
+        this.downloadPaperLink = downloadPaperLink;
         this.repo = new Repo(repoOwner.login, repoName);
     }
 
-    public Review(String requesterLogin, String writerLogin, String reviewerLogin, String repo, String paper, String link, UserService userService) throws IOException {
+    public Review(String requesterLogin, String writerLogin, String reviewerLogin, String repo, String pathToPaperInRepo, String downloadPaperLink, UserService userService) throws IOException {
         this(PDFUser.userFromLogin(requesterLogin, userService),
                 PDFUser.userFromLogin(writerLogin, userService),
                 PDFUser.userFromLogin(reviewerLogin, userService),
-                repo, paper, link);
+                repo, pathToPaperInRepo, downloadPaperLink);
     }
     
     public JSONObject toJSON() throws JSONException {
@@ -48,8 +51,8 @@ public class Review extends ReflectionDBObject {
         request.put("requester", requester.toJSON());
         request.put("reviewer", reviewer.toJSON());
         request.put("repo", repo.toJSON());
-        request.put("paper", paper);
-        request.put("link", link);
+        request.put("paper", pathToPaperInRepo);
+        request.put("link", downloadPaperLink);
         return request;
     }
 
@@ -59,8 +62,8 @@ public class Review extends ReflectionDBObject {
 
     @Override
     public String toString() {
-        return "Review [requester=" + requester + ", reviewer=" + reviewer + ", repo=" + repo + ", paper=" + paper + ", link="
-                + link + "]";
+        return "Review [requester=" + requester + ", reviewer=" + reviewer + ", repo=" + repo + ", paper=" + pathToPaperInRepo + ", link="
+                + downloadPaperLink + "]";
     }
 
     public void setRequester(PDFUser requester) {
@@ -82,22 +85,29 @@ public class Review extends ReflectionDBObject {
     public void setRepo(Repo repo) {
         this.repo = repo;
     }
-
-    public String getPaper() {
-        return paper;
+    
+    public String getPathToPaperInRepo() {
+        return pathToPaperInRepo;
     }
 
-    public void setPaper(String paper) {
-        this.paper = paper;
+    public void setPathToPaperInRepo(String pathToPaperInRepo) {
+        this.pathToPaperInRepo = pathToPaperInRepo;
     }
 
-    public String getLink() {
-        return link;
+    public String getDownloadPaperLink() {
+        return downloadPaperLink;
     }
 
-    public void setLink(String link) {
-        this.link = link;
+    public void setDownloadPaperLink(String downloadPaperLink) {
+        this.downloadPaperLink = downloadPaperLink;
     }
 
+    public void setCustomLabels(List<String> parsedCustomLabels) {
+        this.customLabels = parsedCustomLabels;
+    }
+
+    public List<String> getCustomLabels() {
+        return customLabels;
+    }
     
 }

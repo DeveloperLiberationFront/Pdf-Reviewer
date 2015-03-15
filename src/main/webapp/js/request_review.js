@@ -15,7 +15,7 @@ function setupWriterBtns() {
       pathToPaper: pathToPaper,
       paper: getSelectedFile(),
       reviewers: getSelectedReviewers(),
-      customTags: getCustomTags()
+      customLabels: getCustomLabels()
     };
 
     if(!data.repo) {
@@ -162,7 +162,7 @@ function getSelectedReviewers() {
   return users;
 }
 
-function getCustomTags() {
+function getCustomLabels() {
   return $("#customTags").val();
 }
 

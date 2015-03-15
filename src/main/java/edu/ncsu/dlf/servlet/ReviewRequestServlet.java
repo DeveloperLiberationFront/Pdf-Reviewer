@@ -3,6 +3,8 @@ package edu.ncsu.dlf.servlet;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -47,10 +49,9 @@ public class ReviewRequestServlet extends HttpServlet {
             RepositoryService repoService = new RepositoryService(client);
             CollaboratorService collaboratorService = new CollaboratorService(client);
             
-            Review aReview = newReviews.get(0);
+            Review aReview = newReviews.get(0);     //all these reviews have the same requester and repo involved
             User reviewRequester = userService.getUser(aReview.requester.login);
-            Repo repo = aReview.repo;
-            Repository gitRepo = repoService.getRepository(repo.repoOwner, repo.repoName);
+            Repository gitRepo = repoService.getRepository(aReview.repo.repoOwner, aReview.repo.repoName);
 
 			boolean isOrg = "Organization".equals(reviewRequester.getType());
 
@@ -111,13 +112,10 @@ public class ReviewRequestServlet extends HttpServlet {
         issue.setLabels(labels);
         issue.setAssignee(userService.getUser(review.reviewer.login));
         
-        String linkToRespondToReview = SERVICE_URL + "?repoName=" + review.repo.repoName + "&writer=" + review.repo.repoOwner + "&paper=" + review.paper;
-        
-        
-        
-        String downloadLink = "https://github.com/" + review.repo.repoOwner + '/' + review.repo.repoName + "/raw/master/" + review.paper;
+        String linkToRespondToReview = SERVICE_URL + "?repoName=" + review.repo.repoName + "&writer=" + review.repo.repoOwner + "&paper=" + review.pathToPaperInRepo;
+
         issue.setBody("@" + review.reviewer.login + " has been requested to review this paper by @"+review.requester.login+".\n" +
-        			  "Click [here](" + downloadLink + ") to download the paper\n" +
+        			  "Click [here](" + review.downloadPaperLink + ") to download the paper\n" +
         			  "Click [here](" + linkToRespondToReview + ") to upload your review.");
         
         issueService.createIssue(review.repo.repoOwner, review.repo.repoName, issue);
@@ -132,17 +130,36 @@ public class ReviewRequestServlet extends HttpServlet {
         String pathToPaper = data.getString("pathToPaper");
         String paper = data.getString("paper");
         String requesterLogin = data.getString("login");
+        String customLabels = data.getString("customLabels");
         
+        List<String> parsedCustomLabels = parseCustomLabels(customLabels); //all reviews will have the same labels
+        
+        String pathToPaperInRepo = pathToPaper + "/" + paper;
+        String downloadLink = "https://github.com/" + repoOwner + '/' + repoName + "/raw/master/" + pathToPaperInRepo;
         List<Review> newReviews = new ArrayList<>();
         
         for(int i=0; i<reviewersJson.length(); i++) {
             String reviewerLogin = reviewersJson.getString(i);
-            newReviews.add(new Review(requesterLogin, repoOwner, reviewerLogin, repoName, paper, pathToPaper, userService));
+            Review newReview = new Review(requesterLogin, repoOwner, reviewerLogin, repoName, pathToPaperInRepo, downloadLink, userService);
+            newReview.setCustomLabels(parsedCustomLabels);
+            newReviews.add(newReview);
+            
         }
         return newReviews;
     }
 
-	private void addCommentsToPDF(String pathToPaper, String paper) {
+	private static List<String> parseCustomLabels(String customLabels) {
+	    Pattern pattern = Pattern.compile("\\[.+?\\]");
+	    Matcher m = pattern.matcher(customLabels);
+	    List<String> retVal = new ArrayList<>();
+	    while (m.find()) {
+	        retVal.add(m.group());
+	    }
+        return retVal;
+    }
+
+    @SuppressWarnings("unused")
+    private void addCommentsToPDF(String pathToPaper, String paper) {
         // TODO Auto-generated method stub
         // Should add a comment to the front of the pdf with a memo about tags
     }
