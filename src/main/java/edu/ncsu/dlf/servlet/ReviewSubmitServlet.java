@@ -2,7 +2,6 @@ package edu.ncsu.dlf.servlet;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -27,7 +26,6 @@ import edu.ncsu.dlf.utils.ImageUtils;
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
@@ -49,25 +47,14 @@ import org.json.JSONObject;
 public class ReviewSubmitServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	
-	private transient HttpClient httpClient = HttpClients.createDefault();
-
-    private String repoName;
-
-    private String writerLogin;
-
-    private String accessToken;
-
-    private transient GitHubClient client;
-	
     @Override
     protected void doPost(final HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         final ServletFileUpload upload = new ServletFileUpload();
 
-        this.repoName = req.getParameter("repoName");
-        this.writerLogin = req.getParameter("writer");
-        this.accessToken = req.getParameter("access_token");
+        Repo repo = new Repo(req.getParameter("writer"), req.getParameter("repoName"));
+        String accessToken = req.getParameter("access_token");
 
-        if (repoName == null || writerLogin == null || accessToken == null) {
+        if (repo.repoOwner == null || repo.repoName == null || accessToken == null) {
             System.out.println("Something blank");
             resp.sendError(500);
             return;
@@ -80,17 +67,18 @@ public class ReviewSubmitServlet extends HttpServlet {
             FileItemIterator iter = upload.getItemIterator(req);
             FileItemStream file = iter.next();
 
-            System.out.println(getServletContext().getRealPath(Pdf.pathToCommentBoxImage));
             pdf = new Pdf(file.openStream(), getServletContext());
 
-            this.client = new GitHubClient();
+            GitHubClient client = new GitHubClient();
             client.setOAuth2Token(accessToken);
             UserService userService = new UserService(client);
             User reviewer = userService.getUser();
+            
+            int totalIssues = getNumTotalIssues(client, repo);
 
-            List<PdfComment> comments = updatePdfWithNumberedAndColoredAnnotations(pdf);
-            urlToPdfInRepo = addPdfToRepo(pdf, reviewer);
-            task.setter(comments, accessToken, writerLogin, repoName);
+            List<PdfComment> comments = updatePdfWithNumberedAndColoredAnnotations(pdf, repo, totalIssues);
+            urlToPdfInRepo = addPdfToRepo(pdf, reviewer, client, repo, accessToken);
+            task.setter(comments, accessToken, repo, totalIssues);
             
         } catch (Exception e) {
             e.printStackTrace();
@@ -107,11 +95,11 @@ public class ReviewSubmitServlet extends HttpServlet {
         thread.start();
     }
 	
-	private List<PdfComment> updatePdfWithNumberedAndColoredAnnotations(Pdf pdf) throws IOException {
+	private List<PdfComment> updatePdfWithNumberedAndColoredAnnotations(Pdf pdf, Repo repo, int totalIssues) throws IOException {
 	    List<PdfComment> pdfComments = pdf.getPDFComments();
 		if(!pdfComments.isEmpty()) {
 			// Set the issue numbers
-			int issueNumber = getNumTotalIssues() + 1;
+			int issueNumber = totalIssues + 1;
 			for(PdfComment com : pdfComments) {
 				if(com.getIssueNumber() == 0) {
 					com.setIssueNumber(issueNumber++);
@@ -119,19 +107,19 @@ public class ReviewSubmitServlet extends HttpServlet {
 			}
 			
 			// Update the comments to link to the repository and their newly assigned issue number
-			pdf.updateComments(pdfComments, this.writerLogin, this.repoName);
+			pdf.updateComments(pdfComments, repo);
 		}
 		return pdfComments;
 	}
 	
-	private int getNumTotalIssues() throws IOException {
+	private int getNumTotalIssues(GitHubClient client, Repo repo) throws IOException {
 	    IssueService issueService = new IssueService(client);
 
 	    Map<String, String> prefs = new HashMap<String, String>();
 	    //By default, only open issues are shown
 	    prefs.put(IssueService.FILTER_STATE, "all");
 	    //get all issues for this repo
-	    List<Issue> issues = issueService.getIssues(getRepo(client), prefs);
+	    List<Issue> issues = issueService.getIssues(repo.repoOwner, repo.repoName, prefs);
 	    
         return issues.size();
     }
@@ -151,16 +139,14 @@ public class ReviewSubmitServlet extends HttpServlet {
 		}
 	}
 	
-    private String addPdfToRepo(Pdf pdf, User reviewer) throws IOException {
+    private String addPdfToRepo(Pdf pdf, User reviewer, GitHubClient client, Repo repo, String accessToken) throws IOException {
         String filePath = "reviews/" + reviewer.getLogin() + ".pdf";
         String sha = null;
-        
         ContentsService contents = new ContentsService(client);
-        Repository repo = getRepo(client);
         try {
             //list all the files in reviews.  We can't just fetch our paper, because it might be 
             //bigger than 1MB which breaks this API call
-            List<RepositoryContents> files = contents.getContents(repo, "reviews/");
+            List<RepositoryContents> files = contents.getContents(getRepo(client, repo), "reviews/");
             for(RepositoryContents file: files) {
                 if (file.getName().equals(reviewer.getLogin()+".pdf")) {
                     sha = file.getSha();
@@ -170,7 +156,7 @@ public class ReviewSubmitServlet extends HttpServlet {
             e.printStackTrace();
         }
 
-        HttpPut request = new HttpPut(buildURIForFileUpload(accessToken, writerLogin, repoName, filePath));	
+        HttpPut request = new HttpPut(buildURIForFileUpload(accessToken, repo.repoOwner, repo.repoName, filePath));	
         try {
             ByteArrayOutputStream output = new ByteArrayOutputStream();
             pdf.getDoc().save(output);
@@ -195,7 +181,7 @@ public class ReviewSubmitServlet extends HttpServlet {
             entity.setContentType("application/json");
             request.setEntity(entity);
 
-            httpClient.execute(request);
+            HttpClients.createDefault().execute(request);
         } catch(JSONException | COSVisitorException e) {
             e.printStackTrace();
         } finally {
@@ -205,18 +191,9 @@ public class ReviewSubmitServlet extends HttpServlet {
         return filePath;
     }
 
-    private Repository getRepo(GitHubClient client) throws IOException {
+    private Repository getRepo(GitHubClient client, Repo repo) throws IOException {
         RepositoryService repoService = new RepositoryService(client);
-        return repoService.getRepository(writerLogin, repoName);
-    }
-	
-	private void readObject(ObjectInputStream inputStream) throws IOException, ClassNotFoundException
-    {
-        inputStream.defaultReadObject();
-        //reinstantiate our transient variables.
-        this.httpClient = HttpClients.createDefault();
-        this.client = new GitHubClient();
-        client.setOAuth2Token(accessToken);
+        return repoService.getRepository(repo.repoOwner, repo.repoName);
     }
 
     private URI buildURIForFileUpload(String accessToken, String writerLogin, String repoName, String filePath) throws IOException {
@@ -237,10 +214,11 @@ public class ReviewSubmitServlet extends HttpServlet {
         private int issueCount;
         private Repo repo;
 		
-		public void setter(List<PdfComment> comments, String accessToken, String writerLogin, String repoName) {
+		public void setter(List<PdfComment> comments, String accessToken, Repo repo, int issueCount) {
 			this.comments = comments;
 			this.accessToken = accessToken;
-			repo = new Repo(writerLogin, repoName);
+			this.repo = repo;
+			this.issueCount = issueCount;
 		}
 
 		@Override
@@ -252,8 +230,6 @@ public class ReviewSubmitServlet extends HttpServlet {
 					DBAbstraction database = DatabaseFactory.getDatabase();
 					UserService userService = new UserService(client);
 					User reviewer = userService.getUser();
-					
-					issueCount = getNumTotalIssues();      //helps us to differentiate new issues from old
 					
 					createIssues(client, repo, comments);
 					

@@ -302,7 +302,7 @@ public class Pdf {
         return max;
     }
 	
-	public void updateComments(List<PdfComment> comments, String repoOwner, String repo) {
+	public void updateComments(List<PdfComment> comments, Repo repo) {
 		@SuppressWarnings("unchecked")
 		List<PDPage> pages = doc.getDocumentCatalog().getAllPages();
 		int commentOn = 0;
@@ -316,7 +316,7 @@ public class Pdf {
                     if (anno instanceof PDAnnotationTextMarkup) {
                         PdfComment userComment = comments.get(commentOn);
                         commentOn++;
-                        String newMessage = userComment.getMessageWithLink(repoOwner, repo);
+                        String newMessage = userComment.getMessageWithLink(repo);
                         PDAnnotationTextMarkup newComment = makeNewAnnotation((PDAnnotationTextMarkup) anno, userComment, newMessage);
 
                         newList.add(newComment);

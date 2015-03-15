@@ -104,7 +104,7 @@ public class ReviewRequestServlet extends HttpServlet {
         return reviewRequestLabel;
     }
 
-    private String createReviewRequestIssue(Label reviewRequestLabel, Review review, IssueService issueService, UserService userService) throws IOException {
+    private void createReviewRequestIssue(Label reviewRequestLabel, Review review, IssueService issueService, UserService userService) throws IOException {
         Issue issue = new Issue();
         issue.setTitle("Reviewer - " + review.reviewer.login);
         List<Label> labels = new ArrayList<>();
@@ -119,7 +119,6 @@ public class ReviewRequestServlet extends HttpServlet {
         			  "Click [here](" + linkToRespondToReview + ") to upload your review.");
         
         issueService.createIssue(review.repo.repoOwner, review.repo.repoName, issue);
-        return linkToRespondToReview;
     }
 
     private List<Review> createNewReviews(String body, UserService userService) throws JSONException, IOException { 
@@ -160,7 +159,7 @@ public class ReviewRequestServlet extends HttpServlet {
 
     @SuppressWarnings("unused")
     private void addCommentsToPDF(String pathToPaper, String paper) {
-        // TODO Auto-generated method stub
+        // TODO See https://github.com/DeveloperLiberationFront/Pdf-Reviewer/issues/20
         // Should add a comment to the front of the pdf with a memo about tags
     }
 	
