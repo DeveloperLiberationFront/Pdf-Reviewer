@@ -6,7 +6,6 @@ import edu.ncsu.dlf.model.Repo;
 import edu.ncsu.dlf.model.Review;
 
 import org.eclipse.egit.github.core.User;
-import org.eclipse.egit.github.core.service.UserService;
 
 public interface DBAbstraction {
     
@@ -16,6 +15,8 @@ public interface DBAbstraction {
 
     public void addReviewToDatastore(Review newReview);
 
-    public void removeReviewFromDatastore(String reviewer, Repo repo);
+    public void removeReviewFromDatastore(String reviewerLogin, Repo repo);
+
+    public Review findReview(String reviewerLogin, Repo repo);
 
 }

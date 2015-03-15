@@ -21,6 +21,7 @@ import edu.ncsu.dlf.model.Pdf;
 import edu.ncsu.dlf.model.PdfComment;
 import edu.ncsu.dlf.model.PdfComment.Tag;
 import edu.ncsu.dlf.model.Repo;
+import edu.ncsu.dlf.model.Review;
 import edu.ncsu.dlf.utils.ImageUtils;
 
 import org.apache.commons.fileupload.FileItemIterator;
@@ -59,6 +60,18 @@ public class ReviewSubmitServlet extends HttpServlet {
             resp.sendError(500);
             return;
         }
+        
+        GitHubClient client = new GitHubClient();
+        client.setOAuth2Token(accessToken);
+        UserService userService = new UserService(client);
+        User reviewer = userService.getUser();
+        
+        Review fulfilledReview = DatabaseFactory.getDatabase().findReview(reviewer.getLogin(), repo);
+        if (fulfilledReview == null) {
+            //either they already uploaded the pdf or it doesn't exist
+            resp.sendError(409);  //409 = conflict
+            return;
+        }
 
         UploadIssuesRunnable task = new UploadIssuesRunnable();
         String urlToPdfInRepo = "";
@@ -69,10 +82,7 @@ public class ReviewSubmitServlet extends HttpServlet {
 
             pdf = new Pdf(file.openStream(), getServletContext());
 
-            GitHubClient client = new GitHubClient();
-            client.setOAuth2Token(accessToken);
-            UserService userService = new UserService(client);
-            User reviewer = userService.getUser();
+            
             
             int totalIssues = getNumTotalIssues(client, repo);
 

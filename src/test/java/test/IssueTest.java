@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.ncsu.dlf.model.PdfComment;
+import edu.ncsu.dlf.model.Repo;
 import edu.ncsu.dlf.model.PdfComment.Tag;
 
 import org.junit.Before;
@@ -169,14 +170,15 @@ public class IssueTest {
 	
 	@Test
 	public void testContent() {
-		assertEquals("{{CUSTOM_TAG, MUST_FIX}} [[https://github.com/mpeterson2/Pdf-Test/issues/1]] This is an issue", a.getMessageWithLink("mpeterson2", "Pdf-Test"));
-		assertEquals("{{CUSTOM_TAG, MUST_FIX}} [[https://github.com/mpeterson2/Pdf-Test/issues/2]] This is an issue", b.getMessageWithLink("mpeterson2", "Pdf-Test"));
-		assertEquals("{{CUSTOM_TAG, MUST_FIX}} [[https://github.com/mpeterson2/Pdf-Test/issues/3]] This is an issue", c.getMessageWithLink("mpeterson2", "Pdf-Test"));
-		assertEquals("{{CUSTOM_TAG, MUST_FIX}} [[https://github.com/mpeterson2/Pdf-Test/issues/4]] This is an issue", d.getMessageWithLink("mpeterson2", "Pdf-Test"));
-		assertEquals("{{CUSTOM_TAG, MUST_FIX}} [[https://github.com/mpeterson2/Pdf-Test/issues/5]] This is an issue", e.getMessageWithLink("mpeterson2", "Pdf-Test"));
-		assertEquals("{{CUSTOM_TAG, MUST_FIX}} [[https://github.com/mpeterson2/Pdf-Test/issues/6]] This is an issue", f.getMessageWithLink("mpeterson2", "Pdf-Test"));
-		assertEquals("[[https://github.com/mpeterson2/Pdf-Test/issues/7]] This is an issue", g.getMessageWithLink("mpeterson2", "Pdf-Test"));
-		assertEquals("[[https://github.com/mpeterson2/Pdf-Test/issues/19]] This is not an issue", h.getMessageWithLink("mpeterson2", "Pdf-Test"));
-		assertEquals("{{CUSTOM_TAG, POSITIVE}} This is a positive issue", i.getMessageWithLink("mpeterson2", "Pdf-Test"));
+	    Repo repo = new Repo("mpeterson2", "Pdf-Test");
+		assertEquals("{{CUSTOM_TAG, MUST_FIX}} [[https://github.com/mpeterson2/Pdf-Test/issues/1]] This is an issue", a.getMessageWithLink(repo));
+		assertEquals("{{CUSTOM_TAG, MUST_FIX}} [[https://github.com/mpeterson2/Pdf-Test/issues/2]] This is an issue", b.getMessageWithLink(repo));
+		assertEquals("{{CUSTOM_TAG, MUST_FIX}} [[https://github.com/mpeterson2/Pdf-Test/issues/3]] This is an issue", c.getMessageWithLink(repo));
+		assertEquals("{{CUSTOM_TAG, MUST_FIX}} [[https://github.com/mpeterson2/Pdf-Test/issues/4]] This is an issue", d.getMessageWithLink(repo));
+		assertEquals("{{CUSTOM_TAG, MUST_FIX}} [[https://github.com/mpeterson2/Pdf-Test/issues/5]] This is an issue", e.getMessageWithLink(repo));
+		assertEquals("{{CUSTOM_TAG, MUST_FIX}} [[https://github.com/mpeterson2/Pdf-Test/issues/6]] This is an issue", f.getMessageWithLink(repo));
+		assertEquals("[[https://github.com/mpeterson2/Pdf-Test/issues/7]] This is an issue", g.getMessageWithLink(repo));
+		assertEquals("[[https://github.com/mpeterson2/Pdf-Test/issues/19]] This is not an issue", h.getMessageWithLink(repo));
+		assertEquals("{{CUSTOM_TAG, POSITIVE}} This is a positive issue", i.getMessageWithLink(repo));
 	}
 }

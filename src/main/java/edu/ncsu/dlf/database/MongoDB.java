@@ -82,4 +82,15 @@ public class MongoDB implements DBAbstraction {
         System.out.println(result.getN() +" documents removed");
     }
 
+    @Override
+    public Review findReview(String reviewerLogin, Repo repo) {
+        DB db = mongoClient.getDB(DB_NAME);
+        DBCollection coll = db.getCollection(DB_NAME);
+        coll.setObjectClass(Review.class);
+        BasicDBObject query = new BasicDBObject("Reviewer.Login", reviewerLogin).
+                append("Repo.RepoOwner", repo.repoOwner).
+                append("Repo.RepoName", repo.repoName);
+        return (Review) coll.findOne(query);
+    }
+
 }

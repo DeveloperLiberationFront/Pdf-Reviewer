@@ -43,6 +43,11 @@ public class DatabaseFactory {
         public void removeReviewFromDatastore(String reviewer, Repo repo) {
             //ignores it
         }
+
+        @Override
+        public Review findReview(String reviewerLogin, Repo repo) {
+            return new Review();        //do nothing
+        }
         
     }
 }
