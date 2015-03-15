@@ -262,20 +262,21 @@ public class ReviewSubmitServlet extends HttpServlet {
 
         private List<Label> createCustomLabels(GitHubClient client) {
             List<Label> labels = new ArrayList<>();
+            LabelService labelService = new LabelService(client);
             for (String customLabel : customLabelStrings) {
                 Label newLabel = new Label().setColor(randomColor()).setName(customLabel);
-                
                 try {
-                    LabelService labelService = new LabelService(client);
                     Label alreadyExistingLabel = labelService.getLabel(repo.repoOwner, repo.repoName, customLabel);
-                    if (alreadyExistingLabel == null) {
-                        labelService.createLabel(repo.repoOwner, repo.repoName, newLabel);
-                    }
-                    
+                    labels.add(alreadyExistingLabel);
                 } catch(IOException e) {
-                    e.printStackTrace();
+                    System.out.println("new label " +customLabel + " not found.  Going to create it");
+                    try {
+                        newLabel = labelService.createLabel(repo.repoOwner, repo.repoName, newLabel);
+                    } catch (IOException e1) {
+                        e1.printStackTrace();   //this is a bigger problem
+                    }
+                    labels.add(newLabel);
                 }
-                labels.add(newLabel);
             }
             return labels;
         }
@@ -326,8 +327,8 @@ public class ReviewSubmitServlet extends HttpServlet {
             //add tags to labels
             for(Tag tag : comment.getTags()) {
             	Label label = new Label();
-            	label.setName(tag.name());
-            	labels.add(label);
+            	label.setName(tag.name());     // these tags are, by default, the normal grey color.  
+            	labels.add(label);             // User can change these to the severity whey want
             }
             
             

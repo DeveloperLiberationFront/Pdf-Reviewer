@@ -92,14 +92,16 @@ public class ReviewRequestServlet extends HttpServlet {
     private Label makeOrGetReviewRequestLabel(GitHubClient client, Repo repo) {
         Label reviewRequestLabel = new Label().setColor("009800").setName("Review Request");
         
+        LabelService labelService = new LabelService(client);
         try {
-            LabelService labelService = new LabelService(client);
-            Label label = labelService.getLabel(repo.repoOwner, repo.repoName, "Review Request");
-            if (label == null) {
-                labelService.createLabel(repo.repoOwner, repo.repoName, reviewRequestLabel);
-            }
+            reviewRequestLabel = labelService.getLabel(repo.repoOwner, repo.repoName, "Review Request");
         } catch(IOException e) {
-            e.printStackTrace();
+            System.out.println("Review Request Label not found.  Going to create it");
+            try {
+                reviewRequestLabel = labelService.createLabel(repo.repoOwner, repo.repoName, reviewRequestLabel);
+            } catch (IOException e1) {
+                e1.printStackTrace();   //this is a bigger problem
+            }
         }
         return reviewRequestLabel;
     }
@@ -154,7 +156,8 @@ public class ReviewRequestServlet extends HttpServlet {
 	    Matcher m = pattern.matcher(customLabels);
 	    List<String> retVal = new ArrayList<>();
 	    while (m.find()) {
-	        retVal.add(m.group());
+	        String labelWithBrackets = m.group();
+            retVal.add(labelWithBrackets.substring(1, labelWithBrackets.length()-1));
 	    }
         return retVal;
     }
