@@ -169,15 +169,17 @@ public class ReviewRequestServlet extends HttpServlet {
 		// handle the DELETE request
 	    GitHubClient client = new GitHubClient();
 		client.setOAuth2Token(req.getParameter("access_token"));
-		String writer = req.getParameter("writer");
+		String repoOwner = req.getParameter("writer");
 		String reviewer = req.getParameter("reviewer");
-		String repo = req.getParameter("repo");
+		String repoName = req.getParameter("repo");
+		
+		Repo repo = new Repo(repoOwner, repoName);
 		
 		String closeComment = "@" + reviewer + " is no longer reviewing this paper.";
-		ReviewSubmitServlet.closeReviewIssue(client, writer, repo, reviewer, closeComment);
+		ReviewSubmitServlet.closeReviewIssue(client, repo, reviewer, closeComment);
 		
 		DBAbstraction database = DatabaseFactory.getDatabase();
-		database.removeReviewFromDatastore(reviewer, writer, repo);
+		database.removeReviewFromDatastore(reviewer, repo);
 	}
 
 }

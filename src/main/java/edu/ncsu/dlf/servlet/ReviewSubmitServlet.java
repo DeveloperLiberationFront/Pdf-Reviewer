@@ -1,7 +1,6 @@
 package edu.ncsu.dlf.servlet;
 
 import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.URI;
@@ -22,6 +21,7 @@ import edu.ncsu.dlf.database.DatabaseFactory;
 import edu.ncsu.dlf.model.Pdf;
 import edu.ncsu.dlf.model.PdfComment;
 import edu.ncsu.dlf.model.PdfComment.Tag;
+import edu.ncsu.dlf.model.Repo;
 import edu.ncsu.dlf.utils.ImageUtils;
 
 import org.apache.commons.fileupload.FileItemIterator;
@@ -136,16 +136,16 @@ public class ReviewSubmitServlet extends HttpServlet {
         return issues.size();
     }
 
-    static void closeReviewIssue(GitHubClient client, String writerLogin, String repoName, String reviewer, String comment) throws IOException {
+    static void closeReviewIssue(GitHubClient client, Repo repo, String reviewer, String comment) throws IOException {
 		IssueService issueService = new IssueService(client);
 		
-		for(Issue issue : issueService.getIssues(writerLogin, repoName, null)) {
+		for(Issue issue : issueService.getIssues(repo.repoOwner, repo.repoName, null)) {
 			if(issue.getAssignee() != null) {
 			
 				if(issue.getTitle().startsWith("Reviewer - ") && issue.getAssignee().getLogin().equals(reviewer)) {
-					issueService.createComment(writerLogin, repoName, issue.getNumber(), comment);
+					issueService.createComment(repo.repoOwner, repo.repoName, issue.getNumber(), comment);
 					issue.setState("closed");
-					issueService.editIssue(writerLogin, repoName, issue);
+					issueService.editIssue(repo.repoOwner, repo.repoName, issue);
 				}
 			}
 		}
@@ -234,15 +234,13 @@ public class ReviewSubmitServlet extends HttpServlet {
     private final class UploadIssuesRunnable implements Runnable {
 		private String accessToken;
 		private List<PdfComment> comments;
-		private String repoOwnerLogin;
-		private String repoName;
         private int issueCount;
+        private Repo repo;
 		
 		public void setter(List<PdfComment> comments, String accessToken, String writerLogin, String repoName) {
 			this.comments = comments;
 			this.accessToken = accessToken;
-			this.repoOwnerLogin = writerLogin;
-			this.repoName = repoName;
+			repo = new Repo(writerLogin, repoName);
 		}
 
 		@Override
@@ -257,12 +255,13 @@ public class ReviewSubmitServlet extends HttpServlet {
 					
 					issueCount = getNumTotalIssues();      //helps us to differentiate new issues from old
 					
-					createIssues(client, repoOwnerLogin, repoName, comments);
+					createIssues(client, repo, comments);
 					
 					String closeComment = "@" + reviewer.getLogin() + " has reviewed this paper.";
-					closeReviewIssue(client, repoOwnerLogin, repoName, reviewer.getLogin(), closeComment);
 					
-					database.removeReviewFromDatastore(reviewer.getLogin(), repoOwnerLogin, repoName);
+                    closeReviewIssue(client, repo, reviewer.getLogin(), closeComment);
+					
+					database.removeReviewFromDatastore(reviewer.getLogin(), repo);
 					
 				} catch(IOException e) {
 				    e.printStackTrace();
@@ -270,27 +269,27 @@ public class ReviewSubmitServlet extends HttpServlet {
 				}
 		}
 
-        public void createIssues(GitHubClient client, String writerLogin, String repoName, List<PdfComment> comments) throws IOException {
+        public void createIssues(GitHubClient client, Repo repo, List<PdfComment> comments) throws IOException {
         	for(PdfComment comment : comments) {
         	    System.out.println(comment);
-        		createOrUpdateIssue(client, writerLogin, repoName, comment);
+        		createOrUpdateIssue(client, repo, comment);
         	}
         }
 
-        public void createOrUpdateIssue(GitHubClient client, String writerLogin, String repoName, PdfComment comment) throws IOException {
+        public void createOrUpdateIssue(GitHubClient client, Repo repo, PdfComment comment) throws IOException {
         	IssueService issueService = new IssueService(client);
         	
         	// If the issue does not already exist
         	if(comment.getIssueNumber() > issueCount) { 
-        		createIssue(writerLogin, repoName, comment, issueService);
+        		createIssue(repo, comment, issueService);
         	}
         	// If the issue already exists, update it
         	else {
-        		updateIssue(writerLogin, repoName, comment, issueService);
+        		updateIssue(repo, comment, issueService);
         	}
         }
 
-        private void createIssue(String writerLogin, String repoName, PdfComment comment, IssueService issueService)
+        private void createIssue(Repo repo, PdfComment comment, IssueService issueService)
                 throws IOException {
             Issue issue = new Issue();
             issue.setTitle(comment.getTitle());
@@ -316,18 +315,18 @@ public class ReviewSubmitServlet extends HttpServlet {
             
             issue.setLabels(labels);
             //creates an issue remotely
-            issue = issueService.createIssue(writerLogin, repoName, issue);
+            issue = issueService.createIssue(repo.repoOwner, repo.repoName, issue);
             comment.setIssueNumber(issue.getNumber());
         }
 
-        private void updateIssue(String writerLogin, String repoName, PdfComment comment, IssueService issueService)
+        private void updateIssue(Repo repo, PdfComment comment, IssueService issueService)
                 throws IOException {
-            System.out.println("Looking for "+writerLogin+'/'+repoName);
-            Issue issue = issueService.getIssue(writerLogin, repoName, comment.getIssueNumber());
+            System.out.println("Looking for "+repo.repoOwner+'/'+repo.repoName);
+            Issue issue = issueService.getIssue(repo.repoOwner, repo.repoName, comment.getIssueNumber());
             String issueText = comment.getComment();
             if(!issue.getBody().equals(issueText)) {
                 // makes a comment if the text has changed
-            	issueService.createComment(writerLogin, repoName, comment.getIssueNumber(), issueText);
+            	issueService.createComment(repo.repoOwner, repo.repoName, comment.getIssueNumber(), issueText);
             }
             
             List<Label> existingLabels = issue.getLabels();
@@ -355,7 +354,7 @@ public class ReviewSubmitServlet extends HttpServlet {
             
             if(shouldUpdateLabels) {
             	issue.setLabels(labels);
-            	issueService.editIssue(writerLogin, repoName, issue);
+            	issueService.editIssue(repo.repoOwner, repo.repoName, issue);
             }
         }
 	}

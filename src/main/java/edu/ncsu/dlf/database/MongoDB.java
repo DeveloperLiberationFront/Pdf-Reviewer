@@ -15,6 +15,7 @@ import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
 import com.mongodb.WriteResult;
 
+import edu.ncsu.dlf.model.Repo;
 import edu.ncsu.dlf.model.Review;
 
 import org.eclipse.egit.github.core.User;
@@ -71,12 +72,12 @@ public class MongoDB implements DBAbstraction {
     }
 
     @Override
-    public void removeReviewFromDatastore(String reviewer, String writer, String repo) {
+    public void removeReviewFromDatastore(String reviewer, Repo repo) {
         DB db = mongoClient.getDB(DB_NAME);
         DBCollection coll = db.getCollection(DB_NAME);
         BasicDBObject query = new BasicDBObject("Reviewer.Login", reviewer).
-                append("Writer.Login", writer).
-                append("Repo", repo);
+                append("Repo.RepoOwner", repo.repoOwner).
+                append("Repo.RepoName", repo.repoName);
         WriteResult result = coll.remove(query);
         System.out.println(result.getN() +" documents removed");
     }

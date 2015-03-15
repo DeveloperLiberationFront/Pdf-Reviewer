@@ -4,10 +4,10 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
+import edu.ncsu.dlf.model.Repo;
 import edu.ncsu.dlf.model.Review;
 
 import org.eclipse.egit.github.core.User;
-import org.eclipse.egit.github.core.service.UserService;
 
 public class DatabaseFactory {
     
@@ -40,7 +40,7 @@ public class DatabaseFactory {
         }
 
         @Override
-        public void removeReviewFromDatastore(String reviewer, String writer, String repo) {
+        public void removeReviewFromDatastore(String reviewer, Repo repo) {
             //ignores it
         }
         
