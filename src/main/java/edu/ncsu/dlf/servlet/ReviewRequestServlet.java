@@ -112,11 +112,11 @@ public class ReviewRequestServlet extends HttpServlet {
         issue.setLabels(labels);
         issue.setAssignee(userService.getUser(review.reviewer.login));
         
-        String linkToRespondToReview = SERVICE_URL + "?repoName=" + review.repo.repoName + "&writer=" + review.repo.repoOwner + "&paper=" + review.pathToPaperInRepo;
-
+        String downloadLink = "https://github.com/" + review.repo.repoOwner + '/' + review.repo.repoName + "/raw/master/" + review.pathToPaperInRepo;
+        
         issue.setBody("@" + review.reviewer.login + " has been requested to review this paper by @"+review.requester.login+".\n" +
-        			  "Click [here](" + review.downloadPaperLink + ") to download the paper\n" +
-        			  "Click [here](" + linkToRespondToReview + ") to upload your review.");
+        			  "Click [here](" + downloadLink + ") to download the paper\n" +
+        			  "Click [here](" + review.linkToReviewPaper + ") to upload your review.");
         
         issueService.createIssue(review.repo.repoOwner, review.repo.repoName, issue);
     }
@@ -134,12 +134,14 @@ public class ReviewRequestServlet extends HttpServlet {
         List<String> parsedCustomLabels = parseCustomLabels(customLabels); //all reviews will have the same labels
         
         String pathToPaperInRepo = pathToPaper + "/" + paper;
-        String downloadLink = "https://github.com/" + repoOwner + '/' + repoName + "/raw/master/" + pathToPaperInRepo;
+        String linkToRespondToReview = SERVICE_URL + "?repoName=" + repoName + "&writer=" + repoOwner + "&paper=" + pathToPaperInRepo;
+
+        
         List<Review> newReviews = new ArrayList<>();
         
         for(int i=0; i<reviewersJson.length(); i++) {
             String reviewerLogin = reviewersJson.getString(i);
-            Review newReview = new Review(requesterLogin, repoOwner, reviewerLogin, repoName, pathToPaperInRepo, downloadLink, userService);
+            Review newReview = new Review(requesterLogin, repoOwner, reviewerLogin, repoName, pathToPaperInRepo, linkToRespondToReview, userService);
             newReview.setCustomLabels(parsedCustomLabels);
             newReviews.add(newReview);
             

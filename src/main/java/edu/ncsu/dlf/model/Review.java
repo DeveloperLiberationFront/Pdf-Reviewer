@@ -16,7 +16,7 @@ public class Review extends ReflectionDBObject {
     public PDFUser reviewer;
     public Repo repo;
     public String pathToPaperInRepo;
-    public String downloadPaperLink;
+    public String linkToReviewPaper;
     public List<String> customLabels = Collections.emptyList(); 
     
     public Review() {
@@ -27,7 +27,7 @@ public class Review extends ReflectionDBObject {
         this.requester = requester;
         this.reviewer = reviewer;
         this.pathToPaperInRepo = pathToPaperInRepo;
-        this.downloadPaperLink = downloadPaperLink;
+        this.linkToReviewPaper = downloadPaperLink;
         this.repo = repo;
     }
     
@@ -35,7 +35,7 @@ public class Review extends ReflectionDBObject {
         this.requester = requester;
         this.reviewer = reviewer;
         this.pathToPaperInRepo = pathToPaperInRepo;
-        this.downloadPaperLink = downloadPaperLink;
+        this.linkToReviewPaper = downloadPaperLink;
         this.repo = new Repo(repoOwner.login, repoName);
     }
 
@@ -52,7 +52,7 @@ public class Review extends ReflectionDBObject {
         request.put("reviewer", reviewer.toJSON());
         request.put("repo", repo.toJSON());
         request.put("paper", pathToPaperInRepo);
-        request.put("link", downloadPaperLink);
+        request.put("link", linkToReviewPaper);
         return request;
     }
 
@@ -63,7 +63,7 @@ public class Review extends ReflectionDBObject {
     @Override
     public String toString() {
         return "Review [requester=" + requester + ", reviewer=" + reviewer + ", repo=" + repo + ", paper=" + pathToPaperInRepo + ", link="
-                + downloadPaperLink + "]";
+                + linkToReviewPaper + "]";
     }
 
     public void setRequester(PDFUser requester) {
@@ -94,12 +94,12 @@ public class Review extends ReflectionDBObject {
         this.pathToPaperInRepo = pathToPaperInRepo;
     }
 
-    public String getDownloadPaperLink() {
-        return downloadPaperLink;
+    public String getLinkToReviewPaper() {
+        return linkToReviewPaper;
     }
 
-    public void setDownloadPaperLink(String downloadPaperLink) {
-        this.downloadPaperLink = downloadPaperLink;
+    public void setLinkToReviewPaper(String linkToReviewPaper) {
+        this.linkToReviewPaper = linkToReviewPaper;
     }
 
     public void setCustomLabels(List<String> parsedCustomLabels) {
