@@ -1,8 +1,5 @@
-
-function setupStatus() {
-  $("#statusDiv").fadeIn();
-  getReviews();
-}
+/*global accessToken */
+/*exported getReviews */
 
 function getReviews() {
   $.get("/status?access_token=" + accessToken)
@@ -33,7 +30,7 @@ function showReviews(writerOrReviewer, reviews) {
 
   function getOtherUser(r) {
     if(isReviewer)
-      return r.writer;
+      return r.requester;
     else
       return r.reviewer;
   }
@@ -47,16 +44,16 @@ function showReviews(writerOrReviewer, reviews) {
 
   for(var i=0; i<reviews.length; i++) {
     var review = reviews[i];
-    var otherUser = getUserText(getOtherUser(review));
+    var otherUser = getOtherUser(review);
     var paper = review.paper;
     if(paper.indexOf("/") != -1) {
       paper = paper.substr(paper.lastIndexOf("/") + 1);
     }
 
     var html = "<table>"
-             + "<tr><td><label>" + wrText + "</label></td><td><a href='https://github.com/" + getOtherUser(review).login + "'>" + otherUser + "</a></td></tr>"
-             + "<tr><td><label>Repository:</label></td><td><a href='https://github.com/" + review.writer.login + "/" + review.repo + "'>" + review.repo + "</a></td></tr>"
-             + "<tr><td><label>Paper:</label></td><td><a href='https://github.com/" + review.writer.login + "/" + review.repo + "/blob/master/" + review.paper + "'>" + paper + "</a></td></tr>"
+             + "<tr><td><label>" + wrText + "</label></td><td><a href='https://github.com/" + otherUser.login + "'>" + getUserText(otherUser) + "</a></td></tr>"
+             + "<tr><td><label>Repository:</label></td><td><a href='https://github.com/" + review.repo.repoOwner + "/" + review.repo.repoName + "'>" + review.repo.repoName + "</a></td></tr>"
+             + "<tr><td><label>Paper:</label></td><td><a href='https://github.com/" + review.repo.repoOwner + "/" + review.repo.repoName + "/blob/master/" + review.paper + "'>" + paper + "</a></td></tr>"
              + "</table>";
 
     var reviewDiv = $("<div />")
@@ -70,13 +67,13 @@ function showReviews(writerOrReviewer, reviews) {
 
       var cancelReviewBtn = $("<button>")
         .attr("class", "btn btn-danger")
-        .data("writer", review.writer.login)
+        .data("repoOwner", review.repo.repoOwner)
         .data("reviewer", review.reviewer.login)
-        .data("repo", review.repo)
+        .data("repoName", review.repo.repoName)
         .on("click", function(e) {
             e.preventDefault();
             var data = $(this).data();
-            cancelReview(data.writer, data.reviewer, data.repo);
+            cancelReview(data.repoOwner, data.reviewer, data.repoName);
         });
 
     if(isReviewer) {
@@ -99,6 +96,17 @@ function showReviews(writerOrReviewer, reviews) {
 
 }
 
+
+function getUserText(r) {
+  var hasEmail = "email" in r && r.email !== "";
+  var hasName = "name" in r && r.name !== "";
+
+  var email = hasEmail ? " (" + r.email + ")" : "";
+  var name = hasName ? r.name + " - " : "";
+
+  return name + r.login + email;
+}
+
 function showEmptyReviews(writerOrReviewer) {
   var isReviewer = writerOrReviewer == "reviewer";
   var div = isReviewer ? "#reviewRequests" : "#pendingReviews";
@@ -110,7 +118,7 @@ function cancelReview(writer, reviewer, repo) {
   {
     type: "DELETE"
   })
-  .done(function(data) {
+  .done(function() {
     $.each($("#reviewRequests div.panel, #pendingReviews div.panel"), function(i, elem) {
       var btn = $(elem).find("button.btn-danger");
       if(btn.data("writer") == writer && btn.data("reviewer") == reviewer && btn.data("repo") == repo) {

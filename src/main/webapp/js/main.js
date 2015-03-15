@@ -1,4 +1,5 @@
-
+/*global setupWriterBtns, setupReviewerBtns, setupWriter, setupLogin, setupReviewer, getReviews */
+/*exported showAlert */
 $(document).ready(main);
 
 function main() {
@@ -8,11 +9,11 @@ function main() {
   var repoName = getQueryParams("repoName");
   var writer = getQueryParams("writer");
 
-  if(repoName != null && writer != null) {
-    setupLogin(setupReviewer);
+  if(!repoName || !writer) {
+    setupLogin(setupStatus);
   }
   else {
-    setupLogin(setupStatus);
+    setupLogin(setupReviewer);
   }
 
   $("#showWriterBtn").on("click", function() {
@@ -50,16 +51,6 @@ function getQueryParams(key) {
     return match && decodeURIComponent(match[1].replace(/\+/g, " "));
 }
 
-function getUserText(r) {
-  var hasEmail = "email" in r && r["email"] != "";
-  var hasName = "name" in r && r["name"] != "";
-
-  var email = hasEmail ? " (" + r["email"] + ")" : "";
-  var name = hasName ? r["name"] + " - " : "";
-
-  return name + r["login"] + email;
-}
-
 function setupLoadIndicator() {
   $(document).ajaxStart(function() {
     $("#loading").fadeIn();
@@ -67,5 +58,10 @@ function setupLoadIndicator() {
 
   $(document).ajaxStop(function() {
     $("#loading").hide();
-  })
+  });
+}
+
+function setupStatus() {
+  $("#statusDiv").fadeIn();
+  getReviews();
 }
