@@ -1,3 +1,5 @@
+/*global showAlert, getQueryParams, accessToken */
+/*exported setupReviewerBtns*/
 function setupReviewerBtns() {
   var uploadBtn = $("#upload");
   var fileSelecters = $("#pdf-file");
@@ -9,25 +11,25 @@ function setupReviewerBtns() {
     // Get data and be sure everything is there before it is sent.
     var file = fileSelecter.files[0];
     
-    if(file == null) {
+    if(!file) {
       showAlert("danger", "Be sure to select a file.");
       return;
     }
 
     var repoName = getQueryParams("repoName");
-    if(repoName == null) {
+    if(!repoName) {
       showAlert("danger", "No repository specified, be sure your link is correct.");
       return;
     }
 
     var writer = getQueryParams("writer");
-    if(writer == null) {
+    if(!writer) {
       showAlert("danger", "No writer specified, be sure your link is correct.");
     }
 
     // Show that data is being sent.
-    uploadBtn.val("Uploading...")
-    uploadBtn.attr("disabled", true)
+    uploadBtn.val("Uploading...");
+    uploadBtn.attr("disabled", true);
 
     // Attach the file to the request data.
     var formData = new FormData();
@@ -44,19 +46,24 @@ function setupReviewerBtns() {
       var pdfUrl = "https://github.com/" + writer + "/" + repoName + "/blob/master/" + data;
       showAlert("success", "<strong>Success!</strong> Your PDF has been processed. Click <a href=" + pdfUrl + ">here</a> view it.");
     })
-    .fail(function() {
-      showAlert("danger", "<strong>Uh oh!</strong> There has been an error submitting your review.");
+    .fail(function(data) {
+      if (data.status === 409) {
+        showAlert("danger", "It appears you have already submitted a review for this paper...");
+      } else {
+        showAlert("danger", "<strong>Uh oh!</strong> There has been an error submitting your review.");
+      }
+      
     })
     .always(function() {
       uploadBtn.val("Upload");
       uploadBtn.attr("disabled", false);
-    })
+    });
 
   });
 
   // Show that the file has been changed.
   fileSelecters.on("change", function() {
-    if($(this)[0].files[0] != null) {
+    if($(this)[0].files[0]) {
       var selected = $(this)[0].files[0].name;
       showAlert("info", selected + " has been selected to upload.");
       uploadBtn.attr("disabled", false);
@@ -75,7 +82,7 @@ function setupReviewer() {
 }
 
 function setDownloadBtnLink(writer, repoName, paper) {
-  if(writer == null || repoName == null || paper == null) {
+  if(!writer || !repoName || !paper) {
     $("#downloadPaper").hide();
     return;
   }
