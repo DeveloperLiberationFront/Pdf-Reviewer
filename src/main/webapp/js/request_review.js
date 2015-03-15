@@ -167,10 +167,10 @@ function getCustomLabels() {
 }
 
 function onSelectStuff() {
-  if(!getSelectedLogin() && !getSelectedFile() && !getSelectedRepo() && getSelectedReviewers().length > 0) {
-    $("#submitReview").attr("disabled", false);
+  if(!getSelectedLogin() || !getSelectedFile() || !getSelectedRepo() || getSelectedReviewers().length === 0) {
+    $("#submitReview").attr("disabled", true);
   }
   else {
-    $("#submitReview").attr("disabled", true);
+    $("#submitReview").attr("disabled", false);
   }
 }
