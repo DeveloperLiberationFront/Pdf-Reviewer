@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -40,6 +41,7 @@ import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.ContentsService;
 import org.eclipse.egit.github.core.service.IssueService;
+import org.eclipse.egit.github.core.service.LabelService;
 import org.eclipse.egit.github.core.service.RepositoryService;
 import org.eclipse.egit.github.core.service.UserService;
 import org.json.JSONException;
@@ -88,7 +90,7 @@ public class ReviewSubmitServlet extends HttpServlet {
 
             List<PdfComment> comments = updatePdfWithNumberedAndColoredAnnotations(pdf, repo, totalIssues);
             urlToPdfInRepo = addPdfToRepo(pdf, reviewer, client, repo, accessToken);
-            task.setter(comments, accessToken, repo, totalIssues);
+            task.setter(comments, accessToken, repo, totalIssues, fulfilledReview.customLabels);
             
         } catch (Exception e) {
             e.printStackTrace();
@@ -218,17 +220,19 @@ public class ReviewSubmitServlet extends HttpServlet {
         
     }
 
-    private final class UploadIssuesRunnable implements Runnable {
+    private final static class UploadIssuesRunnable implements Runnable {
 		private String accessToken;
 		private List<PdfComment> comments;
         private int issueCount;
         private Repo repo;
+        private List<String> customLabelStrings;
 		
-		public void setter(List<PdfComment> comments, String accessToken, Repo repo, int issueCount) {
+		public void setter(List<PdfComment> comments, String accessToken, Repo repo, int issueCount, List<String> customLabels) {
 			this.comments = comments;
 			this.accessToken = accessToken;
 			this.repo = repo;
 			this.issueCount = issueCount;
+			this.customLabelStrings = customLabels;
 		}
 
 		@Override
@@ -240,8 +244,9 @@ public class ReviewSubmitServlet extends HttpServlet {
 					DBAbstraction database = DatabaseFactory.getDatabase();
 					UserService userService = new UserService(client);
 					User reviewer = userService.getUser();
+					List<Label> customLabels = createCustomLabels(client);
 					
-					createIssues(client, repo, comments);
+					createIssues(client, customLabels);
 					
 					String closeComment = "@" + reviewer.getLogin() + " has reviewed this paper.";
 					
@@ -255,19 +260,48 @@ public class ReviewSubmitServlet extends HttpServlet {
 				}
 		}
 
-        public void createIssues(GitHubClient client, Repo repo, List<PdfComment> comments) throws IOException {
+        private List<Label> createCustomLabels(GitHubClient client) {
+            List<Label> labels = new ArrayList<>();
+            for (String customLabel : customLabelStrings) {
+                Label newLabel = new Label().setColor(randomColor()).setName(customLabel);
+                
+                try {
+                    LabelService labelService = new LabelService(client);
+                    Label alreadyExistingLabel = labelService.getLabel(repo.repoOwner, repo.repoName, customLabel);
+                    if (alreadyExistingLabel == null) {
+                        labelService.createLabel(repo.repoOwner, repo.repoName, newLabel);
+                    }
+                    
+                } catch(IOException e) {
+                    e.printStackTrace();
+                }
+                labels.add(newLabel);
+            }
+            return labels;
+        }
+
+        private String randomColor() {
+            StringBuilder sb = new StringBuilder(6);
+            Random r = new Random();
+            for(int i = 0; i< 6; i++) {
+                sb.append("0123456789abcdef".charAt(r.nextInt(16)));
+            }
+            return sb.toString();
+        }
+
+        public void createIssues(GitHubClient client, List<Label> customLabels) throws IOException {
         	for(PdfComment comment : comments) {
         	    System.out.println(comment);
-        		createOrUpdateIssue(client, repo, comment);
+        		createOrUpdateIssue(client, repo, comment, customLabels);
         	}
         }
 
-        public void createOrUpdateIssue(GitHubClient client, Repo repo, PdfComment comment) throws IOException {
+        public void createOrUpdateIssue(GitHubClient client, Repo repo, PdfComment comment, List<Label> customLabels) throws IOException {
         	IssueService issueService = new IssueService(client);
         	
         	// If the issue does not already exist
         	if(comment.getIssueNumber() > issueCount) { 
-        		createIssue(repo, comment, issueService);
+        		createIssue(repo, comment, issueService, customLabels);
         	}
         	// If the issue already exists, update it
         	else {
@@ -275,8 +309,7 @@ public class ReviewSubmitServlet extends HttpServlet {
         	}
         }
 
-        private void createIssue(Repo repo, PdfComment comment, IssueService issueService)
-                throws IOException {
+        private void createIssue(Repo repo, PdfComment comment, IssueService issueService, List<Label> labels) throws IOException {
             Issue issue = new Issue();
             issue.setTitle(comment.getTitle());
             
@@ -290,14 +323,13 @@ public class ReviewSubmitServlet extends HttpServlet {
             }
             
             issue.setBody(body); 
-            
-            List<Label> labels = new ArrayList<>();
-            
+            //add tags to labels
             for(Tag tag : comment.getTags()) {
             	Label label = new Label();
             	label.setName(tag.name());
             	labels.add(label);
             }
+            
             
             issue.setLabels(labels);
             //creates an issue remotely
