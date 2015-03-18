@@ -81,12 +81,9 @@ public class ReviewSubmitServlet extends HttpServlet {
         try {
             FileItemIterator iter = upload.getItemIterator(req);
             FileItemStream file = iter.next();
-
             pdf = new Pdf(file.openStream(), getServletContext());
-
             
-            
-            int totalIssues = getNumTotalIssues(client, repo);
+            int totalIssues = getNumTotalIssues(client, repo);      //TODO perhaps involve database to avoid race conditions
 
             List<PdfComment> comments = updatePdfWithNumberedAndColoredAnnotations(pdf, repo, totalIssues);
             urlToPdfInRepo = addPdfToRepo(pdf, reviewer, client, repo, accessToken);
@@ -310,7 +307,7 @@ public class ReviewSubmitServlet extends HttpServlet {
         	}
         }
 
-        private void createIssue(Repo repo, PdfComment comment, IssueService issueService, List<Label> labels) throws IOException {
+        private void createIssue(Repo repo, PdfComment comment, IssueService issueService, List<Label> customLabels) throws IOException {
             Issue issue = new Issue();
             issue.setTitle(comment.getTitle());
             
@@ -324,15 +321,16 @@ public class ReviewSubmitServlet extends HttpServlet {
             }
             
             issue.setBody(body); 
+            List<Label> newLabels = new ArrayList<>(customLabels);
             //add tags to labels
             for(Tag tag : comment.getTags()) {
             	Label label = new Label();
             	label.setName(tag.name());     // these tags are, by default, the normal grey color.  
-            	labels.add(label);             // User can change these to the severity whey want
+            	newLabels.add(label);             // User can change these to the severity whey want
             }
             
             
-            issue.setLabels(labels);
+            issue.setLabels(newLabels);
             //creates an issue remotely
             issue = issueService.createIssue(repo.repoOwner, repo.repoName, issue);
             comment.setIssueNumber(issue.getNumber());
