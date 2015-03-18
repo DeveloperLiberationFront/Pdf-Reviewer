@@ -7,7 +7,7 @@ Aids the paper writing cycle by processing pdfs containing highlights and commen
 
 1. Install [Maven](http://maven.apache.org/download.cgi).  
 2. Download the repository
-3. (optional) Set up the secret keys, as documented below.  You can skip this if you only like to test in prod.
+3. (optional) Install mongodb (perhaps using [vagrant](https://www.vagrantup.com/)?).  If you don't have a GitHub API key, you should [make an application](https://developer.github.com/program/).  You'll need a Google account or something similar for the Picassa picture hosting. Finally, set up the secret environment variables as documented below.
 - Run `mvn clean install` to get dependencies
 - (Optional) Generate an Eclipse Project setup with  
 `mvn eclipse:eclipse -DdownloadSources=true -DdownloadJavadocs=true`  
