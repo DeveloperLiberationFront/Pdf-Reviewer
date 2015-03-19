@@ -25,6 +25,7 @@ import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.graphics.color.PDGamma;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
+import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationMarkup;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationText;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationTextMarkup;
 
@@ -87,8 +88,8 @@ public class Pdf {
 
                 List<PDAnnotation> annotations = page.getAnnotations();
 
-                // erase annotations from page to avoid them blotting out text
-                page.setAnnotations(Collections.<PDAnnotation> emptyList());
+                // erase highlight and popup annotations from page to avoid them blotting out text
+                page.setAnnotations(nonBlockingAnnotations(annotations));
 
                 for (PDAnnotation anno : annotations) {
                     if (pageImage == null) {
@@ -114,6 +115,16 @@ public class Pdf {
 
                         pdfComment.setImage(makePopupSubImage(pageImage, anno.getRectangle()));
                         comments.add(pdfComment);
+                    } else if (anno.getContents() != null || anno.getAppearance() != null){
+                        String writtenComment = anno.getContents();
+                        if (writtenComment == null) {
+                            writtenComment = "[blank]";
+                        }
+                        PdfComment pdfComment = new PdfComment(writtenComment);
+
+                        pdfComment.setImage(makePlainSubImage(pageImage, anno.getRectangle()));
+                        comments.add(pdfComment);
+                        
                     }
 
                 }
@@ -126,16 +137,37 @@ public class Pdf {
 
         return comments;
     }
+
+    private BufferedImage makePlainSubImage(BufferedImage image, PDRectangle r) {
+        float[] convertedQuadPoints = rectToQuadArray(r);
+        return makeSubImage(image, convertedQuadPoints, PostExtractMarkup.NONE);
+    }
+
+    private List<PDAnnotation> nonBlockingAnnotations(List<PDAnnotation> annotations) {
+        List<PDAnnotation> annotationsThatAreNotTextMarkupOrPopup = new ArrayList<>();
+        for(PDAnnotation annotation: annotations) {
+            if (annotation.getClass() == PDAnnotationMarkup.class) {
+                annotationsThatAreNotTextMarkupOrPopup.add(annotation);
+            }
+        }
+        
+        return annotationsThatAreNotTextMarkupOrPopup;
+    }
 	
     private BufferedImage makeHighlightedSubImage(BufferedImage img, float[] quadPoints) {
         return makeSubImage(img, quadPoints, PostExtractMarkup.HIGHLIGHTS);
     }
 
     private BufferedImage makePopupSubImage(BufferedImage img, PDRectangle r) {
+        float[] convertedQuadPoints = rectToQuadArray(r);
+        return makeSubImage(img, convertedQuadPoints, PostExtractMarkup.POPUP);
+    }
+
+    private float[] rectToQuadArray(PDRectangle r) {
         float[] convertedQuadPoints = new float[]{r.getLowerLeftX(),r.getLowerLeftY(),
                 r.getUpperRightX(), r.getLowerLeftY(), r.getLowerLeftX(), r.getUpperRightY(),
                 r.getUpperRightX(), r.getUpperRightY()};
-        return makeSubImage(img, convertedQuadPoints, PostExtractMarkup.POPUP);
+        return convertedQuadPoints;
     }
 
     private enum PostExtractMarkup {

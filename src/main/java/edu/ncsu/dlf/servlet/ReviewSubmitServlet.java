@@ -329,7 +329,6 @@ public class ReviewSubmitServlet extends HttpServlet {
             	newLabels.add(label);             // User can change these to the severity whey want
             }
             
-            
             issue.setLabels(newLabels);
             //creates an issue remotely
             issue = issueService.createIssue(repo.repoOwner, repo.repoName, issue);
