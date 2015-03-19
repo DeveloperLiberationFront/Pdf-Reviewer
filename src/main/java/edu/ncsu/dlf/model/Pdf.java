@@ -63,7 +63,7 @@ public class Pdf {
     private boolean DEBUG = Boolean.parseBoolean(System.getenv("DEBUG"));
 	
     
-    private Pdf(InputStream pdfInputStream, InputStream commentBoxInputStream) throws IOException {
+    Pdf(InputStream pdfInputStream, InputStream commentBoxInputStream) throws IOException {
         this.doc = PDDocument.load(pdfInputStream);
         if (commentBoxInputStream != null)
             this.commentBoxImage = ImageIO.read(commentBoxInputStream);
