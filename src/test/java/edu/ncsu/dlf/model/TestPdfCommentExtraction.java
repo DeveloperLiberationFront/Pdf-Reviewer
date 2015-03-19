@@ -2,9 +2,17 @@ package edu.ncsu.dlf.model;
 
 import static org.junit.Assert.*;
 
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.imageio.ImageIO;
 
 import org.junit.Test;
+
+import test.TestUtils;
 
 public  class TestPdfCommentExtraction {
 
@@ -19,5 +27,40 @@ public  class TestPdfCommentExtraction {
         assertEquals(0, pdf.getPDFComments().size());
     }
     
+    @Test
+    public void testHighlightedPDF() throws Exception {
+        InputStream fos = getClass().getResourceAsStream("/highlights.pdf");
+        InputStream commentBoxStream = getClass().getResourceAsStream("/images/comment_box.PNG");
+        assertNotNull(fos);
+        assertNotNull(commentBoxStream);
+        Pdf pdf = new Pdf(fos, commentBoxStream);
+
+        List<PdfComment> pdfComments = pdf.getPDFComments();
+        assertEquals(5, pdfComments.size());
+        String[] expectedComments = new String[]{"Look at this Introduction", "Bad short words", "Paragraph", "Multi-column", "[blank]"};
+        BufferedImage[] expectedImages = loadExpectedImages("highlights", 5);
+        
+        for(int i =0;i<pdfComments.size();i++) {
+            PdfComment pdfComment = pdfComments.get(i);
+            assertEquals("Failed Comment Comparison for comment "+i, expectedComments[i], pdfComment.getComment());
+            double difference = TestUtils.imagePercentDiff(expectedImages[i], pdfComment.getImage());
+            String possibleErrorMessage = String.format("Failed image Comparison for highlighted/%d.png : difference %1.4f", i, difference);
+            assertTrue(possibleErrorMessage, difference < 0.01);
+        }
+        
+    }
+    
+    
+    
+
+    private BufferedImage[] loadExpectedImages(String resourceDir, int numImages) throws IOException {
+        ArrayList<BufferedImage> loadedImages = new ArrayList<>();
+        for(int picName = 1; picName<=numImages; picName++) {
+            BufferedImage loadedImage = ImageIO.read(getClass().getResourceAsStream("/images/"+resourceDir+"/"+picName+".png"));
+            assertNotNull(loadedImage);
+            loadedImages.add(loadedImage);
+        }
+        return loadedImages.toArray(new BufferedImage[loadedImages.size()]);
+    }
 
 }
