@@ -1,4 +1,4 @@
-PDF-Reviewer
+PDF-Reviewer [![Build Status](https://travis-ci.org/DeveloperLiberationFront/Pdf-Reviewer.svg?branch=master)](https://travis-ci.org/DeveloperLiberationFront/Pdf-Reviewer)
 ============
 
 Aids the paper writing cycle by processing pdfs containing highlights and comments and turning them into GitHub issues that can be used to track progress in resolving them.
