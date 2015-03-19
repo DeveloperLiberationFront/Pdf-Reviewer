@@ -75,6 +75,27 @@ public  class TestPdfCommentExtraction {
 
     }
     
+    @Test
+    public void testDrawingPdf() throws Exception {
+        InputStream fos = getClass().getResourceAsStream("/drawings.pdf");
+        InputStream commentBoxStream = getClass().getResourceAsStream("/images/comment_box.PNG");
+        assertNotNull(fos);
+        assertNotNull(commentBoxStream);
+        Pdf pdf = new Pdf(fos, commentBoxStream);
+
+        try {
+            List<PdfComment> pdfComments = pdf.getPDFComments();
+            assertEquals(4, pdfComments.size());
+            String[] expectedComments = new String[] { "[blank]", "Fix Please", "Was designificated", "[blank]" };
+            BufferedImage[] expectedImages = loadExpectedImages("drawings", 4);
+
+            compare(pdfComments, expectedComments, expectedImages, "drawings");
+        } finally {
+            pdf.close();
+        }
+
+    }
+    
 
     private BufferedImage[] loadExpectedImages(String resourceDir, int numImages) throws IOException {
         ArrayList<BufferedImage> loadedImages = new ArrayList<>();
@@ -91,7 +112,7 @@ public  class TestPdfCommentExtraction {
             PdfComment pdfComment = pdfComments.get(i);
             assertEquals("Failed Comment Comparison for comment "+i, expectedComments[i], pdfComment.getComment());
             double difference = TestUtils.imagePercentDiff(expectedImages[i], pdfComment.getImage());
-            String possibleErrorMessage = String.format("Failed image Comparison for "+foldername+"/%d.png : difference %1.4f", i, difference);
+            String possibleErrorMessage = String.format("Failed image Comparison for "+foldername+"/%d.png : difference %1.4f", i+1, difference);
             assertTrue(possibleErrorMessage, difference < 0.01);
         }
     }
