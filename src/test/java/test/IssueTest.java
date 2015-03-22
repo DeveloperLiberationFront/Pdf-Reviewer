@@ -49,6 +49,10 @@ public class IssueTest {
 
     PdfComment i;
 
+    private String jS;
+
+    private PdfComment j;
+
     @Before
     public void setup() {
         aS = "{{tag 1, mf}} [[https://github.com/mpeterson2/Pdf-Test/issues/1]] This is an issue";
@@ -60,6 +64,7 @@ public class IssueTest {
         gS = "This is  [[https://github.com/mpeterson2/Pdf-Test/issues/7]] an issue";
         hS = "This is not an [[https://github.com/mpeterson2/Pdf-Test/issues/19]] issue";
         iS = "{{tag, p}} This is a positive issue";
+        jS = "This is a really really really really long issue title with an incorrect must-fix tag [[mf]] ";
 
         a = new PdfComment(aS);
         b = new PdfComment(bS);
@@ -70,7 +75,9 @@ public class IssueTest {
         g = new PdfComment(gS);
         h = new PdfComment(hS);
         i = new PdfComment(iS);
-    }
+        j = new PdfComment(jS);
+        j.setIssueNumber(8);        //simulating querying github for the issue count
+    }   
 
     @Test
     public void testComment() {
@@ -82,7 +89,8 @@ public class IssueTest {
         assertEquals(aComment, e.getComment());
         assertEquals(aComment, f.getComment());
         assertEquals(aComment, g.getComment());
-        assertNotEquals(aComment, h.getComment());
+        assertEquals("This is not an issue", h.getComment());
+        assertEquals("This is a really really really really long issue title with an incorrect must-fix tag", j.getComment());
     }
 
     @Test
@@ -95,11 +103,15 @@ public class IssueTest {
         assertEquals(aTitle, e.getTitle());
         assertEquals(aTitle, f.getTitle());
         assertEquals(aTitle, g.getTitle());
+        assertEquals("This is not an issue", h.getTitle());
+        assertEquals("This is a really really really really long issu...", j.getTitle());
     }
 
     @Test
     public void testTags() {
         assertEquals(2, a.getTags().size());
+        assertEquals(1, j.getTags().size());
+        assertEquals(Tag.MUST_FIX, j.getTags().get(0));
 
         assertEquals(Tag.MUST_FIX, PdfComment.getTag("mf"));
         assertEquals(Tag.MUST_FIX, PdfComment.getTag("must-fix"));
@@ -120,7 +132,7 @@ public class IssueTest {
     }
 
     @Test
-    public void testPositive() {
+    public void testPositiveTags() {
         assertTrue(i.getTags().contains(PdfComment.Tag.POSITIVE));
 
         assertEquals(Tag.POSITIVE, PdfComment.getTag("g"));
@@ -133,7 +145,7 @@ public class IssueTest {
     }
 
     @Test
-    public void testGettingFromString() {
+    public void testGettingTagsFromStringList() {
         List<String> commentStrList = new ArrayList<>();
         commentStrList.add(aS);
         commentStrList.add(bS);
@@ -144,6 +156,7 @@ public class IssueTest {
         commentStrList.add(gS);
         commentStrList.add(hS);
         commentStrList.add(iS);
+        commentStrList.add(jS);
 
         List<PdfComment> allComments = convertStringsToPDFComments(commentStrList);
 
@@ -180,6 +193,7 @@ public class IssueTest {
         assertEquals(5, e.getIssueNumber());
         assertEquals(6, f.getIssueNumber());
         assertEquals(7, g.getIssueNumber());
+        assertEquals(8, j.getIssueNumber());
         assertEquals(19, h.getIssueNumber());
         assertEquals(0, i.getIssueNumber());
     }
@@ -202,5 +216,7 @@ public class IssueTest {
         assertEquals("[[https://github.com/mpeterson2/Pdf-Test/issues/7]] This is an issue", g.getMessageWithLink(repo));
         assertEquals("[[https://github.com/mpeterson2/Pdf-Test/issues/19]] This is not an issue", h.getMessageWithLink(repo));
         assertEquals("{{CUSTOM_TAG, POSITIVE}} This is a positive issue", i.getMessageWithLink(repo));
+        assertEquals("{{MUST_FIX}} [[https://github.com/mpeterson2/Pdf-Test/issues/8]] This is a really really really really long issue title with an incorrect must-fix tag", j.getMessageWithLink(repo));
+        
     }
 }

@@ -93,7 +93,7 @@ public class PdfComment {
 		this.comment = comment.trim();
 	}
 	
-    public final String setIssueNumberAndRepairBrokenTags(String originalString) {
+    private final String setIssueNumberAndRepairBrokenTags(String originalString) {
 
         int issueStartPos = originalString.indexOf("[[");
         int issueEndPos = originalString.indexOf("]]");
