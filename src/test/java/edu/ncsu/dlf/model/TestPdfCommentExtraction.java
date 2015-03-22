@@ -18,11 +18,7 @@ public  class TestPdfCommentExtraction {
 
     @Test
     public void testBlankPDF() throws Exception {
-        InputStream fos = getClass().getResourceAsStream("/blank.pdf");
-        InputStream commentBoxStream = getClass().getResourceAsStream("/images/comment_box.PNG");
-        assertNotNull(fos);
-        assertNotNull(commentBoxStream);
-        Pdf pdf = new Pdf(fos, commentBoxStream);
+        Pdf pdf = loadPdf("/blank.pdf");
 
         try {
             assertEquals(0, pdf.getPDFComments().size());
@@ -33,11 +29,7 @@ public  class TestPdfCommentExtraction {
     
     @Test
     public void testHighlightedPDF() throws Exception {
-        InputStream fos = getClass().getResourceAsStream("/highlights.pdf");
-        InputStream commentBoxStream = getClass().getResourceAsStream("/images/comment_box.PNG");
-        assertNotNull(fos);
-        assertNotNull(commentBoxStream);
-        Pdf pdf = new Pdf(fos, commentBoxStream);
+        Pdf pdf = loadPdf("/highlights.pdf");
 
         try {
             List<PdfComment> pdfComments = pdf.getPDFComments();
@@ -56,11 +48,7 @@ public  class TestPdfCommentExtraction {
 
     @Test
     public void testPopupPDF() throws Exception {
-        InputStream fos = getClass().getResourceAsStream("/popups.pdf");
-        InputStream commentBoxStream = getClass().getResourceAsStream("/images/comment_box.PNG");
-        assertNotNull(fos);
-        assertNotNull(commentBoxStream);
-        Pdf pdf = new Pdf(fos, commentBoxStream);
+        Pdf pdf = loadPdf("/popups.pdf");
 
         try {
             List<PdfComment> pdfComments = pdf.getPDFComments();
@@ -77,11 +65,7 @@ public  class TestPdfCommentExtraction {
     
     @Test
     public void testDrawingPdf() throws Exception {
-        InputStream fos = getClass().getResourceAsStream("/drawings.pdf");
-        InputStream commentBoxStream = getClass().getResourceAsStream("/images/comment_box.PNG");
-        assertNotNull(fos);
-        assertNotNull(commentBoxStream);
-        Pdf pdf = new Pdf(fos, commentBoxStream);
+        Pdf pdf = loadPdf("/drawings.pdf");
 
         try {
             List<PdfComment> pdfComments = pdf.getPDFComments();
@@ -95,7 +79,16 @@ public  class TestPdfCommentExtraction {
         }
 
     }
+
     
+
+    private Pdf loadPdf(String pathToPdf) throws IOException {
+        InputStream fos = getClass().getResourceAsStream(pathToPdf);
+        InputStream commentBoxStream = getClass().getResourceAsStream("/images/comment_box.PNG");
+        assertNotNull(fos);
+        assertNotNull(commentBoxStream);
+        return new Pdf(fos, commentBoxStream);
+    }
 
     private BufferedImage[] loadExpectedImages(String resourceDir, int numImages) throws IOException {
         ArrayList<BufferedImage> loadedImages = new ArrayList<>();
