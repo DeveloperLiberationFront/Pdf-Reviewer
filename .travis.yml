@@ -2,3 +2,11 @@
 sudo: false
 
 language: java
+
+env: 
+  global: 
+    - secure: "GWQ4DaqX5+JpZFCXs0p4BgybrF81EH8VCY+kQfsIz3kGCFIZBGpMvy/wj9EPnl4s9DUk/8NSjwi0CUE6sBcbq7t5ah/hQGH8FHJk1RNxTbF+idBKVslSOrRr7YpQ6t5OpechSA06MtMIBbJk2pBGnXMpbWLHXcLkkPydrWAnNIc="
+    
+    
+script:
+ - mvn test jacoco:report coveralls:report -DrepoToken=$COVERALLS_TOKEN -B
