@@ -219,4 +219,11 @@ public class IssueTest {
         assertEquals("{{MUST_FIX}} [[https://github.com/mpeterson2/Pdf-Test/issues/8]] This is a really really really really long issue title with an incorrect must-fix tag", j.getMessageWithLink(repo));
         
     }
+    
+    @Test
+    public void testToJSON() throws Exception {
+        assertEquals(
+                "{\"tags\":[\"CUSTOM_TAG\",\"MUST_FIX\"],\"issueNumber\":1,\"title\":\"This is an issue\",\"comment\":\"This is an issue\"}",
+                a.toJSON().toString());
+    }
 }
