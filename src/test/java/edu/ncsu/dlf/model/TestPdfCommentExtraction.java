@@ -3,6 +3,7 @@ package edu.ncsu.dlf.model;
 import static org.junit.Assert.*;
 
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -14,6 +15,7 @@ import javax.imageio.ImageIO;
 
 import edu.ncsu.dlf.model.PdfComment.Tag;
 
+import org.apache.pdfbox.io.IOUtils;
 import org.junit.Test;
 
 import test.TestUtils;
@@ -22,7 +24,7 @@ public  class TestPdfCommentExtraction {
 
     @Test
     public void testBlankPDF() throws Exception {
-        Pdf pdf = loadPdf("/blank.pdf");
+        Pdf pdf = loadCopyOfPdf("/blank.pdf");
 
         try {
             assertEquals(0, pdf.getPDFComments().size());
@@ -33,7 +35,7 @@ public  class TestPdfCommentExtraction {
     
     @Test
     public void testHighlightedPDF() throws Exception {
-        Pdf pdf = loadPdf("/highlights.pdf");
+        Pdf pdf = loadCopyOfPdf("/highlights.pdf");
 
         try {
             List<PdfComment> pdfComments = pdf.getPDFComments();
@@ -52,7 +54,7 @@ public  class TestPdfCommentExtraction {
 
     @Test
     public void testPopupPDF() throws Exception {
-        Pdf pdf = loadPdf("/popups.pdf");
+        Pdf pdf = loadCopyOfPdf("/popups.pdf");
 
         try {
             List<PdfComment> pdfComments = pdf.getPDFComments();
@@ -69,7 +71,7 @@ public  class TestPdfCommentExtraction {
     
     @Test
     public void testDrawingPdf() throws Exception {
-        Pdf pdf = loadPdf("/drawings.pdf");
+        Pdf pdf = loadCopyOfPdf("/drawings.pdf");
 
         try {
             List<PdfComment> pdfComments = pdf.getPDFComments();
@@ -86,7 +88,7 @@ public  class TestPdfCommentExtraction {
 
     @Test
     public void testCommentsOfVariousIntensities() throws Exception {
-        Pdf pdf = loadPdf("/intenseFixes.pdf");
+        Pdf pdf = loadCopyOfPdf("/intenseFixes.pdf");
 
         try {
             List<PdfComment> pdfComments = pdf.getPDFComments();
@@ -101,18 +103,22 @@ public  class TestPdfCommentExtraction {
             comments.setTags(5, PdfComment.Tag.CONSIDER_FIX);
             
             compare(comments.asList(), pdfComments, "intenseFixes");
+            Repo repo = new Repo("test-owner", "test-repo");
+            pdf.updateComments(pdfComments, repo);
         } finally {
             pdf.close();
         }
     }
     
 
-    private Pdf loadPdf(String pathToPdf) throws IOException {
+    private Pdf loadCopyOfPdf(String pathToPdf) throws IOException {
         InputStream fos = getClass().getResourceAsStream(pathToPdf);
-        InputStream commentBoxStream = getClass().getResourceAsStream("/images/comment_box.PNG");
         assertNotNull(fos);
+        // this makes sure that any changes we make to the pdf are not persisted between tests
+        ByteArrayInputStream copyOfPDF = new ByteArrayInputStream(IOUtils.toByteArray(fos));
+        InputStream commentBoxStream = getClass().getResourceAsStream("/images/comment_box.PNG");
         assertNotNull(commentBoxStream);
-        return new Pdf(fos, commentBoxStream);
+        return new Pdf(copyOfPDF, commentBoxStream);
     }
 
     private BufferedImage[] loadExpectedImages(String resourceDir, int numImages) throws IOException {
