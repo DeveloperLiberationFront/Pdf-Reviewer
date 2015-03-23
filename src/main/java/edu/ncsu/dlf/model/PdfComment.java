@@ -166,8 +166,8 @@ public class PdfComment {
         return issueNumber;
     }
 
-    public String buildLink(Repo repo) {
-        return "https://github.com/" + repo.repoOwner + '/' + repo.repoName + "/issues/" + getIssueNumber();
+    static String buildLink(Repo repo, int issueNumber) {
+        return "https://github.com/" + repo.repoOwner + '/' + repo.repoName + "/issues/" + issueNumber;
     }
 
     public JSONObject toJSON() {
@@ -204,7 +204,7 @@ public class PdfComment {
         String issueLinkStr = "";
 
         if (getIssueNumber() != 0) {
-            issueLinkStr = "[[" + buildLink(repo) + "]] ";
+            issueLinkStr = "[[" + buildLink(repo, getIssueNumber()) + "]] ";
         }
 
         return (tagStr + issueLinkStr + getComment()).trim();

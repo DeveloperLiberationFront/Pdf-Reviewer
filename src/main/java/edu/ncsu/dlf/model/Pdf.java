@@ -398,7 +398,7 @@ public class Pdf {
 	}
 	
 	@SuppressWarnings("unused")
-    public static void main(String[] args) throws Exception{
+    private static void main(String[] args) throws Exception{
 	    FileInputStream fos = new FileInputStream("test.pdf");
 	    Pdf pdf = new Pdf(fos, new FileInputStream("src/main/webapp/images/comment_box.PNG"));
 
