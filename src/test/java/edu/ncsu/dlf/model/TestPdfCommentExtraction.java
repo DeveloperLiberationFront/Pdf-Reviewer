@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -92,22 +91,44 @@ public  class TestPdfCommentExtraction {
 
         try {
             List<PdfComment> pdfComments = pdf.getPDFComments();
-            assertEquals(4, pdfComments.size());
-            PDFCommentMaker comments = new PDFCommentMaker()
-            .fillComments("[blank]", "Fix Please", "You might consider fixing this", "[blank]", "[blank]", "Fix Please", "You might consider fixing this")
-            .fillImages(loadExpectedImages("intenseFixes", 6))
-            .fillTitlesWithDefault();
-            comments.setTags(1, PdfComment.Tag.MUST_FIX);
-            comments.setTags(2, PdfComment.Tag.CONSIDER_FIX);
-            comments.setTags(4, PdfComment.Tag.MUST_FIX);
-            comments.setTags(5, PdfComment.Tag.CONSIDER_FIX);
+            assertEquals(7, pdfComments.size());
+            String comparisonImageDir = "intenseFixes";
             
-            compare(comments.asList(), pdfComments, "intenseFixes");
-            Repo repo = new Repo("test-owner", "test-repo");
-            pdf.updateComments(pdfComments, repo);
+            PDFCommentMaker expectedCommentsMaker = new PDFCommentMaker()
+            .fillComments("[blank]", "Fix Please", "You might consider fixing this", "[blank]", "[blank]", "Fix Please", "You might consider fixing this")
+            .fillImages(loadExpectedImages(comparisonImageDir, 7))
+            .fillTitlesWithDefault();
+            expectedCommentsMaker.setTags(1, PdfComment.Tag.MUST_FIX);
+            expectedCommentsMaker.setTags(2, PdfComment.Tag.CONSIDER_FIX);
+            expectedCommentsMaker.setTags(5, PdfComment.Tag.MUST_FIX);
+            expectedCommentsMaker.setTags(6, PdfComment.Tag.CONSIDER_FIX);
+            
+            List<ExpectedPdfComment> expectedComments = expectedCommentsMaker.asList();
+            compare(expectedComments, pdfComments, comparisonImageDir);
+            // check the colors created by updating the pdf
+            updateCommentsWithColorsAndLinks(pdf, pdfComments);
+            updatedPdfCommentImages(comparisonImageDir, expectedComments, 7);
+            compare(expectedComments, pdf.getPDFComments(), comparisonImageDir);
         } finally {
             pdf.close();
         }
+    }
+
+    private void updatedPdfCommentImages(String comparisonImageDir,  List<ExpectedPdfComment> expectedComments, int numberImages) throws IOException {
+        BufferedImage[] updatedImages = loadExpectedImages(comparisonImageDir+"_updated", numberImages);
+        for (int i = 0; i < expectedComments.size(); i++) {
+            expectedComments.get(i).expectedImage = updatedImages[i];
+        }
+    }
+
+    private void updateCommentsWithColorsAndLinks(Pdf pdf, List<PdfComment> pdfComments) {
+        int issueNumber = 1;
+        for (PdfComment comment: pdfComments) {
+            comment.setIssueNumber(issueNumber);
+            issueNumber++;
+        }
+        Repo repo = new Repo("test-owner", "test-repo");
+        pdf.updateCommentsWithColorsAndLinks(pdfComments, repo);
     }
     
 

@@ -116,7 +116,7 @@ public class ReviewSubmitServlet extends HttpServlet {
 			}
 			
 			// Update the comments to link to the repository and their newly assigned issue number
-			pdf.updateComments(pdfComments, repo);
+			pdf.updateCommentsWithColorsAndLinks(pdfComments, repo);
 		}
 		return pdfComments;
 	}

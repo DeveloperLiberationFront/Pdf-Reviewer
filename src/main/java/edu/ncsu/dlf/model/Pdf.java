@@ -334,7 +334,7 @@ public class Pdf {
         return max;
     }
 	
-	public void updateComments(List<PdfComment> comments, Repo repo) {
+	public void updateCommentsWithColorsAndLinks(List<PdfComment> comments, Repo repo) {
 		@SuppressWarnings("unchecked")
 		List<PDPage> pages = doc.getDocumentCatalog().getAllPages();
 		int commentOn = 0;

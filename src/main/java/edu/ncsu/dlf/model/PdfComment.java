@@ -29,11 +29,13 @@ public class PdfComment {
         tagMap.put("must fix", Tag.MUST_FIX);
         tagMap.put("mustfix", Tag.MUST_FIX);
         tagMap.put("mustFix", Tag.MUST_FIX);
+        tagMap.put("MUST_FIX", Tag.MUST_FIX);
         tagMap.put("sf", Tag.SHOULD_FIX);
         tagMap.put("should-fix", Tag.SHOULD_FIX);
         tagMap.put("should fix", Tag.SHOULD_FIX);
         tagMap.put("shouldfix", Tag.SHOULD_FIX);
         tagMap.put("shouldFix", Tag.SHOULD_FIX);
+        tagMap.put("SHOULD_FIX", Tag.SHOULD_FIX);
         tagMap.put("cf", Tag.CONSIDER_FIX);
         tagMap.put("could-fix", Tag.CONSIDER_FIX);
         tagMap.put("could fix", Tag.CONSIDER_FIX);
@@ -41,6 +43,7 @@ public class PdfComment {
         tagMap.put("couldFix", Tag.CONSIDER_FIX);
         tagMap.put("considerfix", Tag.CONSIDER_FIX);
         tagMap.put("considerFix", Tag.CONSIDER_FIX);
+        tagMap.put("CONSIDER_FIX", Tag.CONSIDER_FIX);
 
         tagMap.put("g", Tag.POSITIVE);
         tagMap.put("good", Tag.POSITIVE);
@@ -49,6 +52,7 @@ public class PdfComment {
         tagMap.put("pos", Tag.POSITIVE);
         tagMap.put("plus", Tag.POSITIVE);
         tagMap.put("+", Tag.POSITIVE);
+        tagMap.put("POSITIVE", Tag.POSITIVE);
     }
 
     private List<Tag> tags;
