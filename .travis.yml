@@ -1,17 +1,20 @@
+# Use docker-based build environment (http://docs.travis-ci.com/user/workers/container-based-infrastructure/)
 sudo: false
+
 language: java
+
 deploy:
   provider: openshift
   user: $OPENSHIFT_USER
   password: $OPENSHIFT_PASS
   domain: ncsudlf
   app: pdfreviewercanary
+
 env:
   global:
   - secure: GWQ4DaqX5+JpZFCXs0p4BgybrF81EH8VCY+kQfsIz3kGCFIZBGpMvy/wj9EPnl4s9DUk/8NSjwi0CUE6sBcbq7t5ah/hQGH8FHJk1RNxTbF+idBKVslSOrRr7YpQ6t5OpechSA06MtMIBbJk2pBGnXMpbWLHXcLkkPydrWAnNIc=
-  - secure: KoZ+Lk2Jfgyk28HokWYQYkdSQzgr1226j+z7Ry1bvBcdVUWgsHYRterdzxaqoKqgMHAiVdAnEIEbDhiUqaahohxHqYz0wDZTGpfGFwKUEfwPnWT9clxMslq4/GGf0UiVcUkX/nghisNzCGKJ+Um8XqyTWb9gth4EdqzvBWEbxK4=
-  matrix:
   - secure: UI2PToOiFuNxO9KAOitAbuzwQALkwa391IwtVrexFq/VPL/DFfzHC3Pg7qvhMxulxyroBLzqGHalmAQsLgDKC0JsXAPGrs4lqBf75AobKhRkG6zN2xlsJmRTKZqRgc2hG0phbbjkFzeN3ag0A9HwJ39iwbfAgTNIUYxfIaY+qKw=
   - secure: bkSSXq3W118IoJINzNBz2+410rn7X0CdoNWnjf9htZD7SXeShBPgurVBVHKr+AYgiWks2dZ+jWRx/12JOe5whGPu2Hgrc0u5r0RNJxUAiwdjqxNX/xdz0XDTgmKCWxJY9C5zoh5Fijxi0t/Z6geugJjiMuHbBvAZdC7gZR13w0w=
+
 script:
-- mvn test jacoco:report coveralls:report -DrepoToken=$COVERALLS_TOKEN -B
+ - mvn test jacoco:report coveralls:report -DrepoToken=$COVERALLS_TOKEN -B
