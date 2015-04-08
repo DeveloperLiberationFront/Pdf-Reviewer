@@ -8,7 +8,7 @@ deploy:
   user: $OPENSHIFT_USER
   password: $OPENSHIFT_PASS
   domain: ncsudlf
-  app: pdfreviewercanary
+  app: pdfreviewcanary
 
 env:
   global:
