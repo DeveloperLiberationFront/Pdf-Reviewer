@@ -32,7 +32,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class ReviewRequestServlet extends HttpServlet {
-	private final String SERVICE_URL = System.getenv("OPENSHIFT_APP_DNS");
     private static final long serialVersionUID = 1L;
 
 	@Override
@@ -136,7 +135,7 @@ public class ReviewRequestServlet extends HttpServlet {
         List<String> parsedCustomLabels = parseCustomLabels(customLabels); //all reviews will have the same labels
         
         String pathToPaperInRepo = pathToPaper + "/" + paper;
-        String linkToRespondToReview = SERVICE_URL + "?repoName=" + repoName + "&writer=" + repoOwner + "&paper=" + pathToPaperInRepo;
+        String linkToRespondToReview = "/?repoName=" + repoName + "&writer=" + repoOwner + "&paper=" + pathToPaperInRepo;
 
         
         List<Review> newReviews = new ArrayList<>();
