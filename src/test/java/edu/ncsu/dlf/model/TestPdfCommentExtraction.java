@@ -33,6 +33,24 @@ public  class TestPdfCommentExtraction {
     }
     
     @Test
+    public void testExoticAnnotations() throws Exception {
+        Pdf pdf = loadCopyOfPdf("/strangeAnnotations.pdf");
+
+        try {
+            List<PdfComment> pdfComments = pdf.getPDFComments();
+
+            assertEquals(7, pdfComments.size());
+            String[] expectedComments = new String[] { "delete this", "Good!", "Typically standard", "Could be section 3", "[blank]", "delete this", "[blank]", "[blank]" };
+            BufferedImage[] expectedImages = loadExpectedImages("strangeAnnotations", 7);
+
+            compare(pdfComments, expectedComments, expectedImages, "strangeAnnotations");
+        } finally {
+            pdf.close();
+        }
+        
+    }
+    
+    @Test
     public void testHighlightedPDF() throws Exception {
         Pdf pdf = loadCopyOfPdf("/highlights.pdf");
 

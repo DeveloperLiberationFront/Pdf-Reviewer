@@ -124,6 +124,9 @@ public class Pdf {
             if (writtenComment == null || writtenComment.isEmpty()) {
                 writtenComment = "[blank]";
             }
+            if (PDAnnotationTextMarkup.SUB_TYPE_STRIKEOUT.equals(comment.getSubtype())) {
+                writtenComment = "delete this";
+            }
             pdfComment = new PdfComment(writtenComment);
 
             if (PDAnnotationTextMarkup.SUB_TYPE_HIGHLIGHT.equals(comment.getSubtype())) {
