@@ -26,7 +26,7 @@ public class StatusServlet extends HttpServlet {
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		
+		System.out.println("Live on "+System.getenv("OPENSHIFT_APP_DNS"));
 	    System.out.println("Is AWT headless: "+GraphicsEnvironment.isHeadless());
 	    DBAbstraction database = DatabaseFactory.getDatabase();
 

@@ -32,7 +32,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class ReviewRequestServlet extends HttpServlet {
-	private static final String SERVICE_URL = "http://pdfreview-ncsudlf.rhcloud.com/";
+	private final String SERVICE_URL = System.getenv("OPENSHIFT_APP_DNS");
     private static final long serialVersionUID = 1L;
 
 	@Override
