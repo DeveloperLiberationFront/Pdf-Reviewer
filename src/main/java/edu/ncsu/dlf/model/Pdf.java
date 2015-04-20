@@ -99,7 +99,7 @@ public class Pdf {
                     if (anno instanceof PDAnnotationTextMarkup) {
                         PDAnnotationTextMarkup comment = (PDAnnotationTextMarkup) anno;
                         String writtenComment = comment.getContents();
-                        if (writtenComment == null) {
+                        if (writtenComment == null || writtenComment.isEmpty()) {
                             writtenComment = "[blank]";
                         }
                         PdfComment pdfComment = new PdfComment(writtenComment);
@@ -108,7 +108,7 @@ public class Pdf {
                         comments.add(pdfComment);
                     } else if (anno instanceof PDAnnotationText ){
                         String writtenComment = anno.getContents();
-                        if (writtenComment == null) {
+                        if (writtenComment == null || writtenComment.isEmpty()) {
                             writtenComment = "[blank]";
                         }
                         PdfComment pdfComment = new PdfComment(writtenComment);
@@ -117,7 +117,7 @@ public class Pdf {
                         comments.add(pdfComment);
                     } else if (anno.getContents() != null || anno.getAppearance() != null){
                         String writtenComment = anno.getContents();
-                        if (writtenComment == null) {
+                        if (writtenComment == null || writtenComment.isEmpty()) {
                             writtenComment = "[blank]";
                         }
                         PdfComment pdfComment = new PdfComment(writtenComment);
