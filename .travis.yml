@@ -3,6 +3,9 @@ sudo: false
 
 language: java
 
+script:
+ - mvn test jacoco:report coveralls:report -DrepoToken=$COVERALLS_TOKEN -B
+
 deploy:
   provider: openshift
   user: $OPENSHIFT_USER
@@ -10,11 +13,13 @@ deploy:
   domain: ncsudlf
   app: pdfreviewcanary
 
+after_deploy:
+	- mvn test -Dtest=BrowserTest -DtestUserName=$TEST_USER_NAME -DtestUserPass=$TEST_USER_PASS
+
 env:
   global:
   - secure: GWQ4DaqX5+JpZFCXs0p4BgybrF81EH8VCY+kQfsIz3kGCFIZBGpMvy/wj9EPnl4s9DUk/8NSjwi0CUE6sBcbq7t5ah/hQGH8FHJk1RNxTbF+idBKVslSOrRr7YpQ6t5OpechSA06MtMIBbJk2pBGnXMpbWLHXcLkkPydrWAnNIc=
   - secure: UI2PToOiFuNxO9KAOitAbuzwQALkwa391IwtVrexFq/VPL/DFfzHC3Pg7qvhMxulxyroBLzqGHalmAQsLgDKC0JsXAPGrs4lqBf75AobKhRkG6zN2xlsJmRTKZqRgc2hG0phbbjkFzeN3ag0A9HwJ39iwbfAgTNIUYxfIaY+qKw=
   - secure: bkSSXq3W118IoJINzNBz2+410rn7X0CdoNWnjf9htZD7SXeShBPgurVBVHKr+AYgiWks2dZ+jWRx/12JOe5whGPu2Hgrc0u5r0RNJxUAiwdjqxNX/xdz0XDTgmKCWxJY9C5zoh5Fijxi0t/Z6geugJjiMuHbBvAZdC7gZR13w0w=
-
-script:
- - mvn test jacoco:report coveralls:report -DrepoToken=$COVERALLS_TOKEN -B
+  - secure: OXChjmLyyNX3qPUKezTrKhaWoq/WtdreotUX0FPHFfrQfUQ3ayGs0TuqAiOi0kJOBVhjtYpiJUXqevN9DfKG35IgghJcHngSSrzitksSzYd2SPmm2dQAc+EOxcd+umedB7dcsoD2Y+p7rMjD641HMWZF+NgCYWjgw0tZbpOMSHY=
+  - secure: j88VqHh+8Ow8Q2koHQdL4EOrL1jwY+FUvCmFtS7Rb9pnFInYwJpvNl1gXSG0b3c+O7o1c/yxZ/flgraxP7pzajWp5mthXeBtDwtvGnh6UsMVXHbv6UbIhZv6jJSiKNkPksAvXye/CvACIMTyrv45lFpdj1+dRKS5kcHCdHke/4M=
