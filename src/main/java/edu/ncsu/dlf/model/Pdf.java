@@ -26,6 +26,7 @@ import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.graphics.color.PDGamma;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationMarkup;
+import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationRubberStamp;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationText;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationTextMarkup;
 
@@ -61,6 +62,7 @@ public class Pdf {
     public static final String pathToCommentBoxImage = "/images/comment_box.PNG";
     private BufferedImage commentBoxImage;
     private boolean DEBUG = Boolean.parseBoolean(System.getenv("DEBUG"));
+    private BufferedImage pageImage;
 	
     
     Pdf(InputStream pdfInputStream, InputStream commentBoxInputStream) throws IOException {
@@ -84,47 +86,22 @@ public class Pdf {
 
         for (PDPage page : pages) {
             try {
-                BufferedImage pageImage = null;
+                
+                pageImage = null;
 
                 List<PDAnnotation> annotations = page.getAnnotations();
 
                 // erase highlight and popup annotations from page to avoid them blotting out text
                 page.setAnnotations(nonBlockingAnnotations(annotations));
-
+                int size = Math.round(DEFAULT_SIZE * SCALE_UP_FACTOR);
+                
                 for (PDAnnotation anno : annotations) {
                     if (pageImage == null) {
-                        int size = Math.round(DEFAULT_SIZE * SCALE_UP_FACTOR);
                         pageImage = page.convertToImage(BufferedImage.TYPE_INT_RGB, size);
                     }
-                    if (anno instanceof PDAnnotationTextMarkup) {
-                        PDAnnotationTextMarkup comment = (PDAnnotationTextMarkup) anno;
-                        String writtenComment = comment.getContents();
-                        if (writtenComment == null) {
-                            writtenComment = "[blank]";
-                        }
-                        PdfComment pdfComment = new PdfComment(writtenComment);
-
-                        pdfComment.setImage(makeHighlightedSubImage(pageImage, comment.getQuadPoints()));
+                    PdfComment pdfComment = turnAnnotationIntoPDFComment(anno);
+                    if (pdfComment != null) {
                         comments.add(pdfComment);
-                    } else if (anno instanceof PDAnnotationText ){
-                        String writtenComment = anno.getContents();
-                        if (writtenComment == null) {
-                            writtenComment = "[blank]";
-                        }
-                        PdfComment pdfComment = new PdfComment(writtenComment);
-
-                        pdfComment.setImage(makePopupSubImage(pageImage, anno.getRectangle()));
-                        comments.add(pdfComment);
-                    } else if (anno.getContents() != null || anno.getAppearance() != null){
-                        String writtenComment = anno.getContents();
-                        if (writtenComment == null) {
-                            writtenComment = "[blank]";
-                        }
-                        PdfComment pdfComment = new PdfComment(writtenComment);
-
-                        pdfComment.setImage(makePlainSubImage(pageImage, anno.getRectangle()));
-                        comments.add(pdfComment);
-                        
                     }
 
                 }
@@ -138,15 +115,64 @@ public class Pdf {
         return comments;
     }
 
+    private PdfComment turnAnnotationIntoPDFComment(PDAnnotation anno) {
+        PdfComment pdfComment = null;
+
+        if (anno instanceof PDAnnotationTextMarkup) {
+            PDAnnotationTextMarkup comment = (PDAnnotationTextMarkup) anno;
+            String writtenComment = comment.getContents();
+            if (writtenComment == null || writtenComment.isEmpty()) {
+                writtenComment = "[blank]";
+            }
+            if (PDAnnotationTextMarkup.SUB_TYPE_STRIKEOUT.equals(comment.getSubtype())) {
+                writtenComment = "delete this";
+            }
+            pdfComment = new PdfComment(writtenComment);
+
+            if (PDAnnotationTextMarkup.SUB_TYPE_HIGHLIGHT.equals(comment.getSubtype())) {
+                pdfComment.setImage(makeHighlightedSubImage(pageImage, comment.getQuadPoints()));
+            } else {
+                pdfComment.setImage(makePlainSubImage(pageImage, comment.getRectangle()));
+            }
+        } 
+        else if (anno instanceof PDAnnotationText) {
+            String writtenComment = anno.getContents();
+            if (writtenComment == null || writtenComment.isEmpty()) {
+                writtenComment = "[blank]";
+            }
+            pdfComment = new PdfComment(writtenComment);
+
+            pdfComment.setImage(makePopupSubImage(pageImage, anno.getRectangle()));
+        } 
+        else if (anno.getContents() != null || anno.getAppearance() != null) {
+            String writtenComment = anno.getContents();
+            if (writtenComment == null || writtenComment.isEmpty()) {
+                writtenComment = "[blank]";
+            }
+            pdfComment = new PdfComment(writtenComment);
+
+            pdfComment.setImage(makePlainSubImage(pageImage, anno.getRectangle()));
+
+        }
+        return pdfComment;
+    }
+
     private BufferedImage makePlainSubImage(BufferedImage image, PDRectangle r) {
         float[] convertedQuadPoints = rectToQuadArray(r);
         return makeSubImage(image, convertedQuadPoints, PostExtractMarkup.NONE);
     }
 
     private List<PDAnnotation> nonBlockingAnnotations(List<PDAnnotation> annotations) {
+        //filters out annotations that pdfbox draws poorly so they don't blot the text out and 
+        //make the images hard to see.  This includes hightlight textMarkups and Popups
         List<PDAnnotation> annotationsThatAreNotTextMarkupOrPopup = new ArrayList<>();
         for(PDAnnotation annotation: annotations) {
-            if (annotation.getClass() == PDAnnotationMarkup.class) {
+            if (annotation instanceof PDAnnotationTextMarkup) {
+                if (!PDAnnotationTextMarkup.SUB_TYPE_HIGHLIGHT.equals(annotation.getSubtype())) {
+                    annotationsThatAreNotTextMarkupOrPopup.add(annotation);
+                }
+            }
+            else if (annotation.getClass() == PDAnnotationMarkup.class || annotation.getClass() == PDAnnotationRubberStamp.class) {
                 annotationsThatAreNotTextMarkupOrPopup.add(annotation);
             }
         }

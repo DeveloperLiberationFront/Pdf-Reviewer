@@ -1,0 +1,6 @@
+#!/bin/bash
+# The logic to start up your application should be put in this
+# script. The application will work only if it binds to
+
+#explicitly set awt headless
+export _JAVA_OPTIONS="-Djava.awt.headless=true"

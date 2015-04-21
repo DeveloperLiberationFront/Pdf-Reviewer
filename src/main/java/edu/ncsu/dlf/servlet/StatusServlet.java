@@ -1,5 +1,6 @@
 package edu.ncsu.dlf.servlet;
 
+import java.awt.GraphicsEnvironment;
 import java.io.IOException;
 import java.util.List;
 
@@ -25,7 +26,9 @@ public class StatusServlet extends HttpServlet {
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		DBAbstraction database = DatabaseFactory.getDatabase();
+		System.out.println("Live on "+System.getenv("OPENSHIFT_APP_DNS"));
+	    System.out.println("Is AWT headless: "+GraphicsEnvironment.isHeadless());
+	    DBAbstraction database = DatabaseFactory.getDatabase();
 
 		GitHubClient client = new GitHubClient();
 		client.setOAuth2Token(req.getParameter("access_token"));

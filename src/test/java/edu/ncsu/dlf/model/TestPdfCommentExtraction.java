@@ -33,6 +33,29 @@ public  class TestPdfCommentExtraction {
     }
     
     @Test
+    public void testExoticAnnotations() throws Exception {
+        Pdf pdf = loadCopyOfPdf("/strangeAnnotations.pdf");
+        String comparisonImageDir = "strangeAnnotations";
+        try {
+            List<PdfComment> pdfComments = pdf.getPDFComments();
+
+            assertEquals(7, pdfComments.size());
+            PDFCommentMaker expectedCommentsMaker = new PDFCommentMaker()
+            .fillComments("delete this", "Good!", "Typically standard", "Could be section 3", "[blank]", "delete this", "[blank]")
+            .fillImages(loadExpectedImages(comparisonImageDir, 7))
+            .fillTitlesWithDefault();
+
+            List<ExpectedPdfComment> expectedComments = expectedCommentsMaker.asList();
+            
+            expectedComments.get(4).imageDifferenceThreshold = 2.9;
+            compare(expectedComments, pdfComments, comparisonImageDir);
+        } finally {
+            pdf.close();
+        }
+        
+    }
+    
+    @Test
     public void testHighlightedPDF() throws Exception {
         Pdf pdf = loadCopyOfPdf("/highlights.pdf");
 
@@ -170,7 +193,7 @@ public  class TestPdfCommentExtraction {
             double difference = TestUtils.imagePercentDiff(e.expectedImage, a.getImage());
             String possibleErrorMessage = String.format("Failed image Comparison for " + folderName
                     + "/%d.png : difference %1.4f", i + 1, difference);
-            assertTrue(possibleErrorMessage, difference < 0.01);
+            assertTrue(possibleErrorMessage, difference < e.imageDifferenceThreshold);
             assertEquals("Failed tag comparison for comment "+i, e.expectedTags, a.getTags());
             
         }
@@ -235,6 +258,7 @@ public  class TestPdfCommentExtraction {
         public BufferedImage expectedImage;
         public String expectedTitle;
         public String expectedComment;
+        public double imageDifferenceThreshold = 0.01;
         
     }
 

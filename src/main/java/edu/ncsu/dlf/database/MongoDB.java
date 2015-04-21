@@ -22,7 +22,7 @@ import org.eclipse.egit.github.core.User;
 
 public class MongoDB implements DBAbstraction {
 
-    private static final String DB_NAME = "pdfreview";
+    private final String DB_NAME;
     private MongoClient mongoClient;
 
     public MongoDB() throws IOException {
@@ -31,6 +31,7 @@ public class MongoDB implements DBAbstraction {
                 Integer.parseInt(portNumber));
         String user = System.getenv("OPENSHIFT_MONGODB_DB_USERNAME");
         String password = System.getenv("OPENSHIFT_MONGODB_DB_PASSWORD");
+        DB_NAME = System.getenv("MONGO_DB_NAME");
         
         MongoCredential credential = MongoCredential.createCredential(user, DB_NAME, password.toCharArray());
         this.mongoClient = new MongoClient(address, Arrays.asList(credential));
