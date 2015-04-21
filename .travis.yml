@@ -14,7 +14,7 @@ deploy:
   app: pdfreviewcanary
 
 after_deploy:
-	- mvn test -Dtest=BrowserTest -DtestUserName=$TEST_USER_NAME -DtestUserPass=$TEST_USER_PASS
+ - mvn test -Dtest=BrowserTest -DtestUserName=$TEST_USER_NAME -DtestUserPass=$TEST_USER_PASS
 
 env:
   global:
