@@ -67,8 +67,8 @@ public class BrowserTest {
     	    File file = new File("strangeAnnotations.pdf");	    
     	    driver.findElement(By.id("pdf-file")).sendKeys(file.getAbsolutePath());
     	    driver.findElement(By.id("upload")).click();
-    	    successCounter++;
     	    driver.findElement(By.linkText("here")).click();
+    	    successCounter++;
     	    driver.findElement(By.cssSelector("a.js-selected-navigation-item.sunken-menu-item > span.octicon.octicon-issue-opened")).click();
     	    driver.findElement(By.linkText("Selenium")).click();
     	    driver.findElement(By.cssSelector("input.js-check-all")).click();
@@ -94,7 +94,21 @@ public class BrowserTest {
 	    Repository repo = repoService.getRepository("DeveloperLiberationFront", "Pdf-Reviewer");
 	    CommitService service = new CommitService(client);
 	    CommitComment comment = new CommitComment();
-	    comment.setBody("test\n\n**hello**");
+	    
+        String message = "step | pass?\n" +
+                "--- | --- \n" +
+                "canary site online |  :fire: \n" +
+                "authenticated with GitHub | :fire: \n" +
+                "no carry over reviews |  ::fire: \n" +
+                "created request |  :fire: \n" +
+                "Uploaded pdf |  :fire: \n" +
+                "Found issues in GitHub |  :fire: \n";
+        
+        for(int i = 0; i< successCounter; i++) {
+            message = message.replaceFirst(":fire:", ":white_check_mark:");
+        }
+
+	    comment.setBody(message);
         service.addComment(repo, sha, comment);
     }
 
