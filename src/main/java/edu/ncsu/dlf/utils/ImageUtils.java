@@ -110,6 +110,7 @@ public class ImageUtils {
     }
 
     //Can be used to regenerate a refresh token
+    @SuppressWarnings("unused")
     private static String getRefreshToken() throws IOException {
         String client_id = System.getenv("PICASSA_CLIENT_ID");
         String client_secret = System.getenv("PICASSA_CLIENT_SECRET");
@@ -151,8 +152,10 @@ public class ImageUtils {
     }
 
     @SuppressWarnings("unused")
-    public static void main(String[] args) throws IOException, ServiceException {
+    private static void main(String[] args) throws IOException, ServiceException {
       //  getRefreshToken();
+        
+        //For testing
         BufferedImage image = ImageIO.read(new File("test.jpg"));
 
         System.out.println(uploadPhoto(image));
