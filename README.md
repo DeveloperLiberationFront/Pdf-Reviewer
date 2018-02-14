@@ -1,5 +1,6 @@
+
 PDF-Reviewer [![Build Status](https://travis-ci.org/DeveloperLiberationFront/Pdf-Reviewer.svg?branch=master)](https://travis-ci.org/DeveloperLiberationFront/Pdf-Reviewer) [![Coverage Status](https://coveralls.io/repos/DeveloperLiberationFront/Pdf-Reviewer/badge.svg)](https://coveralls.io/r/DeveloperLiberationFront/Pdf-Reviewer)
-============
+
 
 Aids the paper writing cycle by processing pdfs containing highlights and comments and turning them into GitHub issues that can be used to track progress in resolving them.
 
@@ -44,5 +45,5 @@ There are a few environment variables the application depends on:
 - OPENSHIFT_MONGODB_DB_PASSWORD
 
 
-These should be set accordingly to run locally and, if you are running on your own server or something, they should be set there as well. 
+These should be set accordingly to run locally and, if you are running on your own server or something, they should be set there as well.
 Picassa is being used to host images (for now) because it's secure (i.e. with Google) and has unlimited hosting for small (less than 2048x2048) pictures, which is perfect for our purposes.
