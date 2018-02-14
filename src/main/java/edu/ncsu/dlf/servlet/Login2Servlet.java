@@ -19,41 +19,56 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 
-public class LoginServlet extends HttpServlet {
+public class Login2Servlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
+		//What is the use case for this?? What will it do if code is null?
 		if (req.getParameter("code") == null) {
 		    resp.setContentType("application/json");
 		    JSONObject jobj = new JSONObject();
 		    try {
 		        jobj.put("client_id", System.getenv("GITHUB_ID"));
-	            jobj.write(resp.getWriter()); 
+	          jobj.write(resp.getWriter());
 		    } catch (JSONException e) {
 		        e.printStackTrace();
 		        resp.sendError(500);
 		    }
 		    return;
 		}
-	    
-	    
-	    HttpPost request = null;
+
+
+	  HttpPost request = null;
 		try {
 			URIBuilder builder = new URIBuilder("https://github.com/login/oauth/access_token");
 			builder.addParameter("client_id", System.getenv("GITHUB_ID"));
 			builder.addParameter("client_secret", System.getenv("GITHUB_API"));
 			builder.addParameter("code", req.getParameter("code"));
-			
+
 			request = new HttpPost(builder.build());
-			
+
 			request.setHeader("accept", "application/json");
-	
-			
+
+
 			HttpClient client = HttpClients.createDefault();
-			HttpResponse response = client.execute(request);
-			String body = HttpUtils.getResponseBody(response);
-			resp.setContentType("application/json");
-			resp.getWriter().write(body);
+			HttpResponse authResponse = client.execute(request);
+
+			String accessToken = "";
+
+			try {
+				JSONObject responseJSON = new JSONObject(HttpUtils.getResponseBody(authResponse));
+				accessToken = (String) responseJSON.get("access_token");
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+
+			resp.sendRedirect(req.getContextPath() + "/tool?access_token=" + accessToken);
+			// req.getRequestDispatcher("/tool?access_token=" + accessToken).forward(req, resp);
+			// resp.setContentType("application/json");
+      //
+			// System.out.println(body);
+			// resp.getWriter().write(body);
 		} catch(URISyntaxException e) {
 			e.printStackTrace();
 		} finally{
@@ -62,5 +77,5 @@ public class LoginServlet extends HttpServlet {
 			}
 		}
 	}
-	
+
 }
