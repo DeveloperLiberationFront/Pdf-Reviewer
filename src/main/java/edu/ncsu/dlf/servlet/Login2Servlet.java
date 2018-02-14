@@ -24,7 +24,9 @@ public class Login2Servlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
-		//What is the use case for this?? What will it do if code is null?
+		//So if someone hits /login2 without going through our flow,
+		//they will just see the client_id displayed on the page
+		//Display error page instead?
 		if (req.getParameter("code") == null) {
 		    resp.setContentType("application/json");
 		    JSONObject jobj = new JSONObject();
@@ -38,7 +40,7 @@ public class Login2Servlet extends HttpServlet {
 		    return;
 		}
 
-
+		//Make a POST to the GitHub OAuth API, with the code received from the previous page
 	  HttpPost request = null;
 		try {
 			URIBuilder builder = new URIBuilder("https://github.com/login/oauth/access_token");
@@ -47,15 +49,13 @@ public class Login2Servlet extends HttpServlet {
 			builder.addParameter("code", req.getParameter("code"));
 
 			request = new HttpPost(builder.build());
-
 			request.setHeader("accept", "application/json");
-
 
 			HttpClient client = HttpClients.createDefault();
 			HttpResponse authResponse = client.execute(request);
 
 			String accessToken = "";
-
+			//Extracts the access_token from the response
 			try {
 				JSONObject responseJSON = new JSONObject(HttpUtils.getResponseBody(authResponse));
 				accessToken = (String) responseJSON.get("access_token");
@@ -64,11 +64,7 @@ public class Login2Servlet extends HttpServlet {
 			}
 
 			resp.sendRedirect(req.getContextPath() + "/tool?access_token=" + accessToken);
-			// req.getRequestDispatcher("/tool?access_token=" + accessToken).forward(req, resp);
-			// resp.setContentType("application/json");
-      //
-			// System.out.println(body);
-			// resp.getWriter().write(body);
+
 		} catch(URISyntaxException e) {
 			e.printStackTrace();
 		} finally{
