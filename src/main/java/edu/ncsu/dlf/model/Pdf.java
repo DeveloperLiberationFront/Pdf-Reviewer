@@ -31,7 +31,7 @@ import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationText;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationTextMarkup;
 
 
-/** 
+/**
  * Puts a wrapper around the PDF library
  *
  */
@@ -39,7 +39,7 @@ public class Pdf {
     private static final int BORDER_WIDTH = 30;
     private static final float SCALE_UP_FACTOR = 2.0f;
     private static final int DEFAULT_SIZE = 72;
-    
+
 	private static final PDGamma ORANGE = new PDGamma();
 	private static final PDGamma GREEN = new PDGamma();
     private static final PDGamma YELLOW = new PDGamma();
@@ -48,11 +48,11 @@ public class Pdf {
 	    ORANGE.setR(0.9921568627f);
 	    ORANGE.setG(0.5333333333f);
 	    ORANGE.setB(0.1803921568f);
-	    
+
 	    GREEN.setR(0);
 	    GREEN.setG(1);
 	    GREEN.setB(0);
-	    
+
 	    YELLOW.setR(1);
 	    YELLOW.setG(1);
 	    YELLOW.setB(0);
@@ -63,30 +63,35 @@ public class Pdf {
     private BufferedImage commentBoxImage;
     private boolean DEBUG = Boolean.parseBoolean(System.getenv("DEBUG"));
     private BufferedImage pageImage;
-	
-    
+
+
     Pdf(InputStream pdfInputStream, InputStream commentBoxInputStream) throws IOException {
         this.doc = PDDocument.load(pdfInputStream);
         if (commentBoxInputStream != null)
             this.commentBoxImage = ImageIO.read(commentBoxInputStream);
     }
-	
+
 	public Pdf(InputStream input, ServletContext servletContext) throws IOException {
 		this(input, servletContext.getResourceAsStream(pathToCommentBoxImage));
 		if (this.commentBoxImage == null) {
 		    System.out.println(servletContext.getRealPath(pathToCommentBoxImage));
 		}
 	}
-	
+
     public List<PdfComment> getPDFComments() {
         List<PdfComment> comments = new ArrayList<>();
 
         @SuppressWarnings("unchecked")
+        /* Version 2.0.8 - doc.getDocumentCatalog().getPages() returns
+           PDPageTree (not list)
+           https://pdfbox.apache.org/docs/2.0.8/javadocs/org/apache/pdfbox/pdmodel/PDDocumentCatalog.html
+           https://pdfbox.apache.org/2.0/migration.html
+        */
         List<PDPage> pages = doc.getDocumentCatalog().getAllPages();
 
         for (PDPage page : pages) {
             try {
-                
+
                 pageImage = null;
 
                 List<PDAnnotation> annotations = page.getAnnotations();
@@ -94,9 +99,13 @@ public class Pdf {
                 // erase highlight and popup annotations from page to avoid them blotting out text
                 page.setAnnotations(nonBlockingAnnotations(annotations));
                 int size = Math.round(DEFAULT_SIZE * SCALE_UP_FACTOR);
-                
+
                 for (PDAnnotation anno : annotations) {
                     if (pageImage == null) {
+                      /*
+                        convertToImage() no longer exists, would require addtional dependency
+                        https://stackoverflow.com/questions/23326562/apache-pdfbox-convert-pdf-to-images
+                      */
                         pageImage = page.convertToImage(BufferedImage.TYPE_INT_RGB, size);
                     }
                     PdfComment pdfComment = turnAnnotationIntoPDFComment(anno);
@@ -134,7 +143,7 @@ public class Pdf {
             } else {
                 pdfComment.setImage(makePlainSubImage(pageImage, comment.getRectangle()));
             }
-        } 
+        }
         else if (anno instanceof PDAnnotationText) {
             String writtenComment = anno.getContents();
             if (writtenComment == null || writtenComment.isEmpty()) {
@@ -143,7 +152,7 @@ public class Pdf {
             pdfComment = new PdfComment(writtenComment);
 
             pdfComment.setImage(makePopupSubImage(pageImage, anno.getRectangle()));
-        } 
+        }
         else if (anno.getContents() != null || anno.getAppearance() != null) {
             String writtenComment = anno.getContents();
             if (writtenComment == null || writtenComment.isEmpty()) {
@@ -163,7 +172,7 @@ public class Pdf {
     }
 
     private List<PDAnnotation> nonBlockingAnnotations(List<PDAnnotation> annotations) {
-        //filters out annotations that pdfbox draws poorly so they don't blot the text out and 
+        //filters out annotations that pdfbox draws poorly so they don't blot the text out and
         //make the images hard to see.  This includes hightlight textMarkups and Popups
         List<PDAnnotation> annotationsThatAreNotTextMarkupOrPopup = new ArrayList<>();
         for(PDAnnotation annotation: annotations) {
@@ -176,10 +185,10 @@ public class Pdf {
                 annotationsThatAreNotTextMarkupOrPopup.add(annotation);
             }
         }
-        
+
         return annotationsThatAreNotTextMarkupOrPopup;
     }
-	
+
     private BufferedImage makeHighlightedSubImage(BufferedImage img, float[] quadPoints) {
         return makeSubImage(img, quadPoints, PostExtractMarkup.HIGHLIGHTS);
     }
@@ -198,53 +207,53 @@ public class Pdf {
 
     private enum PostExtractMarkup {
         NONE(1), HIGHLIGHTS(1), POPUP(2);
-        
+
         public final float subImageContextMultiplier;
-        
+
         PostExtractMarkup(float subImageContextMultiplier) {
             this.subImageContextMultiplier = subImageContextMultiplier;
         }
     }
 
     /* adapted the specs of a pdf tool http://www.pdf-technologies.com/api/html/P_PDFTech_PDFMarkupAnnotation_QuadPoints.htm
-     * The QuadPoints array must contain 8*n elements specifying the coordinates of n quadrilaterals. 
-     * Each quadrilateral encompasses a word or group of continuous words in the text underlying the annotation. 
-     * The coordinates for each quadrilateral are given in the order x4 y4 x3 y3 x1 y1 x2 y2 specifying the quadrilateral's 
-     * four vertices  x1 is upper left and numbering goes clockwise. 
-     * 
+     * The QuadPoints array must contain 8*n elements specifying the coordinates of n quadrilaterals.
+     * Each quadrilateral encompasses a word or group of continuous words in the text underlying the annotation.
+     * The coordinates for each quadrilateral are given in the order x4 y4 x3 y3 x1 y1 x2 y2 specifying the quadrilateral's
+     * four vertices  x1 is upper left and numbering goes clockwise.
+     *
      * I assume all quadrilaterals are rectangles.  No guarantees on multi-column selects
-     * 
+     *
      */
     private BufferedImage makeSubImage(BufferedImage img, float[] quadPoints, PostExtractMarkup markup) {
         if (quadPoints.length < 8) {
             return null;
         }
-        
+
         Rectangle subImageRect = scaleAndTransformSubImageQuad(quadPoints, img, markup);
-       
+
         BufferedImage subImage = img.getSubimage(subImageRect.x, subImageRect.y, subImageRect.width, subImageRect.height);
-        
+
         BufferedImage newImage = new BufferedImage(subImage.getWidth(), subImage.getHeight(), img.getType());
         Graphics2D g2 = newImage.createGraphics();
-        
+
         g2.drawImage(subImage, 0, 0, null);
-       
+
         if (markup == PostExtractMarkup.HIGHLIGHTS) {
             for (int n = 0; n < quadPoints.length; n += 8) {
                 float[] oneQuad = Arrays.copyOfRange(quadPoints, n, n + 8);
-                
+
                 paintHighlight(g2, scaleAndTransformAnnotationQuad(oneQuad, subImageRect, img.getHeight()));
             }
         } else if (markup == PostExtractMarkup.POPUP) {
             //we know quadPoints will be only one quad because that's how makePopupSubImage defines it.
             paintCommentBox(g2, scaleAndTransformAnnotationQuad(quadPoints, subImageRect, img.getHeight()));
         }
-        
+
         g2.dispose();
 
         if (DEBUG) {
             try {
-                // for debugging                
+                // for debugging
                 File output = new File("test"+Math.random()+".png");
                 System.out.println("Saving image to disk "+output.getAbsolutePath());
                 ImageIO.write(newImage, "png", output);
@@ -252,11 +261,11 @@ public class Pdf {
                 e.printStackTrace();
             }
         }
-        
+
 
         return newImage;
     }
-    
+
     private Rectangle scaleAndTransformSubImageQuad(float[] quadPoints, RenderedImage img, PostExtractMarkup markup) {
         // we find the upper left corner
         int minX = getMinXFromQuadPoints(quadPoints);
@@ -279,7 +288,7 @@ public class Pdf {
         y = (img.getHeight() - y - height);
         return new Rectangle(x, y, width, height);
     }
-    
+
     private Rectangle scaleAndTransformAnnotationQuad(float[] oneQuad, Rectangle boundingRect, int imageHeight) {
         int x = getMinXFromQuadPoints(oneQuad);
         int y = getMinYFromQuadPoints(oneQuad);
@@ -293,10 +302,10 @@ public class Pdf {
         x -= boundingRect.x;
         // invert y again
         y = imageHeight - y - boundingRect.y - height;
-        
+
         return new Rectangle(x, y, width, height);
     }
-    
+
     private void paintCommentBox(Graphics2D g2, Rectangle rect) {
         if (commentBoxImage != null) {
             g2.drawImage(commentBoxImage, rect.x, rect.y, rect.width, rect.height, null);
@@ -305,17 +314,17 @@ public class Pdf {
             g2.setStroke(new BasicStroke(2 * SCALE_UP_FACTOR));
             g2.drawRect(rect.x, rect.y , rect.width, rect.height);
         }
-        
+
     }
 
     private void paintHighlight(Graphics2D g2, Rectangle rect) {
         g2.setColor(highlightColor);
-        
+
         g2.fillRect(rect.x, rect.y , rect.width, rect.height);
 
     }
-    
-    
+
+
     //x values are on the even integers
     private static int getMinXFromQuadPoints(float[] quadPoints) {
         int min = Integer.MAX_VALUE;
@@ -326,7 +335,7 @@ public class Pdf {
         }
         return min;
     }
-    
+
     //y values are on the even integers
     private static int getMinYFromQuadPoints(float[] quadPoints) {
         int min = Integer.MAX_VALUE;
@@ -337,7 +346,7 @@ public class Pdf {
         }
         return min;
     }
-    
+
     //x values are on the even integers
     private static int getMaxXFromQuadPoints(float[] quadPoints) {
         int max = 0;
@@ -348,7 +357,7 @@ public class Pdf {
         }
         return max;
     }
-    
+
     //y values are on the even integers
     private static int getMaxYFromQuadPoints(float[] quadPoints) {
         int max = 0;
@@ -359,18 +368,19 @@ public class Pdf {
         }
         return max;
     }
-	
+
 	public void updateCommentsWithColorsAndLinks(List<PdfComment> comments, Repo repo) {
 		@SuppressWarnings("unchecked")
+    // Refer to previous comment regarding getAllPages(): Line 85
 		List<PDPage> pages = doc.getDocumentCatalog().getAllPages();
 		int commentOn = 0;
 		for(PDPage page : pages) {
 			try {
-			    List<PDAnnotation> newList = new ArrayList<PDAnnotation>(); 
+			    List<PDAnnotation> newList = new ArrayList<PDAnnotation>();
 				List<PDAnnotation> annotations = page.getAnnotations();
 				for(int i=0; i<annotations.size(); i++) {
 					PDAnnotation anno = annotations.get(i);
-					
+
                     if (anno instanceof PDAnnotationTextMarkup) {
                         PdfComment userComment = comments.get(commentOn);
                         commentOn++;
@@ -381,12 +391,14 @@ public class Pdf {
                     } else {
                         newList.add(anno);
                     }
-                }		
+                }
 				page.setAnnotations(newList);
 			} catch(IOException e) {
 			    e.printStackTrace();
 			} finally {
 			    //page.clear();
+
+          //Can't find a substitute for this, is it necessary?
 			    page.updateLastModified();
 			}
 		}
@@ -398,6 +410,9 @@ public class Pdf {
         PDAnnotationTextMarkup newComment = new PDAnnotationTextMarkup(PDAnnotationTextMarkup.SUB_TYPE_HIGHLIGHT);
         List<Tag> tags = userComment.getTags();
         if (tags.contains(Tag.CONSIDER_FIX) || tags.contains(Tag.POSITIVE)) {
+
+            //setColour() moved to setColor()
+            //https://pdfbox.apache.org/docs/2.0.8/javadocs/org/apache/pdfbox/pdmodel/interactive/annotation/PDAnnotation.html#setColor(org.apache.pdfbox.pdmodel.graphics.color.PDColor)
             newComment.setColour(GREEN);
         } else if (tags.contains(Tag.MUST_FIX)) {
             newComment.setColour(ORANGE);
@@ -412,17 +427,17 @@ public class Pdf {
         newComment.setTitlePopup(comment.getTitlePopup());    //author name
         return newComment;
     }
-    
-    
+
+
 
 	public PDDocument getDoc() {
 		return doc;
 	}
-	
+
 	public void close() throws IOException {
 		doc.close();
 	}
-	
+
 	@SuppressWarnings("unused")
     private static void main(String[] args) throws Exception{
 	    FileInputStream fos = new FileInputStream("test.pdf");
