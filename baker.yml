@@ -1,7 +1,8 @@
 ---
 name: pdf-review
-vagrant:
+vm:
   ip: "192.168.88.88"
+  ports: 9090:9090
 tools:
   - maven
 lang:
