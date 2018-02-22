@@ -14,7 +14,7 @@
   <script defer src="https://code.getmdl.io/1.1.3/material.min.js"></script>    
   <script defer src="https://rawgit.com/MEYVN-digital/mdl-selectfield/master/mdl-selectfield.min.js"></script>
   <link rel="stylesheet" href="upload.css">
-  <script src="upload.js"></script>
+  
   <link rel="stylesheet" href="recentlyUsedRepo.css">
   <script class="jsbin" src="https://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
   <style>
@@ -92,16 +92,14 @@
                         <div class="mdl-tabs vertical-mdl-tabs mdl-js-tabs mdl-js-ripple-effect">
                         <div class="mdl-grid mdl-grid--no-spacing">
                             <div class="mdl-cell mdl-cell--12-col tabSpacing">
-                                    <a  class="mdl-tabs__tab" id="repo1">Repo1</a>
-                                    <a  class="mdl-tabs__tab" id="repo2">Repo2</a>
-                                    <a  class="mdl-tabs__tab" id="repo3">Repo3</a>
-                                    <a  class="mdl-tabs__tab" id="repo4">Repo4</a>
-                                    <a  class="mdl-tabs__tab" id="repo5">Repo5</a>
-                                    <a  class="mdl-tabs__tab" id="repo6">Repo6</a>
-                                    <a  class="mdl-tabs__tab" id="repo7">Repo7</a>
-                                    <a  class="mdl-tabs__tab" id="repo8">Repo8</a>
-                                    <a  class="mdl-tabs__tab" id="repo9">Repo9</a>
-                                    <a  class="mdl-tabs__tab" id="repo10">Repo10</a>
+                                    <!-- rendering with the repositories -->
+                                    <script id="repoTemplate" type="x-tmpl-mustache">
+                                        {{#repos}}
+                                        <a class="mdl-tabs__tab" id="{{id}}">{{name}}</a>
+                                        {{/repos}}
+                                    </script>
+                                    <div id="repoTemplateRendered">
+                                </div>
                                 </div>
                             </div>
                         </div>
@@ -166,9 +164,12 @@
 
     $(document).ready(function() {
       var access_token = getQueryParams("access_token");
-      alert("This is the access_token: " + access_token);
+      //alert("This is the access_token: " + access_token);
     });
   </script>
 
+  <script src="./js/tool.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/2.3.0/mustache.min.js"></script>
+  <script src="./js/upload.js"></script>
 </body>
 </html>
