@@ -1,12 +1,175 @@
 <html>
 <head>
+    <meta charset="utf-8" />
   <title>PDF Reviewer</title>
-
   <link rel="icon" href="favicon.png" type="image/png">
-</head>
-<body>
+  <!-- Material Design Lite -->
+  <script src="https://storage.googleapis.com/code.getmdl.io/1.0.1/material.min.js"></script>
+  <link rel="stylesheet" href="https://storage.googleapis.com/code.getmdl.io/1.0.1/material.indigo-pink.min.css">
+  <!-- Material Design icon font -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <!-- http://webagility.com/posts/the-wonderful-story-of-an-ugly-form -->
+  <link rel="stylesheet" href="https://code.getmdl.io/1.1.3/material.indigo-pink.min.css">
+  <link rel="stylesheet" href="https://rawgit.com/MEYVN-digital/mdl-selectfield/master/mdl-selectfield.min.css">
+  <script defer src="https://code.getmdl.io/1.1.3/material.min.js"></script>    
+  <script defer src="https://rawgit.com/MEYVN-digital/mdl-selectfield/master/mdl-selectfield.min.js"></script>
+  <link rel="stylesheet" href="upload.css">
+  <script src="upload.js"></script>
+  <script class="jsbin" src="https://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+  <style>
+      h3 {
+          text-align:center;
+      }
+      .bodyPanel section.section--center {
+          text-align:center;
+          max-width: 660px;
+      }
+      .bodyPanel .mdl-layout__content .mdl-layout__tab-panel .mdl-card > * {
+          height: auto;
+      }
+      .bodyPanel main > .mdl-layout__tab-panel {
+          padding: 8px;
+          padding-top: 48px;
+      }
+      .bodyPanel .mdl-layout__content section:not(:last-of-type) {
+          position: relative;
+          margin-bottom: 48px;
+      }
+      .bodyPanel .mdl-card__supporting-text {
+          color: black;
+      }
+      
+      .bodyPanel .section--center .mdl-card {
+          align-items: center;
+          overflow: visible !important;
+      }
+      .bodyPanel .section--center .mdl-card ul {
+          overflow-y: auto;
+      }
 
-  <h1> TOOL PAGE </h1>
+  </style>
+  <script type="application/javascript">
+      window.onload = function(){
+          materializeControls();
+      }
+      function materializeControls(){
+          materializeSelects();
+      }
+
+      function materializeSelects() {
+          var label, parentEl;
+          document.querySelectorAll('select').forEach(function(control) {
+              parentEl = control.parentElement;
+              control.classList.add('mdl-selectfield__select');
+              if (parentEl.tagName !== 'DIV') {
+                  return;
+              }
+              parentEl.classList.add('mdl-selectfield', 'mdl-js-selectfield');
+              label = parentEl.querySelector('label');
+              if (label) {
+                  label.setAttribute('for', control.id || control.name)
+                  label.classList.add('mdl-selectfield__label');
+              }
+          });
+      }
+  </script>
+</head>
+<body class="bodyPanel">
+
+  <!-- Always shows a header, even in smaller screens. -->
+  <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+      <header class="mdl-layout__header mdl-color--blue-grey-700">
+          <h3>PDF Reviewer Tool</h3>
+      </header>
+      <main class="mdl-layout__content">
+          <div class="mdl-layout__tab-panel is-active">
+              <section class="section--center mdl-grid mdl-grid--no-spacing mdl-shadow--16dp sec1">
+                  <div class="mdl-card mdl-cell mdl-cell--12-col">
+                      <div class="mdl-card__supporting-text">
+                          <h4 class="mdl-cell mdl-cell--12-col">Select A Repository</h4>
+                      </div>
+                      <table class="mdl-data-table mdl-js-data-table mdl-data-table--selectable">
+                          <tbody>
+                              <tr>
+                                  <td class="mdl-data-table__cell--non-numeric">Repo1</td>
+                              </tr>
+                              <tr>
+                                  <td class="mdl-data-table__cell--non-numeric">Repo2</td>
+                              </tr>
+                              <tr>
+                                  <td class="mdl-data-table__cell--non-numeric">Repo3</td>
+                              </tr>
+                              <tr>
+                                  <td class="mdl-data-table__cell--non-numeric">Repo4</td>
+                              </tr>
+                              <tr>
+                                  <td class="mdl-data-table__cell--non-numeric">Repo5</td>
+                              </tr>
+                              <tr>
+                                  <td class="mdl-data-table__cell--non-numeric">Repo6</td>
+                              </tr>
+                              <tr>
+                                  <td class="mdl-data-table__cell--non-numeric">Repo7</td>
+                              </tr>
+                              <tr>
+                                  <td class="mdl-data-table__cell--non-numeric">Repo8</td>
+                              </tr>
+                              <tr>
+                                  <td class="mdl-data-table__cell--non-numeric">Repo9</td>
+                              </tr>
+                              <tr>
+                                  <td class="mdl-data-table__cell--non-numeric">Repo10</td>
+                              </tr>
+                          </tbody>
+                      </table>
+                      <div class="mdl-card__actions">
+                          <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+                              More
+                          </a>
+                      </div>
+                  </div>    
+              </section>
+              <section class="section--center mdl-grid mdl-grid--no-spacing mdl-shadow--16dp">
+                  <div class="mdl-card mdl-cell mdl-cell--12-col">
+                      <div class="mdl-card__supporting-text">
+                          <h4 class="mdl-cell mdl-cell--12-col">Select A Branch</h4>
+                      </div>
+                      <div class=" mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                          <label class="mdl-textfield__label" for="branch_id">Branch</label>
+                          <select class="mdl-textfield__input" id="branch_id" name="branch">
+                              <option value="Master">Master</option>
+                              <option value="Dev1">Dev1</option>
+                              <option value="Dev2">Dev2</option>
+                          </select>
+                      </div>
+                  </div>     
+              </section>
+              <section class="section--center mdl-grid mdl-grid--no-spacing mdl-shadow--16dp">
+                  <div class="mdl-card mdl-cell mdl-cell--12-col">
+                      <!--https://codepen.io/aaronvanston/pen/yNYOXR-->
+                      <div class="file-upload align--center">
+                          <div class="pdf-upload-wrap">
+                              <input class="file-upload-input" type='file' onchange="readURL(this);" accept=".pdf" />
+                              <div class="drag-text">
+                                  <h6>Drag and drop a file or click inside the box</h6>
+                              </div>
+                          </div>
+                          <div class="file-upload-content">
+                              <div class="pdf-title-wrap">
+                              <button type="button" onclick="removeUpload()" class="remove-pdf">Remove <span class="pdf-title">Uploaded PDF</span></button>
+                              </div>
+                          </div>
+                      </div>
+                      <div class="mdl-card__actions mdl-card--border">
+                          <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+                              Upload File
+                          </a>
+                      </div>
+                  </div>
+              </section>
+          </div>
+      </main>
+  </div>
 
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
