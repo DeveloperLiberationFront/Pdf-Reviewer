@@ -36,3 +36,6 @@ eclipse-launch-profiles/
 SecretKeys.java
 test.pdf
 test.jpg
+
+ansible/inventory
+*.retry

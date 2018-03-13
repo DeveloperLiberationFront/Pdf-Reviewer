@@ -8,9 +8,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.egit.github.core.Repository;
+import org.eclipse.egit.github.core.RepositoryBranch;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.RepositoryService;
 import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.Date;
 import java.util.Map;
@@ -23,19 +26,31 @@ public class RepositoriesServlet extends HttpServlet {
 		GitHubClient client = new GitHubClient();
 		client.setOAuth2Token(req.getParameter("access_token"));
 
-		TreeMap<Date, String> sortedRepos = new TreeMap<Date, String>();
+		TreeMap<Date, Repository> sortedRepos = new TreeMap<Date, Repository>();
 		RepositoryService service = new RepositoryService(client);
 		for (Repository repo : service.getRepositories()) {
-			sortedRepos.put(repo.getUpdatedAt(), repo.getName());
+			sortedRepos.put(repo.getUpdatedAt(), repo);
 		}
 
 		JSONArray reposJSON = new JSONArray();
-		for(Map.Entry<Date, String> entry : sortedRepos.entrySet()) {
+		for(Map.Entry<Date, Repository> entry : sortedRepos.entrySet()) {
 			// Date key = entry.getKey();
 			// String value = entry.getValue();
 			// System.out.println("key is: "+ key + " & Value is: " + value);
 			
-			reposJSON.put(entry.getValue());
+			
+			JSONArray branchArray = new JSONArray();
+			for(RepositoryBranch branch: service.getBranches(entry.getValue())){
+				branchArray.put(branch.getName());
+			}
+
+			JSONObject repoJSON;
+			try {
+				repoJSON = new JSONObject().put("repoName", entry.getValue().getName()).put("branches", branchArray);
+				reposJSON.put(repoJSON);
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
 		}
 		// System.out.println(reposJSON);
 		resp.setContentType("application/json");
