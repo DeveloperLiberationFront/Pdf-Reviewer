@@ -4,22 +4,19 @@
   <title>PDF Reviewer</title>
   <link rel="icon" href="favicon.png" type="image/png">
   <!-- Material Design Lite -->
-  <script src="https://storage.googleapis.com/code.getmdl.io/1.0.1/material.min.js"></script>
-  <link rel="stylesheet" href="https://storage.googleapis.com/code.getmdl.io/1.0.1/material.indigo-pink.min.css">
+  <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+  <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css">
   <!-- Material Design icon font -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-  <!-- http://webagility.com/posts/the-wonderful-story-of-an-ugly-form -->
-  <link rel="stylesheet" href="https://code.getmdl.io/1.1.3/material.indigo-pink.min.css">
-  <link rel="stylesheet" href="https://rawgit.com/MEYVN-digital/mdl-selectfield/master/mdl-selectfield.min.css">
-  <script defer src="https://code.getmdl.io/1.1.3/material.min.js"></script>
-  <script defer src="https://rawgit.com/MEYVN-digital/mdl-selectfield/master/mdl-selectfield.min.js"></script>
   <link rel="stylesheet" href="upload.css">
 
   <link rel="stylesheet" href="recentlyUsedRepo.css">
-  <script class="jsbin" src="https://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
   <style>
       h3 {
           text-align:center;
+      }
+      .bodyPanel {
+          background-color: #90A4AE;
       }
       .bodyPanel section.section--center {
           text-align:center;
@@ -48,32 +45,12 @@
           overflow-y: auto;
       }
 
+        .mdl-dropdown .mdl-menu__container,
+        .mdl-dropdown .mdl-menu__outline,
+        .mdl-dropdown .mdl-menu {
+        width: 100% !important;
+        }
   </style>
-  <script type="application/javascript">
-      window.onload = function(){
-        materializeControls();
-      }
-      function materializeControls(){
-          materializeSelects();
-      }
-
-      function materializeSelects() {
-          var label, parentEl;
-          document.querySelectorAll('select').forEach(function(control) {
-              parentEl = control.parentElement;
-              control.classList.add('mdl-selectfield__select');
-              if (parentEl.tagName !== 'DIV') {
-                  return;
-              }
-              parentEl.classList.add('mdl-selectfield', 'mdl-js-selectfield');
-              label = parentEl.querySelector('label');
-              if (label) {
-                  label.setAttribute('for', control.id || control.name)
-                  label.classList.add('mdl-selectfield__label');
-              }
-          });
-      }
-  </script>
 </head>
 <body class="bodyPanel">
 
@@ -89,6 +66,15 @@
                         <div class="mdl-card__supporting-text">
                             <h4 class="mdl-cell mdl-cell--12-col">Select A Repository</h4>
                         </div>
+                        <form action="#">
+                            <div class="mdl-textfield mdl-js-textfield">
+                              <input class="mdl-textfield__input" type="text" id="sample1">
+                              <label class="mdl-textfield__label" for="sample1">Search...</label>
+                            </div>
+                            <label class="mdl-button mdl-js-button mdl-button--icon" for="sample6">
+                                <i class="material-icons">search</i>
+                              </label>
+                          </form>
                         <div class="mdl-tabs vertical-mdl-tabs mdl-js-tabs mdl-js-ripple-effect">
                         <div class="mdl-grid mdl-grid--no-spacing">
                             <div class="mdl-cell mdl-cell--12-col tabSpacing">
@@ -104,9 +90,6 @@
                             </div>
                         </div>
                         <div class="mdl-card__actions">
-                            <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
-                                More
-                            </a>
                         </div>
                     </div>
               </section>
@@ -115,13 +98,14 @@
                       <div class="mdl-card__supporting-text">
                           <h4 class="mdl-cell mdl-cell--12-col">Select A Branch</h4>
                       </div>
-                      <div class=" mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                          <label class="mdl-textfield__label" for="branch_id">Branch</label>
-                          <select class="mdl-textfield__input" id="branch_id" name="branch">
-                              <option value="Master">Master</option>
-                              <option value="Dev1">Dev1</option>
-                              <option value="Dev2">Dev2</option>
-                          </select>
+                      <div class="mdl-textfield mdl-js-textfield mdl-dropdown mdl-textfield--floating-label" style="">
+                        <input class="mdl-textfield__input mdl-dropdown_input" type="text" id="branch">
+                        <label class="mdl-textfield__label" for="branch">Branch</label>
+                        <ul class="mdl-menu mdl-js-menu mdl-dropdown-menu" for="branch">
+                          <li class="mdl-menu__item">Master</li>
+                          <li class="mdl-menu__item">Dev1</li>
+                          <li class="mdl-menu__item">Dev2</li>
+                        </ul>
                       </div>
                   </div>
               </section>
@@ -157,5 +141,14 @@
   <script src="./js/tool.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/2.3.0/mustache.min.js"></script>
   <script src="./js/upload.js"></script>
+  <script>
+    //make branch selectable 
+    var _mdlDrp = null;
+        $(".mdl-menu__item").on("click", function() {
+        _mdlDrp = $(this).parents(".mdl-textfield").find("input");
+        _mdlDrp.val($(this).text());
+        _mdlDrp.parent().addClass("is-dirty");
+        });
+  </script>
 </body>
 </html>
