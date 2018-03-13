@@ -21,6 +21,9 @@
       h3 {
           text-align:center;
       }
+      .bodyPanel {
+          background-color: #90A4AE;
+      }
       .bodyPanel section.section--center {
           text-align:center;
           max-width: 660px;
@@ -89,6 +92,15 @@
                         <div class="mdl-card__supporting-text">
                             <h4 class="mdl-cell mdl-cell--12-col">Select A Repository</h4>
                         </div>
+                        <form action="#">
+                            <div class="mdl-textfield mdl-js-textfield">
+                              <input class="mdl-textfield__input" type="text" id="sample1">
+                              <label class="mdl-textfield__label" for="sample1">Search...</label>
+                            </div>
+                            <label class="mdl-button mdl-js-button mdl-button--icon" for="sample6">
+                                <i class="material-icons">search</i>
+                              </label>
+                          </form>
                         <div class="mdl-tabs vertical-mdl-tabs mdl-js-tabs mdl-js-ripple-effect">
                         <div class="mdl-grid mdl-grid--no-spacing">
                             <div class="mdl-cell mdl-cell--12-col tabSpacing">
@@ -104,9 +116,6 @@
                             </div>
                         </div>
                         <div class="mdl-card__actions">
-                            <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
-                                More
-                            </a>
                         </div>
                     </div>
               </section>
