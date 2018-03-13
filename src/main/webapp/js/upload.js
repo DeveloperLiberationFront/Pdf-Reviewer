@@ -13,6 +13,22 @@ function readURL(input) {
 
     reader.readAsDataURL(input.files[0]);
 
+    reader.addEventListener("load", function () {
+      $.post( "http://localhost:9090/fileupload", {"dataurl" : reader.result})
+      .done(function( data ) {
+        alert( "Data Loaded: " + data );
+      });
+    }, false);
+
+
+    // $.ajax({
+    //   type: "POST",
+    //   url: "http://localhost:9090/fileupload",
+    //   data: reader.result,
+    //   success: success,
+    //   dataType: 'json'
+    // });
+
   } else {
     removeUpload();
   }
