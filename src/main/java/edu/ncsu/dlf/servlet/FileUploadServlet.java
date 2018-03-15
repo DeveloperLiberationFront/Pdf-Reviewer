@@ -45,8 +45,5 @@ public class FileUploadServlet extends HttpServlet {
 		for(PdfComment comment: comments) {
 			System.out.println(comment.getComment());
 		}
-
-		src/main/java/edu/ncsu/dlf
-
 	}
 }
