@@ -9,7 +9,7 @@
   <!-- Material Design icon font -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
   <link rel="stylesheet" href="upload.css">
-
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
   <link rel="stylesheet" href="recentlyUsedRepo.css">
   <style>
       h3 {
@@ -50,6 +50,18 @@
         .mdl-dropdown .mdl-menu {
         width: 100% !important;
         }
+        
+        .ui-state-active,
+        .ui-widget-content .ui-state-active,
+        .ui-widget-header .ui-state-active,
+        a.ui-button:active,
+        .ui-button:active,
+        .ui-button.ui-state-active:hover {
+            border: 1px solid #bdbdbd;
+            background: #bdbdbd;
+            font-weight: normal;
+            color: #000000;
+        }
   </style>
 </head>
 <body class="bodyPanel">
@@ -67,13 +79,10 @@
                             <h4 class="mdl-cell mdl-cell--12-col">Select A Repository</h4>
                         </div>
                         <form action="#">
-                            <div class="mdl-textfield mdl-js-textfield">
-                              <input class="mdl-textfield__input" type="text" id="sample1">
-                              <label class="mdl-textfield__label" for="sample1">Search...</label>
+                            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label ui-widget">
+                                <input class="mdl-textfield__input" id="repoList">
+                                <label class="mdl-textfield__label" for="repoList">Search for Repository Name</label>
                             </div>
-                            <label class="mdl-button mdl-js-button mdl-button--icon" for="sample6">
-                                <i class="material-icons">search</i>
-                              </label>
                           </form>
                         <div class="mdl-tabs vertical-mdl-tabs mdl-js-tabs mdl-js-ripple-effect">
                         <div class="mdl-grid mdl-grid--no-spacing">
@@ -98,7 +107,7 @@
                       <div class="mdl-card__supporting-text">
                           <h4 class="mdl-cell mdl-cell--12-col">Select A Branch</h4>
                       </div>
-                      <div class="mdl-textfield mdl-js-textfield mdl-dropdown mdl-textfield--floating-label" style="">
+                      <div class="mdl-textfield mdl-js-textfield mdl-dropdown mdl-textfield--floating-label">
                         <input class="mdl-textfield__input mdl-dropdown_input" type="text" id="branch">
                         <label class="mdl-textfield__label" for="branch">Branch</label>
                         <ul class="mdl-menu mdl-js-menu mdl-dropdown-menu" for="branch">
@@ -141,6 +150,9 @@
   <script src="./js/tool.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/2.3.0/mustache.min.js"></script>
   <script src="./js/upload.js"></script>
+  
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
   <script>
     //make branch selectable 
     var _mdlDrp = null;
@@ -150,5 +162,18 @@
         _mdlDrp.parent().addClass("is-dirty");
         });
   </script>
+  <script>
+    $( function() {
+      var availableRepo = [
+        "Project1",
+        "PDFReviewTool",
+        "HelloWorld",
+        "Research",
+      ];
+      $( "#repoList" ).autocomplete({
+        source: availableRepo
+      });
+    } );
+    </script>
 </body>
 </html>
