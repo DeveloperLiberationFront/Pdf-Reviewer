@@ -115,6 +115,7 @@
 					<excludes>
 						<!-- Don't run browser tests with the other tests -->
 						<exclude>**/BrowserTest.java</exclude>
+						<exclude>**/frontendTests.java</exclude>
 					</excludes>
 				</configuration>
 			</plugin>
