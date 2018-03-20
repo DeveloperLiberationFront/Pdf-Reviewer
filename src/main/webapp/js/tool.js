@@ -20,5 +20,12 @@ window.onload = function() {
           $(this).addClass('is-active');
           var otherRepos = $(this).siblings().removeClass('is-active');
         })
+
+        //Populates the searchbar with repository names so that user can type and  the tool will autocomplete
+        console.log(repoTemplateJSON.repos.map(repo=>repo.name.repoName))
+        var availableRepo = repoTemplateJSON.repos.map(repo=>repo.name.repoName);
+        $( "#repoList" ).autocomplete({
+            source: availableRepo
+        });
     });
   }
