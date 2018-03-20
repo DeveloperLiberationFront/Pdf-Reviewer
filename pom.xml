@@ -138,6 +138,7 @@
 						<!-- Don't run browser tests with the other tests -->
 						<exclude>**/BrowserTest.java</exclude>
 						<exclude>**/frontendTests.java</exclude>
+						<exclude>**/PdfTest.java</exclude>
 					</excludes>
 				</configuration>
 			</plugin>
