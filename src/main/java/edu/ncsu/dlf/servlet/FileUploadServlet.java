@@ -17,6 +17,7 @@ import edu.ncsu.dlf.model.PdfComment;
 
 public class FileUploadServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	public static final String pathToCommentBoxImage = "/images/comment_box.PNG";
 
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -27,7 +28,9 @@ public class FileUploadServlet extends HttpServlet {
 		InputStream fileStream = new ByteArrayInputStream(data);
 		//FileUtils.writeByteArrayToFile(new File("test.pdf"), data);
 
-		Pdf test = new Pdf(fileStream, getServletContext());
+		InputStream commentBoxImageStream = getServletContext().getResourceAsStream(pathToCommentBoxImage);
+		
+		Pdf test = new Pdf(fileStream, commentBoxImageStream);
 		List<PdfComment> comments = test.getPDFComments();
 
 		for(PdfComment comment: comments) {

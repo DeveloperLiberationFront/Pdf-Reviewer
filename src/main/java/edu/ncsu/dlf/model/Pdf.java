@@ -14,7 +14,6 @@ import org.apache.pdfbox.pdmodel.graphics.color.PDGamma;
 
 import org.apache.pdfbox.rendering.PDFRenderer;
 import javax.imageio.ImageIO;
-import javax.servlet.ServletContext;
 
 import org.apache.pdfbox.rendering.ImageType;
 
@@ -34,11 +33,8 @@ public class Pdf {
   private PDFRenderer renderer;
   private BufferedImage pageImage;
 
- // private Color highlightColor = new Color(234, 249, 35, 140);
-
-  public static final String pathToCommentBoxImage = "/images/comment_box.PNG";
+  //public static final String pathToCommentBoxImage = "/images/comment_box.PNG";
   private BufferedImage commentBoxImage;
-  //private boolean DEBUG = Boolean.parseBoolean(System.getenv("DEBUG"));
 
  // private static final int BORDER_WIDTH = 30;
   private static final float SCALE_UP_FACTOR = 2.0f;
@@ -62,13 +58,13 @@ public class Pdf {
   	    YELLOW.setB(0);
   	}
 
-  public Pdf(InputStream fileStream, ServletContext context) throws IOException {
+  public Pdf(InputStream fileStream, InputStream commentBoxImageStream) throws IOException {
     document = PDDocument.load(fileStream);
     renderer = new PDFRenderer(document);
 
     //The class is technically loaded fromt he snapshot apparently, so probably better to through ServletContext
     //System.out.println(getClass().getProtectionDomain().getCodeSource().getLocation());
-    commentBoxImage = ImageIO.read(context.getResourceAsStream(pathToCommentBoxImage));
+    commentBoxImage = ImageIO.read(commentBoxImageStream);
   }
 
   public List<PdfComment> getPDFComments() throws IOException {
