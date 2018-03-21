@@ -17,9 +17,10 @@ window.onload = function() {
         document.getElementById('repoTemplateRendered').innerHTML = repoTemplateRendered;
 
         $('.mdl-tabs__tab').on('click', function() {
-          $(this).addClass('is-active');
-          var otherRepos = $(this).siblings().removeClass('is-active');
-        })
+            $(this).addClass('is-active');
+            var otherRepos = $(this).siblings().removeClass('is-active');
+            populateBranches(repoTemplateJSON, $(this).text());
+          })
 
         //Populates the searchbar with repository names so that user can type and  the tool will autocomplete
         console.log(repoTemplateJSON.repos.map(repo=>repo.name.repoName))
@@ -29,3 +30,11 @@ window.onload = function() {
         });
     });
   }
+
+function populateBranches(repoTemplateJSON, repoName){
+    let repoTemplate = document.getElementById('branchTemplate').innerHTML;
+    let selectedRepo = repoTemplateJSON.repos.find((repos)=>repos.name.repoName === repoName)
+    Mustache.parse(repoTemplate);
+    let branchTemplateRendered = Mustache.render(repoTemplate, selectedRepo.name);
+    document.getElementById('branchList').innerHTML = branchTemplateRendered;
+}
