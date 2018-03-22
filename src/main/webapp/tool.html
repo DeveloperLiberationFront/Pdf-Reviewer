@@ -127,12 +127,12 @@
                             </div>
                         </div>
                         <div class="mdl-card__actions">
-                                <form action="#">
-                                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label ui-widget ">
-                                            <input class="mdl-textfield__input" id="repoList">
-                                            <label class="mdl-textfield__label" for="repoList" text-align="center" >Search for Repository Name</label>
-                                        </div>
-                                    </form>
+                            <form action="#">
+                                    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label ui-widget ">
+                                        <input class="mdl-textfield__input" id="repoList" type="text">
+                                        <label class="mdl-textfield__label" for="repoList" >Search for Repository Name</label>
+                                    </div>
+                            </form>
                         </div>
                     </div>
               </section>
@@ -142,16 +142,14 @@
                           <h4 class="mdl-cell mdl-cell--12-col">Select A Branch</h4>
                       </div>
                       <div class="mdl-textfield mdl-js-textfield mdl-dropdown mdl-textfield--floating-label">
-                        <input class="mdl-textfield__input mdl-dropdown_input" type="text" id="branch">
-                        <label class="mdl-textfield__label" for="branch">Branch</label>
-                        <ul class="mdl-menu mdl-js-menu mdl-dropdown-menu" for="branch" id="branchList">
-                          <script id="branchTemplate" type="x-tmpl-mustache">                          
-                          {{#branches}}
-                            <li class="mdl-menu__item">{{.}}</li>
-                          {{/branches}}
-                          </script>
-                        </ul>
-                      </div>
+                            <select class="mdl-textfield__input" id="branchList" name="branch">
+                                <script id="branchTemplate" type="x-tmpl-mustache">                          
+                                    {{#branches}}
+                                        <option>{{.}}</option>
+                                    {{/branches}}
+                                </script>
+                            </select>
+                        </div>
                   </div>
               </section>
               <section class="section--center mdl-grid mdl-grid--no-spacing mdl-shadow--16dp">
@@ -189,15 +187,5 @@
   
     <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-  <script>
-    //make branch selectable 
-    var _mdlDrp = null;
-        $(".mdl-menu__item").on("click", function() {
-        _mdlDrp = $(this).parents(".mdl-textfield").find("input");
-        _mdlDrp.val($(this).text());
-        _mdlDrp.parent().addClass("is-dirty");
-        });
-  </script>
-
 </body>
 </html>
