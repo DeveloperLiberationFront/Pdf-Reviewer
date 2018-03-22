@@ -48,15 +48,6 @@
       .bodyPanel .branch-selection-card {
           z-index: 2;
       }
-        .mdl-dropdown .mdl-menu__container,
-        .mdl-dropdown .mdl-menu__outline,
-        .mdl-dropdown .mdl-menu {
-        width: 100%;
-        }
-        .mdl-menu__item {
-            font-size: 17px;
-            text-align: center;
-        }
         .ui-widget {
             border-color: transparent;
         }
@@ -142,14 +133,14 @@
                           <h4 class="mdl-cell mdl-cell--12-col">Select A Branch</h4>
                       </div>
                       <div class="mdl-textfield mdl-js-textfield mdl-dropdown mdl-textfield--floating-label">
-                            <select class="mdl-textfield__input" id="branchList" name="branch">
-                                <script id="branchTemplate" type="x-tmpl-mustache">                          
-                                    {{#branches}}
-                                        <option>{{.}}</option>
-                                    {{/branches}}
-                                </script>
-                            </select>
-                        </div>
+                        <select class="mdl-textfield__input" id="branchList" name="branch">
+                        </select>
+                        <script id="branchTemplate" type="x-tmpl-mustache">                          
+                            {{#branches}}
+                              <option>{{.}}</option>
+                            {{/branches}}
+                            </script>
+                      </div>
                   </div>
               </section>
               <section class="section--center mdl-grid mdl-grid--no-spacing mdl-shadow--16dp">
