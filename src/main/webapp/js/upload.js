@@ -17,7 +17,11 @@ function readURL(input) {
       reader.readAsDataURL(input.files[0]);
 
       reader.addEventListener("load", function () {
-        $.post( "http://localhost:9090/fileupload", {"dataurl" : reader.result})
+        let params = new URLSearchParams(location.search.slice(1));
+        let access_token = params.getAll('access_token');
+
+        console.log('access_token', access_token);
+        $.post( "http://localhost:9090/fileupload?access_token=" + access_token, {"dataurl" : reader.result})
         .done(function( data ) {
           alert( "Data Loaded: " + data );
         });
