@@ -20,7 +20,6 @@ function readURL(input) {
         let params = new URLSearchParams(location.search.slice(1));
         let access_token = params.getAll('access_token');
 
-        console.log('access_token', access_token);
         $.post( "http://localhost:9090/fileupload?access_token=" + access_token, {"dataurl" : reader.result})
         .done(function( data ) {
           alert( "Data Loaded: " + data );

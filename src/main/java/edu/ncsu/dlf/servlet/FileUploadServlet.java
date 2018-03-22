@@ -42,8 +42,6 @@ public class FileUploadServlet extends HttpServlet {
 
 		GitHubClient client = new GitHubClient();
 		client.setOAuth2Token(req.getParameter("access_token"));
-
-		System.out.println("\n\naccess token:\n\n"+ req.getParameter("access_token"));
 		
 		for(PdfComment comment: comments) {
 			System.out.println(comment.toString());
