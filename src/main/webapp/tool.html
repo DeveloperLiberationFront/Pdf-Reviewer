@@ -116,12 +116,12 @@
                         <input class="mdl-textfield__input mdl-dropdown_input" type="text" id="branch">
                         <label class="mdl-textfield__label" for="branch">Branch</label>
                         <ul class="mdl-menu mdl-js-menu mdl-dropdown-menu" for="branch" id="branchList">
-                          <script id="branchTemplate" type="x-tmpl-mustache">                          
-                          {{#branches}}
-                            <li class="mdl-menu__item">{{.}}</li>
-                          {{/branches}}
-                          </script>
                         </ul>
+                        <script id="branchTemplate" type="x-tmpl-mustache">                          
+                            {{#branches}}
+                              <li class="mdl-menu__item">{{.}}</li>
+                            {{/branches}}
+                            </script>
                       </div>
                   </div>
               </section>
