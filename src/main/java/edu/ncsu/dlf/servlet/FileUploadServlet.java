@@ -28,10 +28,10 @@ public class FileUploadServlet extends HttpServlet {
 
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-    String dataurl = req.getParameter("dataurl");
-    dataurl = dataurl.replace("data:application/pdf;base64,", "");
+		String dataurl = req.getParameter("dataurl");
+		dataurl = dataurl.replace("data:application/pdf;base64,", "");
 
-    byte[] data = Base64.decodeBase64(dataurl);
+		byte[] data = Base64.decodeBase64(dataurl);
 		InputStream fileStream = new ByteArrayInputStream(data);
 		//FileUtils.writeByteArrayToFile(new File("test.pdf"), data);
 

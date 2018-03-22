@@ -48,10 +48,30 @@
       .bodyPanel .branch-selection-card {
           z-index: 2;
       }
-        .mdl-dropdown .mdl-menu__container,
-        .mdl-dropdown .mdl-menu__outline,
-        .mdl-dropdown .mdl-menu {
-        width: 100% !important;
+        .ui-widget {
+            border-color: transparent;
+        }
+        .ui-widget-content {
+            margin-left: 1em;
+            margin-right: 1em;
+            margin-top: 0em;
+            margin-bottom: 0em;
+            line-height: 48px;
+            padding-top: 8px;
+            padding-right: 0px;
+            padding-bottom: 8px;
+            padding-left: 0px;
+            padding-inline-start: 1em;
+            font-size: 17px;
+            font-weight: 400;
+            text-align: center;
+            
+        }
+        .ui-widget-shadow {
+            box-shadow: 16px;
+        }
+        .ui-button{
+            padding-left:16px;
         }
         
         .ui-state-active,
@@ -60,12 +80,11 @@
         a.ui-button:active,
         .ui-button:active,
         .ui-button.ui-state-active:hover {
-            border: 1px solid #bdbdbd;
-            background: #bdbdbd;
+            border: none;
+            background-color: #eee;
             font-weight: normal;
             color: #000000;
-            padding-top: 2px;
-            padding-bottom: 2px;
+            
         }
   </style>
 </head>
@@ -83,12 +102,7 @@
                         <div class="mdl-card__supporting-text">
                             <h4 class="mdl-cell mdl-cell--12-col">Select A Repository</h4>
                         </div>
-                        <form action="#">
-                            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label ui-widget">
-                                <input class="mdl-textfield__input" id="repoList">
-                                <label class="mdl-textfield__label" for="repoList">Search for Repository Name</label>
-                            </div>
-                          </form>
+                        
                         <div class="mdl-tabs vertical-mdl-tabs mdl-js-tabs mdl-js-ripple-effect">
                         <div class="mdl-grid mdl-grid--no-spacing">
                             <div class="mdl-cell mdl-cell--12-col tabSpacing">
@@ -104,6 +118,12 @@
                             </div>
                         </div>
                         <div class="mdl-card__actions">
+                            <form action="#">
+                                    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label ui-widget ">
+                                        <input class="mdl-textfield__input" id="repoList" type="text">
+                                        <label class="mdl-textfield__label" for="repoList" >Search for Repository Name</label>
+                                    </div>
+                            </form>
                         </div>
                     </div>
               </section>
@@ -113,15 +133,13 @@
                           <h4 class="mdl-cell mdl-cell--12-col">Select A Branch</h4>
                       </div>
                       <div class="mdl-textfield mdl-js-textfield mdl-dropdown mdl-textfield--floating-label">
-                        <input class="mdl-textfield__input mdl-dropdown_input" type="text" id="branch">
-                        <label class="mdl-textfield__label" for="branch">Branch</label>
-                        <ul class="mdl-menu mdl-js-menu mdl-dropdown-menu" for="branch" id="branchList">
-                          <script id="branchTemplate" type="x-tmpl-mustache">                          
-                          {{#branches}}
-                            <li class="mdl-menu__item">{{.}}</li>
-                          {{/branches}}
-                          </script>
-                        </ul>
+                        <select class="mdl-textfield__input" id="branchList" name="branch">
+                        </select>
+                        <script id="branchTemplate" type="x-tmpl-mustache">                          
+                            {{#branches}}
+                              <option>{{.}}</option>
+                            {{/branches}}
+                            </script>
                       </div>
                   </div>
               </section>
@@ -160,15 +178,5 @@
   
     <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-  <script>
-    //make branch selectable 
-    var _mdlDrp = null;
-        $(".mdl-menu__item").on("click", function() {
-        _mdlDrp = $(this).parents(".mdl-textfield").find("input");
-        _mdlDrp.val($(this).text());
-        _mdlDrp.parent().addClass("is-dirty");
-        });
-  </script>
-
 </body>
 </html>
