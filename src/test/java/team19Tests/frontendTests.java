@@ -5,7 +5,9 @@ import static org.junit.Assert.*;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
+import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -29,7 +31,6 @@ public class frontendTests {
 	/**
 	 * Tests the login functionality
 	 */
-	//**
 	@Test
 	public void testLogin() {
 		
@@ -64,12 +65,10 @@ public class frontendTests {
 		
 		driver.close();
 	}
-	//*/
 	
 	/**
 	 * Tests uploading a PDF
 	 */
-	//**
 	@Test
 	public void testUpload() {
 		System.setProperty("webdriver.chrome.driver", "C:/Users/Dikolai/Documents/College/CSC 492/chromedriver.exe");
@@ -85,9 +84,9 @@ public class frontendTests {
 		driver.findElement(By.id("repo0")).click();
 		assertEquals(driver.findElement(By.id("repo0")).getText(), "FOOBAR");
 				
-		Select branchDropDown = new Select(driver.findElement(By.id("branch_id")));
+		Select branchDropDown = new Select(driver.findElement(By.id("branchList")));
 		branchDropDown.selectByIndex(1);
-		assertEquals(branchDropDown.getOptions().get(1).getText(), "Dev1");
+		assertEquals(branchDropDown.getOptions().get(1).getText(), "dev");
 		
 		driver.findElement(By.className("file-upload-input")).sendKeys("C:/Users/Dikolai/Documents/College/CSC 492/test-files/Test_Document_A1.pdf");
 		
@@ -99,12 +98,10 @@ public class frontendTests {
 		
 		driver.close();
 	}
-	//*/
 	
 	/**
 	 * Tests the remove upload button
 	 */
-	//**
 	@Test
 	public void testRemove() {
 		System.setProperty("webdriver.chrome.driver", "C:/Users/Dikolai/Documents/College/CSC 492/chromedriver.exe");
@@ -120,9 +117,9 @@ public class frontendTests {
 		driver.findElement(By.id("repo0")).click();
 		assertEquals(driver.findElement(By.id("repo0")).getText(), "FOOBAR");
 				
-		Select branchDropDown = new Select(driver.findElement(By.id("branch_id")));
+		Select branchDropDown = new Select(driver.findElement(By.id("branchList")));
 		branchDropDown.selectByIndex(1);
-		assertEquals(branchDropDown.getOptions().get(1).getText(), "Dev1");
+		assertEquals(branchDropDown.getOptions().get(1).getText(), "dev");
 		
 		driver.findElement(By.className("file-upload-input")).sendKeys("C:/Users/Dikolai/Documents/College/CSC 492/test-files/Test_Document_A1.pdf");
 		
@@ -141,12 +138,10 @@ public class frontendTests {
 		
 		driver.close();
 	}
-	//*/
 	
 	/**
 	 * Tests uploading an invalid file type
 	 */
-	//**
 	@Test
 	public void testInvalidFile() {
 		System.setProperty("webdriver.chrome.driver", "C:/Users/Dikolai/Documents/College/CSC 492/chromedriver.exe");
@@ -162,35 +157,81 @@ public class frontendTests {
 		driver.findElement(By.id("repo0")).click();
 		assertEquals(driver.findElement(By.id("repo0")).getText(), "FOOBAR");
 				
-		Select branchDropDown = new Select(driver.findElement(By.id("branch_id")));
+		Select branchDropDown = new Select(driver.findElement(By.id("branchList")));
 		branchDropDown.selectByIndex(1);
-		assertEquals(branchDropDown.getOptions().get(1).getText(), "Dev1");
+		assertEquals(branchDropDown.getOptions().get(1).getText(), "dev");
 		
 		driver.findElement(By.className("file-upload-input")).sendKeys("C:/Users/Dikolai/Documents/College/CSC 492/test-files/Test_Document_I1.docx");
+		
+		Alert alert = driver.switchTo().alert();
+		
+		System.out.println(alert.getText());
+		
+		assertTrue(alert.getText().equals("Please upload pdf files only."));
+		
+		alert.accept();
 		
 		WebElement removeButton = driver.findElement(By.className("remove-pdf"));
 		assertFalse(removeButton == null);
 		
-		try {
-			TimeUnit.SECONDS.sleep(1);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		driver.findElement(By.className("mdl-button__ripple-container")).click();
-		
-		//TODO add checks for error message
+		//assertFalse(driver.findElement(By.className("mdl-button__ripple-container")).isEnabled());
 		
 		driver.close();
 	}
-	//*/
+
+	/**
+	 * Tests the search bar for repositories
+	 */
+	@Test
+	public void searchRepos() {
+		System.setProperty("webdriver.chrome.driver", "C:/Users/Dikolai/Documents/College/CSC 492/chromedriver.exe");
+		
+		WebDriver driver = new ChromeDriver();
+		driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
+		
+		String username = "nranthon+multipleRepo@ncsu.edu";
+		String password = "nranthon+multipleRepo@ncsu.edu";
+		
+		login(driver, username, password);
+		
+		driver.findElement(By.id("repoList")).sendKeys("REPO");
+		//driver.findElement(By.id("ui-id-17")).click();
+		
+		//driver.close();
+
+	}
+	
+	/**
+	 * Tests what is displayed when the user doesn't have access to any repositories
+	 */
+	@Test
+	public void noRepos() {
+		System.setProperty("webdriver.chrome.driver", "C:/Users/Dikolai/Documents/College/CSC 492/chromedriver.exe");
+		
+		WebDriver driver = new ChromeDriver();
+		driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
+		
+		String username = "nranthon+noRepo@ncsu.edu";
+		String password = "nranthon+noRepo@ncsu.edu";
+		
+		login(driver, username, password);
+		
+		try {
+			driver.findElement(By.id("repo0"));
+			fail("It shouldn't exist");
+		} catch (NoSuchElementException e) {
+
+		} finally {
+			driver.close();
+		}
+		
+		
+	}
 	
 	/**
 	 * Logs into the system using the testing credentials
 	 * @param driver The chrome web driver to use
 	 */
-	//**
 	private void login(WebDriver driver, String username, String password) {
 		driver.get(ADDRESS);
 		WebElement loginButton = driver.findElement(By.id("login"));
@@ -222,5 +263,4 @@ public class frontendTests {
 			e.printStackTrace();
 		}
 	}
-	//*/
 }
