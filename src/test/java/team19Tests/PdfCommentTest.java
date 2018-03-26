@@ -43,11 +43,16 @@ public class PdfCommentTest {
 	 * Tests the creation of long comments
 	 */
 	@Test
-	public void longComment() {
-		PdfComment comment = new PdfComment("This comment is really long and should "
+	public void longComments() {
+		PdfComment comment1 = new PdfComment("This comment is really long and should "
 				+ "probably have some sort of puncution with it but we're not going to bother "
 				+ "with that because this is a test and we aren't the most thorough of folk.");
-		assertEquals(comment.getTitle(), "This comment is really long and should probably...");
+		assertEquals(comment1.getTitle(), "This comment is really long and should probably...");
+		
+		PdfComment comment2 = new PdfComment("This comment is also very long but this one is different"
+				+ "because it'll have both a tag and an issue number [[/4]] {{cf}}");
+		assertEquals(comment2.getIssueNumber(), 4);
+		assertEquals(comment2.getTitle(), "This comment is also very long but this one is...");
 	}
 	
 	/**
@@ -79,9 +84,21 @@ public class PdfCommentTest {
 	 * Tests making a comment with an incorrect tag
 	 */
 	@Test
-	public void brokenTag() {
-		PdfComment comment = new PdfComment("What am I reading here? [[considerFix]]");
-		assertEquals(comment.getTags().get(0).toString(), "CONSIDER_FIX");
+	public void brokenTags() {
+		PdfComment comment1 = new PdfComment("What am I reading here? [[considerFix]]");
+		assertEquals(comment1.getTags().get(0).toString(), "CONSIDER_FIX");
+		
+		PdfComment comment2 = new PdfComment("Here is a comment with a broken tag }}");
+		assertEquals(comment2.getTags().size(), 0);
+		
+		PdfComment comment3 = new PdfComment("And another! {{ Hello");
+		assertEquals(comment3.getTags().size(), 0);
+		
+		PdfComment comment4 = new PdfComment("This one opens [[ but never closes");
+		assertEquals(comment4.getTags().size(), 0);
+		
+		PdfComment comment5 = new PdfComment("This one ]] closes but never opens!");
+		assertEquals(comment5.getTags().size(), 0);
 	}
 	
 	/**
@@ -100,13 +117,18 @@ public class PdfCommentTest {
 	 */
 	@Test
 	public void testRepo() {
-		PdfComment comment = new PdfComment("Literally never seen something this horrible in my life {{mustfix}} [[/5]]");
+		PdfComment comment1 = new PdfComment("Literally never seen something this horrible in my life {{mustfix}} [[/5]]");
 		Repo repo = new Repo();
 		repo.repoName = "master";
 		repo.repoOwner = "Dikolai";
-		String response = comment.getMessageWithLink(repo);
+		String response = comment1.getMessageWithLink(repo);
 		
 		assertTrue(response.contains("MUST_FIX"));
 		assertTrue(response.contains("https://github.com/Dikolai/master/issues/5"));
+		
+		PdfComment comment2 = new PdfComment("This one has no issues. You are wonderful");
+		response = comment2.getMessageWithLink(repo);
+		
+		assertEquals(response, "This one has no issues. You are wonderful");
 	}
 }

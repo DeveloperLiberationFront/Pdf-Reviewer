@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import java.util.concurrent.TimeUnit;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
@@ -28,13 +29,24 @@ public class frontendTests {
 	
 	public static final int DEFAULT_TIMEOUT = 20;
 	
+	public static final String DRIVER = "../chromedriver.exe";
+	
+	public String files;
+	
+	@Before
+	public void setUp() {
+		files = System.getProperty("user.dir");
+		files = files.replace('\\', '/');
+		files += "/src/test/resources/test-files";
+	}
+	
 	/**
 	 * Tests the login functionality
 	 */
 	@Test
 	public void testLogin() {
 		
-		System.setProperty("webdriver.chrome.driver", "C:/Users/Dikolai/Documents/College/CSC 492/chromedriver.exe");
+		System.setProperty("webdriver.chrome.driver", DRIVER);
 		
 		WebDriver driver = new ChromeDriver();
 		driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
@@ -71,8 +83,8 @@ public class frontendTests {
 	 */
 	@Test
 	public void testUpload() {
-		System.setProperty("webdriver.chrome.driver", "C:/Users/Dikolai/Documents/College/CSC 492/chromedriver.exe");
-		
+		System.setProperty("webdriver.chrome.driver", DRIVER);
+
 		WebDriver driver = new ChromeDriver();
 		driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
 		
@@ -88,7 +100,7 @@ public class frontendTests {
 		branchDropDown.selectByIndex(1);
 		assertEquals(branchDropDown.getOptions().get(1).getText(), "dev");
 		
-		driver.findElement(By.className("file-upload-input")).sendKeys("C:/Users/Dikolai/Documents/College/CSC 492/test-files/Test_Document_A1.pdf");
+		driver.findElement(By.className("file-upload-input")).sendKeys(files + "/Test_Document_A1.pdf");
 		
 		WebElement removeButton = driver.findElement(By.className("remove-pdf"));
 		
@@ -104,7 +116,7 @@ public class frontendTests {
 	 */
 	@Test
 	public void testRemove() {
-		System.setProperty("webdriver.chrome.driver", "C:/Users/Dikolai/Documents/College/CSC 492/chromedriver.exe");
+		System.setProperty("webdriver.chrome.driver", DRIVER);
 		
 		WebDriver driver = new ChromeDriver();
 		driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
@@ -121,7 +133,7 @@ public class frontendTests {
 		branchDropDown.selectByIndex(1);
 		assertEquals(branchDropDown.getOptions().get(1).getText(), "dev");
 		
-		driver.findElement(By.className("file-upload-input")).sendKeys("C:/Users/Dikolai/Documents/College/CSC 492/test-files/Test_Document_A1.pdf");
+		driver.findElement(By.className("file-upload-input")).sendKeys(files + "/Test_Document_A1.pdf");
 		
 		WebElement removeButton = driver.findElement(By.className("remove-pdf"));
 		assertFalse(removeButton == null);
@@ -144,7 +156,7 @@ public class frontendTests {
 	 */
 	@Test
 	public void testInvalidFile() {
-		System.setProperty("webdriver.chrome.driver", "C:/Users/Dikolai/Documents/College/CSC 492/chromedriver.exe");
+		System.setProperty("webdriver.chrome.driver", DRIVER);
 		
 		WebDriver driver = new ChromeDriver();
 		driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
@@ -161,7 +173,7 @@ public class frontendTests {
 		branchDropDown.selectByIndex(1);
 		assertEquals(branchDropDown.getOptions().get(1).getText(), "dev");
 		
-		driver.findElement(By.className("file-upload-input")).sendKeys("C:/Users/Dikolai/Documents/College/CSC 492/test-files/Test_Document_I1.docx");
+		driver.findElement(By.className("file-upload-input")).sendKeys(files + "/Test_Document_I1.docx");
 		
 		Alert alert = driver.switchTo().alert();
 		
@@ -184,7 +196,7 @@ public class frontendTests {
 	 */
 	@Test
 	public void searchRepos() {
-		System.setProperty("webdriver.chrome.driver", "C:/Users/Dikolai/Documents/College/CSC 492/chromedriver.exe");
+		System.setProperty("webdriver.chrome.driver", DRIVER);
 		
 		WebDriver driver = new ChromeDriver();
 		driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
@@ -206,7 +218,7 @@ public class frontendTests {
 	 */
 	@Test
 	public void noRepos() {
-		System.setProperty("webdriver.chrome.driver", "C:/Users/Dikolai/Documents/College/CSC 492/chromedriver.exe");
+		System.setProperty("webdriver.chrome.driver", DRIVER);
 		
 		WebDriver driver = new ChromeDriver();
 		driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
