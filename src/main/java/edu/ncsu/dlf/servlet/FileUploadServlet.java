@@ -54,7 +54,8 @@ public class FileUploadServlet extends HttpServlet {
 
 			// Setting body
 			String body = comment.getComment();
-			issue.setBody(body);
+			String pageReference = "Page Number: " + comment.getPageNumber();
+			issue.setBody(body + "\n\n" + pageReference);
 			
 			// Setting lables
             List<Label> newLabels = new ArrayList<>();
@@ -66,6 +67,8 @@ public class FileUploadServlet extends HttpServlet {
 			issue.setLabels(newLabels);
 
 			// Create the issue
+			//System.out.println("Selected Repo: " + req.getParameter("selectedRepository"));
+			//System.out.println("Selected Branch: " + req.getParameter("selectedBranch"));
             issue = issueService.createIssue("pdf-reviewer-bot", "creating-issues", issue);
 			
 			System.out.println("created issue #" + issue.getNumber());

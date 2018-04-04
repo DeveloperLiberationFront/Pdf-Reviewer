@@ -17,6 +17,7 @@ public class PdfComment {
 
     public static final int TITLE_LENGTH = 47;
 
+    // TODO: Add more tag types?
     public enum Tag {
         MUST_FIX, SHOULD_FIX, CONSIDER_FIX, POSITIVE, CUSTOM_TAG
     }
@@ -63,6 +64,8 @@ public class PdfComment {
 
     private BufferedImage image;
 
+    private int pageNumber;
+
     public PdfComment(String string) {
         string = setIssueNumberAndRepairBrokenTags(string);
         setTags(string);
@@ -100,6 +103,7 @@ public class PdfComment {
         this.comment = comment.trim();
     }
 
+    //TODO: Figure out what issue number is supposed to be formatted like?
     private final String setIssueNumberAndRepairBrokenTags(String originalString) {
 
         int issueStartPos = originalString.indexOf("[[");
@@ -216,5 +220,13 @@ public class PdfComment {
 
     public void setImage(BufferedImage image) {
         this.image = image;
+    }
+
+    public int getPageNumber() {
+        return pageNumber;
+    }
+
+    public void setPageNumber(int pageNum) {
+        this.pageNumber = pageNum;
     }
 }

@@ -90,7 +90,8 @@ public class Pdf {
 
         PdfComment pdfComment = turnAnnotationIntoPDFComment(annotation);
         if (pdfComment != null) {
-          comments.add(pdfComment);
+            pdfComment.setPageNumber(pageIndex);
+            comments.add(pdfComment);
         }
       }
 
