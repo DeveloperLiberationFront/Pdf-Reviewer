@@ -118,9 +118,9 @@ public class PdfCommentTest {
 	@Test
 	public void testRepo() {
 		PdfComment comment1 = new PdfComment("Literally never seen something this horrible in my life {{mustfix}} [[/5]]");
-		Repo repo = new Repo();
-		repo.repoName = "master";
-		repo.repoOwner = "Dikolai";
+
+		//TODO: The repo name being master makes it confusing (probably should be renamed)
+		Repo repo = new Repo("Dikolai", "master");
 		String response = comment1.getMessageWithLink(repo);
 		
 		assertTrue(response.contains("MUST_FIX"));

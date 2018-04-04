@@ -1,16 +1,15 @@
 package edu.ncsu.dlf.model;
 
-import com.mongodb.ReflectionDBObject;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class Repo extends ReflectionDBObject{
+public class Repo {
     public String repoOwner;
     public String repoName;
     
-    public Repo() {
-        // For mongodb
+    public Repo(String repoOwner, String repoName) {
+        this.repoOwner = repoOwner;
+        this.repoName = repoName;
     }
     
     public String getRepoOwner() {
@@ -26,11 +25,6 @@ public class Repo extends ReflectionDBObject{
     }
 
     public void setRepoName(String repoName) {
-        this.repoName = repoName;
-    }
-
-    public Repo(String repoOwner, String repoName) {
-        this.repoOwner = repoOwner;
         this.repoName = repoName;
     }
 
