@@ -2,6 +2,7 @@ function readURL(input) {
   if(!input.files[0].name.endsWith(".pdf")){
     alert("Please upload pdf files only.")
   } else {
+    enableUploadButton();
     if (input.files && input.files[0]) {
 
       var reader = new FileReader();
@@ -23,7 +24,7 @@ function readURL(input) {
         console.log('access_token', access_token);
         $.post( "http://localhost:9090/fileupload?access_token=" + access_token, {"dataurl" : reader.result})
         .done(function( data ) {
-          alert( "Data Loaded: " + data );
+          //alert( "Data Loaded: " + data );
         });
       }, false);
 
@@ -38,14 +39,22 @@ function readURL(input) {
 
     } else {
       removeUpload();
+      
     }
   }
 }
 
+function enableUploadButton(){
+  $('#upload-button').prop("disabled", false);
+}
+function dissableUploadButton(){
+  $('#upload-button').prop("disabled", true);
+}
 function removeUpload() {
   $('.file-upload-input').replaceWith($('.file-upload-input').clone());
   $('.file-upload-content').hide();
   $('.pdf-upload-wrap').show();
+  dissableUploadButton();
 }
 $('.pdf-upload-wrap').bind('dragover', function () {
 		$('.pdf-upload-wrap').addClass('pdf-dropping');
