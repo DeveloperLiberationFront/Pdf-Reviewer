@@ -13,7 +13,6 @@ import javax.servlet.http.HttpServletResponse;
 
 
 import org.eclipse.egit.github.core.Issue;
-import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.IssueService;
 import org.eclipse.egit.github.core.service.UserService;
@@ -22,7 +21,6 @@ import org.eclipse.egit.github.core.service.RepositoryService;
 import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.RepositoryContents;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.utils.URIBuilder;
 import java.io.ByteArrayOutputStream;
@@ -32,19 +30,19 @@ import org.apache.http.impl.client.HttpClients;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-
+import org.apache.commons.fileupload.FileItemIterator;
+import org.apache.commons.fileupload.FileItemStream;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
 import javax.xml.bind.DatatypeConverter;
 
 import org.eclipse.egit.github.core.User;
 
 import java.io.InputStream;
-import java.io.ByteArrayInputStream;
 
 import edu.ncsu.dlf.model.Pdf;
 import edu.ncsu.dlf.model.Repo;
 import edu.ncsu.dlf.model.PdfComment;
-import edu.ncsu.dlf.model.PdfComment.Tag;
 
 public class FileUploadServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -52,13 +50,7 @@ public class FileUploadServlet extends HttpServlet {
 
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		String dataurl = req.getParameter("dataurl");
-		dataurl = dataurl.replace("data:application/pdf;base64,", "");
-
-		byte[] data = Base64.decodeBase64(dataurl);
-		InputStream fileStream = new ByteArrayInputStream(data);
-		//FileUtils.writeByteArrayToFile(new File("test.pdf"), data);
-
+		InputStream fileStream = getFileInputSteamFromReq(req);
 		InputStream commentBoxImageStream = getServletContext().getResourceAsStream(pathToCommentBoxImage);
 
 		//Instantiate GitHub Client
@@ -66,13 +58,8 @@ public class FileUploadServlet extends HttpServlet {
 		GitHubClient client = new GitHubClient();
 		client = client.setOAuth2Token(accessToken);
 
-
-		//Instantiate userService to get logged in username
-		UserService userService = new UserService();
-		userService.getClient().setOAuth2Token(accessToken);
-		User u = userService.getUser();
-
-		String activeUser = u.getLogin();
+		//Instantiate the Repo object
+		String activeUser = getUsernameOfLoggedInUser(accessToken);
 		String selectedRepository = req.getParameter("selectedRepository");
 		Repo repo = new Repo(activeUser, selectedRepository);
 
@@ -85,37 +72,36 @@ public class FileUploadServlet extends HttpServlet {
 		List<PdfComment> comments = updatePdfWithNumberedAndColoredAnnotations(test, repo, totalIssues);
 
 		String selectedBranch = req.getParameter("selectedBranch");
-		String urlToPdfInRepo = addPdfToRepo(test, activeUser, selectedBranch, client, repo, accessToken);
-		
-		for(PdfComment comment: comments) {
-			System.out.println(comment.toString());
-			
-			IssueService issueService = new IssueService(client);
-			
-			// Setting title
-			Issue issue = new Issue();
-			issue.setTitle(comment.getTitle());
+		addPdfToRepo(test, activeUser, selectedBranch, client, repo, accessToken);
 
-			// Setting body
-			String body = comment.getComment();
-			String pageReference = "Page Number: " + comment.getPageNumber();
-			issue.setBody(body + "\n\n" + pageReference);
-			
-			// Setting lables
-            List<Label> newLabels = new ArrayList<>();
-            for(Tag tag : comment.getTags()) {
-            	Label label = new Label();
-            	label.setName(tag.name());
-            	newLabels.add(label);
-			}
-			issue.setLabels(newLabels);
+		test.close(); //Close the PDF
+		UploadIssuesRunnable task = new UploadIssuesRunnable();
+		//What are custom labels?
+		List<String> customLabels = new ArrayList<String>();
+		task.setter(comments, accessToken, repo, totalIssues, customLabels);
 
-			// Create the issue
-			//System.out.println("Selected Branch: " + req.getParameter("selectedBranch"));
-            issue = issueService.createIssue("pdf-reviewer-bot", "creating-issues", issue);
-			
-			System.out.println("created issue #" + issue.getNumber());
+		Thread t = new Thread(task);
+		t.start();
+	}
+
+	private InputStream getFileInputSteamFromReq(HttpServletRequest req) throws IOException {
+		try {
+			final ServletFileUpload upload = new ServletFileUpload();
+			FileItemIterator iter = upload.getItemIterator(req);
+			FileItemStream file = iter.next();
+			return file.openStream();
+		} catch(Exception e) {
+			e.printStackTrace();
+			throw new IOException("Unable to process file");
 		}
+	}
+
+	private String getUsernameOfLoggedInUser(String accessToken) throws IOException {
+		UserService userService = new UserService();
+		userService.getClient().setOAuth2Token(accessToken);
+		User u = userService.getUser();
+
+		return u.getLogin();
 	}
 
 	private int getNumTotalIssues(GitHubClient client, Repo repo) throws IOException {
@@ -216,7 +202,6 @@ public class FileUploadServlet extends HttpServlet {
             throw new IOException("Could not build uri", e);
         }
 
-    }
-
+	}
 	
 }

@@ -15,39 +15,28 @@ function readURL(input) {
         $('.pdf-title').html(input.files[0].name);
       };
 
-      reader.readAsDataURL(input.files[0]);
+      var formData = new FormData();
+      formData.append("file", input.files[0]);
 
-      reader.addEventListener("load", function () {
-        let params = new URLSearchParams(location.search.slice(1));
-        let access_token = params.getAll('access_token');
+      let params = new URLSearchParams(location.search.slice(1));
+      let access_token = params.getAll('access_token');
 
-        // alert($(".mdl-tabs__tab.is-active").text());
-        // alert($('#branchList').find(":selected").text());
+      var postURL = "http://localhost:9090/fileupload?access_token=" + access_token;
+      postURL += "&selectedRepository=" + escape($(".mdl-tabs__tab.is-active").text());
+      postURL += "&selectedBranch=" + escape($('#branchList').find(":selected").text());
 
-        let t0 = performance.now();
+      let t0 = performance.now();
 
-        $.post(
-          "http://localhost:9090/fileupload?access_token=" + access_token, 
-          {
-            "dataurl" : reader.result,
-            "selectedRepository" : $(".mdl-tabs__tab.is-active").text(),
-            "selectedBranch" : $('#branchList').find(":selected").text()
-          }
-        )
-        .done(function( data ) {
-          alert( "Time Taken (milliseconds):" + (performance.now() - t0) );
-        });
-      }, false);
-
-
-      // $.ajax({
-      //   type: "POST",
-      //   url: "http://localhost:9090/fileupload",
-      //   data: reader.result,
-      //   success: success,
-      //   dataType: 'json'
-      // });
-
+      $.ajax({
+        type: "POST",
+        url: postURL,
+        processData: false,
+        contentType: false,
+        data: formData
+      })
+      .done(function( data ) {
+       alert( "Time Taken (milliseconds):" + (performance.now() - t0) );
+      });
     } else {
       removeUpload();
       
