@@ -22,7 +22,7 @@ import org.json.JSONObject;
 public class Login2Servlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	@Override
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+	public void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
 		//So if someone hits /login2 without going through our flow,
 		//they will just see the client_id displayed on the page

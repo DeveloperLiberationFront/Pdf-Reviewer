@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="upload.css">
   <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
   <link rel="stylesheet" href="recentlyUsedRepo.css">
+  <link rel="stylesheet" href="getmdl-select.min.css">
   <style>
       h3 {
           text-align:center;
@@ -65,6 +66,7 @@
             font-size: 17px;
             font-weight: 400;
             text-align: center;
+            position: fixed;
             
         }
         .ui-widget-shadow {
@@ -86,6 +88,15 @@
             color: #000000;
             
         }
+        
+        .mdl-dialog {
+  border: none;
+  box-shadow: 16px;
+  width:660px;
+  }
+
+
+
   </style>
 </head>
 <body class="bodyPanel">
@@ -112,7 +123,7 @@
                                         <a class="mdl-tabs__tab" id="{{id}}">{{name.repoName}}</a>
                                         {{/repos}}
                                     </script>
-                                    <div id="repoTemplateRendered">
+                                <div id="repoTemplateRendered">
                                 </div>
                                 </div>
                             </div>
@@ -132,8 +143,8 @@
                       <div class="mdl-card__supporting-text">
                           <h4 class="mdl-cell mdl-cell--12-col">Select A Branch</h4>
                       </div>
-                      <div class="mdl-textfield mdl-js-textfield mdl-dropdown mdl-textfield--floating-label">
-                        <select class="mdl-textfield__input" id="branchList" name="branch">
+                      <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                            <select class="mdl-textfield__input repoBranchList" id="branchList" name="branch">
                         </select>
                         <script id="branchTemplate" type="x-tmpl-mustache">                          
                             {{#branches}}
@@ -160,9 +171,21 @@
                           </div>
                       </div>
                       <div class="mdl-card__actions mdl-card--border">
-                          <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+                          <button id="upload-button" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" disabled>
                               Upload File
-                          </a>
+                          </button>
+                          <dialog id="dialog" class="mdl-dialog">
+                                <h3 class="mdl-dialog__title">Success</h3>
+                                <div class="mdl-dialog__content">
+                                  <p>
+                                    Below is the link for the page where issues have been created.
+                                  </p>
+                                  <a href="https://github.com/pdf-reviewer-bot/creating-issues/issues" target="_blank" style="color:blue;">https://github.com/pdf-reviewer-bot/creating-issues/issues</a>
+                                </div>
+                                <div class="mdl-dialog__actions">
+                                  <button type="button" class="mdl-button" onClick="window.location.reload();">Close</button>
+                                </div>
+                              </dialog>
                       </div>
                   </div>
               </section>
@@ -175,8 +198,25 @@
   <script src="./js/tool.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/2.3.0/mustache.min.js"></script>
   <script src="./js/upload.js"></script>
-  
+  <script src="./js/getmdl-select.min.js"></script>
     <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script>
+      (function() {
+    'use strict';
+    var dialogButton = document.querySelector('#upload-button');
+    var dialog = document.querySelector('#dialog');
+    if (! dialog.showModal) {
+      dialogPolyfill.registerDialog(dialog);
+    }
+    dialogButton.addEventListener('click', function() {
+       dialog.showModal();
+    });
+    dialog.querySelector('button:not([disabled])')
+    .addEventListener('click', function() {
+      dialog.close();
+    });
+  }());
+    </script>
 </body>
 </html>
