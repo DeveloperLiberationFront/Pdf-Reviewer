@@ -15,6 +15,9 @@ function readURL(input) {
         $('.pdf-title').html(input.files[0].name);
       };
 
+      reader.readAsDataURL(input.files[0]);
+
+
       var formData = new FormData();
       formData.append("file", input.files[0]);
 
