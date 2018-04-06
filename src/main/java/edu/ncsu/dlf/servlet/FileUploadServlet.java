@@ -82,6 +82,13 @@ public class FileUploadServlet extends HttpServlet {
 
 		Thread t = new Thread(task);
 		t.start();
+
+		//Don't return control to front end, until all issues are created.
+		while(task.getCommentsToIssues() < comments.size()) {}
+
+		int finalIssues = getNumTotalIssues(client, repo);
+		System.out.println((finalIssues - totalIssues) + " have been created!");
+
 	}
 
 	private InputStream getFileInputSteamFromReq(HttpServletRequest req) throws IOException {

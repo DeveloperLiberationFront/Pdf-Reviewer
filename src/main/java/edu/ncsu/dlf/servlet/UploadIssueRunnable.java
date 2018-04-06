@@ -25,6 +25,8 @@ final class UploadIssuesRunnable implements Runnable {
     private Repo repo;
     private List<String> customLabelStrings;
 
+    private volatile int commentsToIssues = 0;
+
     public void setter(List<PdfComment> comments, String accessToken, Repo repo, int issueCount, List<String> customLabels) {
         this.comments = comments;
         this.accessToken = accessToken;
@@ -42,12 +44,6 @@ final class UploadIssuesRunnable implements Runnable {
                 List<Label> customLabels = createCustomLabels(client);
 
                 createIssues(client, customLabels);
-
-                //UserService userService = new UserService(client);
-                //User reviewer = userService.getUser();
-                
-                //String closeComment = "@" + reviewer.getLogin() + " has reviewed this paper.";
-
             } catch(IOException e) {
                 e.printStackTrace();
                 System.err.println("Error processing Pdf.");
@@ -55,9 +51,20 @@ final class UploadIssuesRunnable implements Runnable {
     }
 
     public void createIssues(GitHubClient client, List<Label> customLabels) throws IOException {
+        int count = 0;
         for(PdfComment comment : comments) {
             System.out.println(comment);
+            if(count == 30) {
+                try {
+                    count = 0;
+                    Thread.sleep(60000);
+                } catch(InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
             createOrUpdateIssue(client, repo, comment, customLabels);
+            count++;
+            commentsToIssues++;
         }
     }
 
@@ -176,6 +183,10 @@ final class UploadIssuesRunnable implements Runnable {
             sb.append("0123456789abcdef".charAt(r.nextInt(16)));
         }
         return sb.toString();
+    }
+
+    public int getCommentsToIssues() {
+        return this.commentsToIssues;
     }
 
 }
