@@ -38,7 +38,8 @@ function readURL(input) {
         data: formData
       })
       .done(function( data ) {
-       alert( "Time Taken (milliseconds):" + (performance.now() - t0) );
+        var timeTakenString = "Time Taken (milliseconds):" + (performance.now() - t0) ;
+        alert(data + "\n\n" + timeTakenString);
       });
     } else {
       removeUpload();

@@ -72,7 +72,7 @@ public class FileUploadServlet extends HttpServlet {
 		List<PdfComment> comments = updatePdfWithNumberedAndColoredAnnotations(test, repo, totalIssues);
 
 		String selectedBranch = req.getParameter("selectedBranch");
-		addPdfToRepo(test, activeUser, selectedBranch, client, repo, accessToken);
+		String urlToPDFInRepo = addPdfToRepo(test, activeUser, selectedBranch, client, repo, accessToken);
 
 		test.close(); //Close the PDF
 		UploadIssuesRunnable task = new UploadIssuesRunnable();
@@ -87,7 +87,17 @@ public class FileUploadServlet extends HttpServlet {
 		while(task.getCommentsToIssues() < comments.size()) {}
 
 		int finalIssues = getNumTotalIssues(client, repo);
-		System.out.println((finalIssues - totalIssues) + " have been created!");
+		String successMessage = (finalIssues - totalIssues) + " issues have been created!";
+
+		String fullPDFUrl = String.format(
+			"https://github.com/%s/%s/tree/%s/%s", 
+			activeUser, selectedRepository, selectedBranch, urlToPDFInRepo
+		);
+		successMessage += "\n\n" + "The PDF file has been archived to : " + fullPDFUrl;
+
+		resp.getWriter().write(successMessage);
+
+		System.out.println(successMessage);
 
 	}
 
