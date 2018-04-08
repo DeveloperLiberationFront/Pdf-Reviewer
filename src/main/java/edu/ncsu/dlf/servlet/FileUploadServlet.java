@@ -96,10 +96,11 @@ public class FileUploadServlet extends HttpServlet {
 		//issueSucessMessage += "\n\n" + "The PDF file has been archived to : " + fullPDFUrl;
 
 		String successHTML = String.format(
-							"<p> %s <p>" 
-							+ "<p>Link to the archived PDF: "
-							+ " <a href=\"%s\"> %s <a><p>",
-							issueSuccessMessage, fullPDFUrl, fullPDFUrl);
+								"<p> %s <p>" 
+								+ "<p>Link to the archived PDF: "
+								+ " <a href=\"%s\"> %s <a><p>",
+								issueSuccessMessage, fullPDFUrl, fullPDFUrl
+							);
 
 
 		resp.getWriter().write(successHTML);
