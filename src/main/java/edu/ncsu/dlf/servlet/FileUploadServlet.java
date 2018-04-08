@@ -87,17 +87,24 @@ public class FileUploadServlet extends HttpServlet {
 		while(task.getCommentsToIssues() < comments.size()) {}
 
 		int finalIssues = getNumTotalIssues(client, repo);
-		String successMessage = (finalIssues - totalIssues) + " issues have been created!";
+		String issueSuccessMessage = (finalIssues - totalIssues) + " issues have been created!";
 
 		String fullPDFUrl = String.format(
 			"https://github.com/%s/%s/tree/%s/%s", 
 			activeUser, selectedRepository, selectedBranch, urlToPDFInRepo
 		);
-		successMessage += "\n\n" + "The PDF file has been archived to : " + fullPDFUrl;
+		//issueSucessMessage += "\n\n" + "The PDF file has been archived to : " + fullPDFUrl;
 
-		resp.getWriter().write(successMessage);
+		String successHTML = String.format(
+							"<p> %s <p>" 
+							+ "<p>Link to the archived PDF: "
+							+ " <a href=\"%s\"> %s <a><p>",
+							issueSuccessMessage, fullPDFUrl, fullPDFUrl);
 
-		System.out.println(successMessage);
+
+		resp.getWriter().write(successHTML);
+
+		System.out.println(issueSuccessMessage);
 
 	}
 

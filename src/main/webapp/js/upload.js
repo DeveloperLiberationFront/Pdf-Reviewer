@@ -40,6 +40,8 @@ function readURL(input) {
       .done(function( data ) {
         var timeTakenString = "Time Taken (milliseconds):" + (performance.now() - t0) ;
         alert(data + "\n\n" + timeTakenString);
+
+        $(".mdl-dialog__content").html(data);
       });
     } else {
       removeUpload();
