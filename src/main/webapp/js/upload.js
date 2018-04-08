@@ -16,33 +16,7 @@ function readURL(input) {
       };
 
       reader.readAsDataURL(input.files[0]);
-
-
-      var formData = new FormData();
-      formData.append("file", input.files[0]);
-
-      let params = new URLSearchParams(location.search.slice(1));
-      let access_token = params.getAll('access_token');
-
-      var postURL = "http://localhost:9090/fileupload?access_token=" + access_token;
-      postURL += "&selectedRepository=" + escape($(".mdl-tabs__tab.is-active").text());
-      postURL += "&selectedBranch=" + escape($('#branchList').find(":selected").text());
-
-      let t0 = performance.now();
-
-      $.ajax({
-        type: "POST",
-        url: postURL,
-        processData: false,
-        contentType: false,
-        data: formData
-      })
-      .done(function( data ) {
-        var timeTakenString = "Time Taken (milliseconds):" + (performance.now() - t0) ;
-        alert(data + "\n\n" + timeTakenString);
-
-        $(".mdl-dialog__content").html(data);
-      });
+      displayMessage(input.files[0]);
     } else {
       removeUpload();
       
@@ -68,3 +42,45 @@ $('.pdf-upload-wrap').bind('dragover', function () {
 	$('.pdf-upload-wrap').bind('dragleave', function () {
 		$('.pdf-upload-wrap').removeClass('pdf-dropping');
 });
+
+function displayMessage(inputFile) {
+  'use strict';
+  var dialogButton = document.querySelector('#upload-button');
+  var dialog = document.querySelector('#dialog');
+  if (! dialog.showModal) {
+    dialogPolyfill.registerDialog(dialog);
+  }
+
+  dialogButton.addEventListener('click', function() {
+    var formData = new FormData();
+    formData.append("file", inputFile);
+
+    let params = new URLSearchParams(location.search.slice(1));
+    let access_token = params.getAll('access_token');
+
+    var postURL = "http://localhost:9090/fileupload?access_token=" + access_token;
+    postURL += "&selectedRepository=" + escape($(".mdl-tabs__tab.is-active").text());
+    postURL += "&selectedBranch=" + escape($('#branchList').find(":selected").text());
+
+    let t0 = performance.now();
+
+    $.ajax({
+      type: "POST",
+      url: postURL,
+      processData: false,
+      contentType: false,
+      data: formData
+    })
+    .done(function( data ) {
+      var timeTakenString = "Time Taken (milliseconds):" + (performance.now() - t0) ;
+      alert(timeTakenString);
+
+      $(".mdl-dialog__content").html(data);
+      dialog.showModal();
+    });
+  });
+  dialog.querySelector('button:not([disabled])')
+  .addEventListener('click', function() {
+    dialog.close();
+  });
+};
