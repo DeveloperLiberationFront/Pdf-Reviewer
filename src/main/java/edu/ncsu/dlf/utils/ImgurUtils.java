@@ -60,6 +60,10 @@ public class ImgurUtils {
                 imageURL = dataJSON.get("link").toString();
             } catch (URISyntaxException | JSONException | IOException e) {
                 e.printStackTrace();
+            }  finally{
+                if (request != null) {
+                    request.releaseConnection();
+                }
             }
         }
         return imageURL;
