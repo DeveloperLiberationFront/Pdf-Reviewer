@@ -21,16 +21,16 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-import edu.ncsu.dlf.servlet.Login2Servlet;
+import edu.ncsu.dlf.servlet.LoginServlet;
 
 import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Tests the functionality of the Login2Servlet
+ * Tests the functionality of the LoginServlet
  * @author Nicholas Anthony
  */
-public class Login2ServletTest {
+public class LoginServletTest {
 
 	 @Mock
 	 HttpServletRequest request;
@@ -63,7 +63,7 @@ public class Login2ServletTest {
 		Mockito.when(request.getParameter("code")).thenReturn(null);
 		Mockito.when(response.getWriter()).thenReturn(new PrintWriter("TestFilePleaseIgnore.txt"));
 		
-		Login2Servlet servlet = new Login2Servlet();
+		LoginServlet servlet = new LoginServlet();
 		try {
 			servlet.doGet(request, response);
 		} catch (ServletException | IOException | NullPointerException e) {
@@ -87,7 +87,7 @@ public class Login2ServletTest {
 		Mockito.when(request.getContextPath()).thenReturn("localhost:9090");
 		Mockito.when(response.getWriter()).thenReturn(new PrintWriter("TestFilePleaseIgnore.txt"));
 		
-		Login2Servlet servlet = new Login2Servlet();
+		LoginServlet servlet = new LoginServlet();
 		try {
 			servlet.doGet(request, response);
 		} catch (ServletException | IOException | NullPointerException e) {
