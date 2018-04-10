@@ -50,7 +50,7 @@ function displayMessage(inputFile) {
   if (! dialog.showModal) {
     dialogPolyfill.registerDialog(dialog);
   }
-
+  
   dialogButton.addEventListener('click', function() {
     var formData = new FormData();
     formData.append("file", inputFile);
