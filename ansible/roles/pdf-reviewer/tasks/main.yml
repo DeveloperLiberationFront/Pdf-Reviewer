@@ -1,2 +1,32 @@
 ---
-- name: clone the repository to 
+- name: add github.ncsu.edu to known hosts
+  become: yes
+  lineinfile:
+    dest: /etc/ssh/ssh_known_hosts
+    create: yes
+    state: present
+    line: "{{ lookup('pipe', 'ssh-keyscan -t rsa github.ncsu.edu') }}"
+    regexp: "^github\\.ncsu\\.edu"
+
+- name: clone the pdf-review-tool repository
+  git:
+    repo: 'git@github.ncsu.edu:engr-csc-sdc/2018SpringTeam19.git'
+    dest: "/home/{{ansible_user}}/pdf-review-tool"
+    version: dev
+
+- name: add environment variables
+  become: yes
+  lineinfile: 
+    dest: /etc/environment 
+    line: "{{item.name}}={{item.value}}"
+  with_items: "{{env_vars}}"
+
+- name: mvn clean install
+  command: mvn clean install
+  args:
+    chdir: "/home/{{ansible_user}}/pdf-review-tool"
+
+# - name: start pdf-review-tool
+#   command: mvn tomcat7:run
+    # args:
+    #   chdir: "/home/{{ansible_user}}/pdf-review-tool"
