@@ -17,6 +17,9 @@ import edu.ncsu.dlf.model.Repo;
 import edu.ncsu.dlf.model.PdfComment;
 import edu.ncsu.dlf.model.PdfComment.Tag;
 
+import edu.ncsu.dlf.utils.ImgurUtils;
+
+
 //TODO: Should I put this back in FileUpload Servlet and make it static?
 final class UploadIssuesRunnable implements Runnable {
     private String accessToken;
@@ -88,8 +91,7 @@ final class UploadIssuesRunnable implements Runnable {
         String body = comment.getComment();
         try {
             //TODO: Implement image upload
-            //String imageURL = ImageUtils.uploadPhoto(comment.getImage());
-            String imageURL = "default";
+            String imageURL = ImgurUtils.uploadImage(comment.getImage());
             body = String.format("![snippet](%s)%n%n%s", imageURL, body);
         } catch (Exception e) { //TODO: Should be IO Exception
             e.printStackTrace();
