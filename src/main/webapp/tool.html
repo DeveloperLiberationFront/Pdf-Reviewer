@@ -11,7 +11,6 @@
   <link rel="stylesheet" href="upload.css">
   <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
   <link rel="stylesheet" href="recentlyUsedRepo.css">
-  <link rel="stylesheet" href="getmdl-select.min.css">
   <style>
       h3 {
           text-align:center;
@@ -129,12 +128,10 @@
                             </div>
                         </div>
                         <div class="mdl-card__actions">
-                            <form action="#">
-                                    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label ui-widget ">
-                                        <input class="mdl-textfield__input" id="repoList" type="text">
-                                        <label class="mdl-textfield__label" for="repoList" >Search for Repository Name</label>
-                                    </div>
-                            </form>
+                            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label ui-widget ">
+                                <input class="mdl-textfield__input repoSearchBar" id="repoList" type="text">
+                                <label class="mdl-textfield__label" for="repoList" >Search for Repository Name</label>
+                            </div>
                         </div>
                     </div>
               </section>
@@ -194,7 +191,6 @@
   <script src="./js/tool.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/2.3.0/mustache.min.js"></script>
   <script src="./js/upload.js"></script>
-  <script src="./js/getmdl-select.min.js"></script>
   <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
   <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 </body>
