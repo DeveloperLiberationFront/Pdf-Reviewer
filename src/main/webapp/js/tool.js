@@ -19,14 +19,32 @@ window.onload = function() {
         $('.mdl-tabs__tab').on('click', function() {
             $(this).addClass('is-active');
             var otherRepos = $(this).siblings().removeClass('is-active');
+            //if there is something written on the search bar than remove it. 
+            if($("#repoList").val().length != 0){
+                $("#repoList").val('');
+            }
             populateBranches(repoTemplateJSON, $(this).text());
-          })
+        })
 
         //Populates the searchbar with repository names so that user can type and  the tool will autocomplete
         console.log(repoTemplateJSON.repos.map(repo=>repo.name.repoName))
         var availableRepo = repoTemplateJSON.repos.map(repo=>repo.name.repoName);
         $( "#repoList" ).autocomplete({
-            source: availableRepo
+            source: availableRepo,
+            autoFocus: true,
+            change: function(event, ui){
+                event.preventDefault();
+                //if the item on the search repository box is not a valid repository then clear the box and show message
+                if(!ui.item && $("#repoList").val() != ''){
+                    $("#repoList").val('');
+                    alert("Please select a valid repository.");
+                } else {
+                    $('.mdl-tabs__tab').removeClass('is-active');
+                    $('#branchList')[0].options.length = 0;
+                    populateBranches(repoTemplateJSON, ui.item.value);
+                }
+                   
+            }
         });
     });
   }
