@@ -59,7 +59,7 @@ function displayMessage(inputFile) {
     let params = new URLSearchParams(location.search.slice(1));
     let access_token = params.getAll('access_token');
 
-    var postURL = "http://localhost:9090/fileupload?access_token=" + access_token;
+    var postURL = "/fileupload?access_token=" + access_token;
     postURL += "&selectedRepository=" + escape($(".mdl-tabs__tab.is-active").text());
     postURL += "&selectedBranch=" + escape($('#branchList').find(":selected").text());
 

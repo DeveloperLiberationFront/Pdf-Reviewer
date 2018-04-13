@@ -41,3 +41,4 @@ ansible/inventory
 *.retry
 
 .vscode
+TestFilePleaseIgnore.txt

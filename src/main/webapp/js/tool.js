@@ -4,7 +4,7 @@ let access_token = params.getAll('access_token');
 
 window.onload = function() {
     //Grab the inline template
-    $.get('http://localhost:9090/repositories?access_token=' + access_token).done((repositories)=>{
+    $.get('/repositories?access_token=' + access_token).done((repositories)=>{
         let repoTemplateJSON = {repos:[]}
         for (let i = 0; i < repositories.length; i++) {
             repoTemplateJSON.repos.push({id: 'repo'+i, name: repositories[i]});
