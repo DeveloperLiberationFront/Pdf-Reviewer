@@ -52,6 +52,7 @@ function displayMessage(inputFile) {
   }
   
   dialogButton.addEventListener('click', function() {
+    showLoading();
     var formData = new FormData();
     formData.append("file", inputFile);
 
@@ -72,8 +73,9 @@ function displayMessage(inputFile) {
       data: formData
     })
     .done(function( data ) {
-      var timeTakenString = "Time Taken (milliseconds):" + (performance.now() - t0) ;
-      alert(timeTakenString);
+      hideLoading();
+      // var timeTakenString = "Time Taken (milliseconds):" + (performance.now() - t0) ;
+      // alert(timeTakenString);
 
       $(".mdl-dialog__content").html(data);
       dialog.showModal();
@@ -84,3 +86,22 @@ function displayMessage(inputFile) {
     dialog.close();
   });
 };
+
+/* library */
+function showLoading() {
+  // remove existing loaders
+  $('.loading-container').remove();
+  $('<div id="orrsLoader" class="loading-container"><div><div class="mdl-spinner mdl-js-spinner is-active"></div></div></div>').appendTo("body");
+
+  componentHandler.upgradeElements($('.mdl-spinner').get());
+  setTimeout(function () {
+      $('#orrsLoader').css({opacity: 1});
+  }, 1);
+}
+
+function hideLoading() {
+  $('#orrsLoader').css({opacity: 0});
+  setTimeout(function () {
+      $('#orrsLoader').remove();
+  }, 400);
+}
