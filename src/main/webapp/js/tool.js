@@ -6,14 +6,17 @@ window.onload = function() {
     //Grab the inline template
     $.get('/repositories?access_token=' + access_token).done((repositories)=>{
         let repoTemplateJSON = {repos:[]}
+        let repoTemplateJSON10 = {repos:[]}
         for (let i = 0; i < repositories.length; i++) {
-            repoTemplateJSON.repos.push({id: 'repo'+i, name: repositories[i]});
+            repoTemplateJSON.repos.push({id: 'repo'+i, name: repositories[i]});            
+            if(i < 10)
+                repoTemplateJSON10.repos.push({id: 'repo'+i, name: repositories[i]});
         }
 
         console.log(JSON.stringify(repoTemplateJSON))
         let repoTemplate = document.getElementById('repoTemplate').innerHTML;
         Mustache.parse(repoTemplate);
-        let repoTemplateRendered = Mustache.render(repoTemplate, repoTemplateJSON);
+        let repoTemplateRendered = Mustache.render(repoTemplate, repoTemplateJSON10);
         document.getElementById('repoTemplateRendered').innerHTML = repoTemplateRendered;
 
         $('.mdl-tabs__tab').on('click', function() {
@@ -52,6 +55,12 @@ window.onload = function() {
 function populateBranches(repoTemplateJSON, repoName){
     let repoTemplate = document.getElementById('branchTemplate').innerHTML;
     let selectedRepo = repoTemplateJSON.repos.find((repos)=>repos.name.repoName === repoName)
+    selectedRepo.name.branches.sort((a, b)=> {
+        if(a == 'master') 
+            return -1;
+        else if(b=='master'){
+            return 1;
+        }})
     Mustache.parse(repoTemplate);
     let branchTemplateRendered = Mustache.render(repoTemplate, selectedRepo.name);
     document.getElementById('branchList').innerHTML = branchTemplateRendered;
