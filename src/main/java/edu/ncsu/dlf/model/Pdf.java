@@ -228,7 +228,7 @@ public class Pdf {
         }
         newComment.setContents(messageWithLink);
 
-        System.out.println(newComment.getContents());
+        //System.out.println(newComment.getContents());
 
         newComment.setRectangle(comment.getRectangle());   //both rectangle and quadpoints are needed... don't know why
         newComment.setQuadPoints(comment.getQuadPoints());

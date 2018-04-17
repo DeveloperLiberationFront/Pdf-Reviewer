@@ -1,4 +1,4 @@
-package team19Tests;
+package modelTests;
 
 import static org.junit.Assert.*;
 

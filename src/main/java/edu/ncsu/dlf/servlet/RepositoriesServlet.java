@@ -22,7 +22,7 @@ import java.util.TreeMap;
 public class RepositoriesServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	@Override
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+	public void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		GitHubClient client = new GitHubClient();
 		client.setOAuth2Token(req.getParameter("access_token"));
 

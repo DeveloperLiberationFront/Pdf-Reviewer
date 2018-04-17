@@ -1,11 +1,7 @@
-package team19Tests;
+package servletTests;
 
 import static org.junit.Assert.*;
 
-import java.io.IOException;
-
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -16,13 +12,13 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-import edu.ncsu.dlf.servlet.ToolServlet;
+import edu.ncsu.dlf.servlet.RepositoriesServlet;
 
 /**
- * Tests the functionality of the ToolServlet
+ * Attempts to test the RepositoriesServlet class
  * @author Nicholas Anthony
  */
-public class ToolServletTest {
+public class RepositoriesServletTest {
 
 	 @Mock
 	 HttpServletRequest request;
@@ -31,6 +27,8 @@ public class ToolServletTest {
 	 @Mock
 	 HttpSession session;
 	
+	 //https://www.tutorialspoint.com/mockito/mockito_environment.htm
+	 	
 	/**
 	 * Initializes Mockito
 	 * @throws Exception
@@ -39,31 +37,26 @@ public class ToolServletTest {
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
 	}
-	 
+	
 	/**
-	 * The one test
+	 * Attempts to test the servlet
 	 */
 	@Test
 	public void testServlet() {
 		HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
 		HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
-		RequestDispatcher reqDis = Mockito.mock(RequestDispatcher.class);
 		
-		Mockito.when(request.getRequestDispatcher("tool.html")).thenReturn(reqDis);
-		try {
-			Mockito.doNothing().when(reqDis).forward(request, response);
-		} catch (ServletException | IOException e1) {
-			fail("Something bad shouldn't happen");
-		}
+		Mockito.when(request.getParameter("access_token")).thenReturn(null);
 		
-		ToolServlet servlet = new ToolServlet();
+		RepositoriesServlet servlet = new RepositoriesServlet();
 		
 		try {
 			servlet.doGet(request, response);
-		} catch (ServletException | IOException | NullPointerException e) {
-			fail("Something bad shouldn't happen");
+			fail("There should be an error");
+		} catch (Exception e) {
+			
 		}
-		assertEquals(request.getHeader("accept"), null);
+		
 	}
 
 }

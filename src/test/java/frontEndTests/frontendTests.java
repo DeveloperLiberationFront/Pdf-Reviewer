@@ -1,4 +1,4 @@
-package team19Tests;
+package frontEndTests;
 
 import static org.junit.Assert.*;
 
@@ -189,28 +189,6 @@ public class frontendTests {
 		//assertFalse(driver.findElement(By.className("mdl-button__ripple-container")).isEnabled());
 		
 		driver.close();
-	}
-
-	/**
-	 * Tests the search bar for repositories
-	 */
-	@Test
-	public void searchRepos() {
-		System.setProperty("webdriver.chrome.driver", DRIVER);
-		
-		WebDriver driver = new ChromeDriver();
-		driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
-		
-		String username = "nranthon+multipleRepo@ncsu.edu";
-		String password = "nranthon+multipleRepo@ncsu.edu";
-		
-		login(driver, username, password);
-		
-		driver.findElement(By.id("repoList")).sendKeys("REPO");
-		//driver.findElement(By.id("ui-id-17")).click();
-		
-		//driver.close();
-
 	}
 	
 	/**
