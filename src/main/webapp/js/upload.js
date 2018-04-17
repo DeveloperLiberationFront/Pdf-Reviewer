@@ -1,25 +1,32 @@
 function readURL(input) {
-  if(!input.files[0].name.endsWith(".pdf")){
-    alert("Please upload pdf files only.")
+  if($('#branchList').find(":selected").text().length == 0){
+    alert("Please select a repository first.")
   } else {
-    enableUploadButton();
-    if (input.files && input.files[0]) {
-
-      var reader = new FileReader();
-
-      reader.onload = function(e) {
-        $('.pdf-upload-wrap').hide();
-
-        $('.file-upload-content').show();
-
-        $('.pdf-title').html(input.files[0].name);
-      };
-
-      reader.readAsDataURL(input.files[0]);
-      displayMessage(input.files[0]);
+    if(!input.files[0].name.endsWith(".pdf")){
+      alert("Please upload pdf files only.")
     } else {
-      removeUpload();
+      //if($('#branchList').find(":selected").text().length != 0){
+        enableUploadButton();
+      //}
       
+      if (input.files && input.files[0]) {
+
+        var reader = new FileReader();
+
+        reader.onload = function(e) {
+          $('.pdf-upload-wrap').hide();
+
+          $('.file-upload-content').show();
+
+          $('.pdf-title').html(input.files[0].name);
+        };
+
+        reader.readAsDataURL(input.files[0]);
+        displayMessage(input.files[0]);
+      } else {
+        removeUpload();
+        
+      }
     }
   }
 }
@@ -60,7 +67,14 @@ function displayMessage(inputFile) {
     let access_token = params.getAll('access_token');
 
     var postURL = "/fileupload?access_token=" + access_token;
-    postURL += "&selectedRepository=" + escape($(".mdl-tabs__tab.is-active").text());
+    var repoName = "";
+    if($("#repoList").val() != '' && $("#repoList").val().length != 0){
+     repoName = $("#repoList").val();
+    } 
+    if($(".mdl-tabs__tab.is-active").text().length != 0){
+      repoName = $(".mdl-tabs__tab.is-active").text();
+    }
+    postURL += "&selectedRepository=" + escape(repoName);
     postURL += "&selectedBranch=" + escape($('#branchList').find(":selected").text());
 
     let t0 = performance.now();
