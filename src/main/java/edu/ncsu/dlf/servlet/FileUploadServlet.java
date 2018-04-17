@@ -49,7 +49,7 @@ public class FileUploadServlet extends HttpServlet {
 	public static final String pathToCommentBoxImage = "/images/comment_box.PNG";
 
 	@Override
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+	public void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		InputStream fileStream = getFileInputSteamFromReq(req);
 		InputStream commentBoxImageStream = getServletContext().getResourceAsStream(pathToCommentBoxImage);
 
