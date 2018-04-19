@@ -1,4 +1,9 @@
 ---
+- name: stop any previously running instance
+  become: yes
+  command: pkill java
+  ignore_errors: yes # returns status code 1
+
 - name: add github.ncsu.edu to known hosts
   become: yes
   lineinfile:
@@ -8,11 +13,17 @@
     line: "{{ lookup('pipe', 'ssh-keyscan -t rsa github.ncsu.edu') }}"
     regexp: "^github\\.ncsu\\.edu"
 
+ # resetting because we modifies some files
+- command: git reset --hard
+  args:
+    chdir: "/home/{{ansible_user}}/pdf-review-tool"
+
 - name: clone the pdf-review-tool repository
   git:
     repo: 'git@github.ncsu.edu:engr-csc-sdc/2018SpringTeam19.git'
     dest: "/home/{{ansible_user}}/pdf-review-tool"
     version: dev
+    update: yes
 
 - name: add environment variables
   become: yes
@@ -21,12 +32,25 @@
     line: "{{item.name}}={{item.value}}"
   with_items: "{{env_vars}}"
 
+- name: changing localhost to the actual ip address in src/main/webapp/js/login.js
+  replace:
+    path: "/home/{{ansible_user}}/pdf-review-tool/src/main/webapp/js/login.js"
+    regexp: 'localhost'
+    replace: '{{item}}'
+    backup: yes
+  with_items:
+    - "{{ansible_default_ipv4.address}}"
+
+# - name: debug
+#   debug:
+#     msg: "{{ansible_default_ipv4.address}}"
+
 - name: mvn clean install
   command: mvn clean install
   args:
     chdir: "/home/{{ansible_user}}/pdf-review-tool"
 
 # - name: start pdf-review-tool
-#   command: mvn tomcat7:run
-    # args:
-    #   chdir: "/home/{{ansible_user}}/pdf-review-tool"
+#   command: nohup mvn tomcat7:run </dev/null >/dev/null 2>&1 &
+#   args:
+#     chdir: "/home/{{ansible_user}}/pdf-review-tool"
