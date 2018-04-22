@@ -51,54 +51,58 @@ $('.pdf-upload-wrap').bind('dragover', function () {
 });
 
 function displayMessage(inputFile) {
-  'use strict';
-  var dialogButton = document.querySelector('#upload-button');
-  var dialog = document.querySelector('#dialog');
-  if (! dialog.showModal) {
-    dialogPolyfill.registerDialog(dialog);
-  }
-  
-  dialogButton.addEventListener('click', function() {
-    showLoading();
-    var formData = new FormData();
-    formData.append("file", inputFile);
-
-    let params = new URLSearchParams(location.search.slice(1));
-    let access_token = params.getAll('access_token');
-
-    var postURL = "/fileupload?access_token=" + access_token;
-    var repoName = "";
-    if($("#repoList").val() != '' && $("#repoList").val().length != 0){
-     repoName = $("#repoList").val();
-    } 
-    if($(".mdl-tabs__tab.is-active").text().length != 0){
-      repoName = $(".mdl-tabs__tab.is-active").text();
+    'use strict';
+    var dialogButton = document.querySelector('#upload-button');
+    var dialog = document.querySelector('#dialog');
+    if (! dialog.showModal) {
+      dialogPolyfill.registerDialog(dialog);
     }
-    postURL += "&selectedRepository=" + escape(repoName);
-    postURL += "&selectedBranch=" + escape($('#branchList').find(":selected").text());
+    
+    dialogButton.addEventListener('click', function() {
+      var repoName = "";
+      if($("#repoList").val() != '' && $("#repoList").val().length != 0){
+        repoName = $("#repoList").val();
+      } else if($(".mdl-tabs__tab.is-active").text().length != 0){
+        repoName = $(".mdl-tabs__tab.is-active").text();
+      } else {
+        alert("Please select a repository.");
+        return;
+      }
+      showLoading();
+      var formData = new FormData();
+      formData.append("file", inputFile);
 
-    let t0 = performance.now();
+      let params = new URLSearchParams(location.search.slice(1));
+      let access_token = params.getAll('access_token');
 
-    $.ajax({
-      type: "POST",
-      url: postURL,
-      processData: false,
-      contentType: false,
-      data: formData
-    })
-    .done(function( data ) {
-      hideLoading();
-      // var timeTakenString = "Time Taken (milliseconds):" + (performance.now() - t0) ;
-      // alert(timeTakenString);
+      var postURL = "/fileupload?access_token=" + access_token;
+      
+      postURL += "&selectedRepository=" + escape(repoName);
+      postURL += "&selectedBranch=" + escape($('#branchList').find(":selected").text());
 
-      $(".mdl-dialog__content").html(data);
-      dialog.showModal();
+      let t0 = performance.now();
+
+      $.ajax({
+        type: "POST",
+        url: postURL,
+        processData: false,
+        contentType: false,
+        data: formData
+      })
+      .done(function( data ) {
+        hideLoading();
+        // var timeTakenString = "Time Taken (milliseconds):" + (performance.now() - t0) ;
+        // alert(timeTakenString);
+
+        $(".mdl-dialog__content").html(data);
+        dialog.showModal();
+      });
     });
-  });
-  dialog.querySelector('button:not([disabled])')
-  .addEventListener('click', function() {
-    dialog.close();
-  });
+    dialog.querySelector('button:not([disabled])')
+    .addEventListener('click', function() {
+      dialog.close();
+    });
+  
 };
 
 /* library */
