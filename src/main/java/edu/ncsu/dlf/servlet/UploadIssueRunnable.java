@@ -17,10 +17,9 @@ import edu.ncsu.dlf.model.Repo;
 import edu.ncsu.dlf.model.PdfComment;
 import edu.ncsu.dlf.model.PdfComment.Tag;
 
-import edu.ncsu.dlf.utils.ImgurUtils;
+import edu.ncsu.dlf.utils.S3Utils;
 
 
-//TODO: Should I put this back in FileUpload Servlet and make it static?
 final class UploadIssuesRunnable implements Runnable {
     private String accessToken;
     private List<PdfComment> comments;
@@ -89,14 +88,9 @@ final class UploadIssuesRunnable implements Runnable {
         issue.setTitle(comment.getTitle());
 
         String body = comment.getComment();
-        try {
-            //TODO: Implement image upload
-            String imageURL = ImgurUtils.uploadImage(comment.getImage());
-            body = String.format("![snippet](%s)%n%n%s", imageURL, body);
-        } catch (Exception e) { //TODO: Should be IO Exception
-            e.printStackTrace();
-            // could not upload image, but carry on anyway
-        }
+
+        String imageURL = S3Utils.uploadImage(comment.getImage(), repo, commentsToIssues);
+        body = String.format("![snippet](%s)%n%n%s", imageURL, body);
 
         String pageReference = "Page Number: " + comment.getPageNumber();
         body += "\n\n" + pageReference;

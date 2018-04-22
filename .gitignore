@@ -42,3 +42,5 @@ ansible/inventory
 
 .vscode
 TestFilePleaseIgnore.txt
+
+baker.yml

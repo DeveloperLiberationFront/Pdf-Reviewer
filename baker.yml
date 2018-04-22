@@ -14,6 +14,5 @@ packages:
 env:
   - GITHUB_ID: c806c99f0bddb0fdd605
   - GITHUB_API: 79cf9d3f7d1049cdec99728c34431e32fcfb2dbf
-  - IMGUR_ID: 98e84c4fd238e72
-  - IMGUR_SECRET: a8505529f432f25a5171cf389cdee896cf67ec16
-  - IMGUR_ALBUM_ID: gzdtXUtarXFHwOf
+  - S3_BUCKET_NAME: github-paper-review-images
+  - S3_BUCKET_REGION: us-east-1
