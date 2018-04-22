@@ -53,7 +53,7 @@
 
     <listener>
         <listener-class>
-            edu.ncsu.dlf.servlet.AmazonConnectionListener 
+            edu.ncsu.dlf.servlet.listeners.AmazonConnectionListener 
         </listener-class>
     </listener>
 </web-app>

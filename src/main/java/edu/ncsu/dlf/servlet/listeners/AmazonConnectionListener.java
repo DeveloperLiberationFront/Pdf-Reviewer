@@ -1,4 +1,4 @@
-package edu.ncsu.dlf.servlet;
+package edu.ncsu.dlf.servlet.listeners;
 
 import javax.servlet.ServletContextListener;
 import javax.servlet.ServletContextEvent;
