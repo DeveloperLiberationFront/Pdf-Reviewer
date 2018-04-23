@@ -21,7 +21,6 @@ public class ImageUtils {
 
     private static final int BORDER_WIDTH = 30;
     private static final float SCALE_UP_FACTOR = 2.0f;
-    private static final int DEFAULT_SIZE = 72;
 
     private enum PostExtractMarkup {
         NONE(1), HIGHLIGHTS(1), POPUP(2);
