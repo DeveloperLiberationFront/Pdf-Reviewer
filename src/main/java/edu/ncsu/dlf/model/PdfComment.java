@@ -26,18 +26,23 @@ public class PdfComment {
 
     static {
         tagMap.put("mf", Tag.MUST_FIX);
+        tagMap.put("MF", Tag.MUST_FIX);
         tagMap.put("must-fix", Tag.MUST_FIX);
         tagMap.put("must fix", Tag.MUST_FIX);
         tagMap.put("mustfix", Tag.MUST_FIX);
         tagMap.put("mustFix", Tag.MUST_FIX);
         tagMap.put("MUST_FIX", Tag.MUST_FIX);
+
         tagMap.put("sf", Tag.SHOULD_FIX);
+        tagMap.put("SF", Tag.SHOULD_FIX);
         tagMap.put("should-fix", Tag.SHOULD_FIX);
         tagMap.put("should fix", Tag.SHOULD_FIX);
         tagMap.put("shouldfix", Tag.SHOULD_FIX);
         tagMap.put("shouldFix", Tag.SHOULD_FIX);
         tagMap.put("SHOULD_FIX", Tag.SHOULD_FIX);
+
         tagMap.put("cf", Tag.CONSIDER_FIX);
+        tagMap.put("CF", Tag.CONSIDER_FIX);
         tagMap.put("could-fix", Tag.CONSIDER_FIX);
         tagMap.put("could fix", Tag.CONSIDER_FIX);
         tagMap.put("couldfix", Tag.CONSIDER_FIX);
@@ -64,7 +69,7 @@ public class PdfComment {
 
     private BufferedImage image;
 
-    private int pageNumber;
+    private String pageNumber;
 
     public PdfComment(String string) {
         string = setIssueNumberAndRepairBrokenTags(string);
@@ -222,11 +227,11 @@ public class PdfComment {
         this.image = image;
     }
 
-    public int getPageNumber() {
+    public String getPageNumber() {
         return pageNumber;
     }
 
-    public void setPageNumber(int pageNum) {
+    public void setPageNumber(String pageNum) {
         this.pageNumber = pageNum;
     }
 }
