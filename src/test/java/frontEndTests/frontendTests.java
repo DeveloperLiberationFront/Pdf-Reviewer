@@ -93,12 +93,12 @@ public class frontendTests {
 		
 		login(driver, username, password);
 		
-		driver.findElement(By.id("repo0")).click();
-		assertEquals(driver.findElement(By.id("repo0")).getText(), "FOOBAR");
+		driver.findElement(By.id("repo9")).click();
+		assertEquals(driver.findElement(By.id("repo9")).getText(), "PDF-REVIEWER-BOT/FOOBAR");
 				
 		Select branchDropDown = new Select(driver.findElement(By.id("branchList")));
-		branchDropDown.selectByIndex(1);
-		assertEquals(branchDropDown.getOptions().get(1).getText(), "dev");
+		branchDropDown.selectByIndex(2);
+		assertEquals(branchDropDown.getOptions().get(2).getText(), "dev");
 		
 		driver.findElement(By.className("file-upload-input")).sendKeys(files + "/Test_Document_A1.pdf");
 		
@@ -126,12 +126,12 @@ public class frontendTests {
 		
 		login(driver, username, password);
 		
-		driver.findElement(By.id("repo0")).click();
-		assertEquals(driver.findElement(By.id("repo0")).getText(), "FOOBAR");
+		driver.findElement(By.id("repo9")).click();
+		assertEquals(driver.findElement(By.id("repo9")).getText(), "PDF-REVIEWER-BOT/FOOBAR");
 				
 		Select branchDropDown = new Select(driver.findElement(By.id("branchList")));
-		branchDropDown.selectByIndex(1);
-		assertEquals(branchDropDown.getOptions().get(1).getText(), "dev");
+		branchDropDown.selectByIndex(2);
+		assertEquals(branchDropDown.getOptions().get(2).getText(), "dev");
 		
 		driver.findElement(By.className("file-upload-input")).sendKeys(files + "/Test_Document_A1.pdf");
 		
@@ -166,12 +166,12 @@ public class frontendTests {
 		
 		login(driver, username, password);
 		
-		driver.findElement(By.id("repo0")).click();
-		assertEquals(driver.findElement(By.id("repo0")).getText(), "FOOBAR");
+		driver.findElement(By.id("repo9")).click();
+		assertEquals(driver.findElement(By.id("repo9")).getText(), "PDF-REVIEWER-BOT/FOOBAR");
 				
 		Select branchDropDown = new Select(driver.findElement(By.id("branchList")));
-		branchDropDown.selectByIndex(1);
-		assertEquals(branchDropDown.getOptions().get(1).getText(), "dev");
+		branchDropDown.selectByIndex(2);
+		assertEquals(branchDropDown.getOptions().get(2).getText(), "dev");
 		
 		driver.findElement(By.className("file-upload-input")).sendKeys(files + "/Test_Document_I1.docx");
 		
