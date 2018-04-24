@@ -46,7 +46,7 @@ public class RepositoriesServlet extends HttpServlet {
 
 			JSONObject repoJSON;
 			try {
-				repoJSON = new JSONObject().put("repoName", entry.getValue().getName()).put("branches", branchArray);
+				repoJSON = new JSONObject().put("repoName", entry.getValue().getOwner().getLogin()  + "/" + entry.getValue().getName()).put("branches", branchArray);
 				reposJSON.put(repoJSON);
 			} catch (JSONException e) {
 				e.printStackTrace();

@@ -61,7 +61,9 @@ public class FileUploadServlet extends HttpServlet {
 		//Instantiate the Repo object
 		String activeUser = getUsernameOfLoggedInUser(accessToken);
 		String selectedRepository = req.getParameter("selectedRepository");
-		Repo repo = new Repo(activeUser, selectedRepository);
+		String selectedRepoOwner = selectedRepository.split("/")[0];
+		String selectedRepoName = selectedRepository.split("/")[1];
+		Repo repo = new Repo(selectedRepoOwner, selectedRepoName);
 
 		int totalIssues = getNumTotalIssues(client, repo);
 
@@ -90,8 +92,8 @@ public class FileUploadServlet extends HttpServlet {
 		String issueSuccessMessage = (finalIssues - totalIssues) + " issues have been created!";
 
 		String fullPDFUrl = String.format(
-			"https://github.com/%s/%s/tree/%s/%s", 
-			activeUser, selectedRepository, selectedBranch, urlToPDFInRepo
+			"https://github.com/%s/tree/%s/%s", 
+			selectedRepository, selectedBranch, urlToPDFInRepo
 		);
 		//issueSucessMessage += "\n\n" + "The PDF file has been archived to : " + fullPDFUrl;
 
