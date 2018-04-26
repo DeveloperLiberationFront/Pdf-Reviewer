@@ -94,14 +94,10 @@
             color: #000000;
             
         }
-        
-        .mdl-dialog {
-  border: none;
-  box-shadow: 16px;
-  width:660px;
-  }
 
-  .loading-container {
+  /* library */
+.dialog-container,
+.loading-container {
     position: absolute;
     top: 0;
     right: 0;
@@ -116,6 +112,21 @@
     transition: opacity 400ms ease-in;
 }
 
+.dialog-container > div {
+    position: relative;
+    width: 90%;
+    max-width: 700px;
+    min-height: 25px;
+    margin: 10% auto;
+    z-index: 99999;
+    padding: 16px 16px 0;
+}
+
+.dialog-button-bar {
+    text-align: center;
+    margin-top: 8px;
+}
+
 .loading-container > div {
     position: relative;
     width: 50px;
@@ -128,7 +139,6 @@
     width: 100%;
     height: 100%;
 }
-
 
   </style>
 </head>
@@ -204,14 +214,6 @@
                           <button id="upload-button" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" disabled>
                               Upload File
                           </button>
-                          <dialog id="dialog" class="mdl-dialog">
-                            <h3 class="mdl-dialog__title">Success</h3>
-                            <div class="mdl-dialog__content">
-                            </div>
-                            <div class="mdl-dialog__actions">
-                              <button type="button" class="mdl-button" onClick="window.location.reload();">Close</button>
-                            </div>
-                          </dialog>
                       </div>
                   </div>
               </section>
