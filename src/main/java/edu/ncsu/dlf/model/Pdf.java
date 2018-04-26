@@ -3,14 +3,13 @@ package edu.ncsu.dlf.model;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageTree;
-
+import org.apache.pdfbox.pdmodel.common.PDPageLabels;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationTextMarkup;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationText;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationRubberStamp;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationMarkup;
 
-//import org.apache.pdfbox.pdmodel.graphics.color.PDGamma;
 import org.apache.pdfbox.pdmodel.graphics.color.PDColor;
 import org.apache.pdfbox.pdmodel.graphics.color.PDDeviceRGB;
 
@@ -33,18 +32,13 @@ public class Pdf {
 
   private PDDocument document = null;
   private PDFRenderer renderer;
-  private BufferedImage pageImage;
 
-  //public static final String pathToCommentBoxImage = "/images/comment_box.PNG";
+  private BufferedImage pageImage;
   private BufferedImage commentBoxImage;
 
- // private static final int BORDER_WIDTH = 30;
   private static final float SCALE_UP_FACTOR = 2.0f;
   private static final int DEFAULT_SIZE = 72;
 
-//   private static final PDGamma ORANGE = new PDGamma();
-//   private static final PDGamma GREEN = new PDGamma();
-//   private static final PDGamma YELLOW = new PDGamma();
 
   private static final PDColor ORANGE = new PDColor(
         new float[] { 0.9921568627f, 0.5333333333f, 0.1803921568f },
@@ -61,26 +55,12 @@ public class Pdf {
         PDDeviceRGB.INSTANCE
     );
 
-  	// static {
-  	//     ORANGE.setR(0.9921568627f);
-  	//     ORANGE.setG(0.5333333333f);
-  	//     ORANGE.setB(0.1803921568f);
-
-  	//     GREEN.setR(0);
-  	//     GREEN.setG(1);
-  	//     GREEN.setB(0);
-
-  	//     YELLOW.setR(1);
-  	//     YELLOW.setG(1);
-  	//     YELLOW.setB(0);
-  	// }
 
   public Pdf(InputStream fileStream, InputStream commentBoxImageStream) throws IOException {
+    System.setProperty("sun.java2d.cmm", "sun.java2d.cmm.kcms.KcmsServiceProvider");
     document = PDDocument.load(fileStream);
     renderer = new PDFRenderer(document);
 
-    //The class is technically loaded fromt he snapshot apparently, so probably better to through ServletContext
-    //System.out.println(getClass().getProtectionDomain().getCodeSource().getLocation());
     commentBoxImage = ImageIO.read(commentBoxImageStream);
   }
 
@@ -92,9 +72,11 @@ public class Pdf {
 	  List<PdfComment> comments = new ArrayList<>();
       PDPageTree pages = document.getDocumentCatalog().getPages();
 
-    int pageIndex = 0;
+      String[] pageLabels = new PDPageLabels(document).getLabelsByPageIndices();
+
     for(PDPage page: pages) {
       pageImage = null;
+      int pageIndex = pages.indexOf(page);
       List<PDAnnotation> originalAnnotations = page.getAnnotations();
 
       page.setAnnotations(nonBlockingAnnotations(page.getAnnotations()));
@@ -102,12 +84,12 @@ public class Pdf {
 
       for(PDAnnotation annotation: originalAnnotations) {
         if(pageImage == null) {
-          pageImage = renderer.renderImageWithDPI(pageIndex++, size, ImageType.RGB);
+          pageImage = renderer.renderImageWithDPI(pageIndex, size, ImageType.RGB);
         }
 
         PdfComment pdfComment = turnAnnotationIntoPDFComment(annotation);
         if (pdfComment != null) {
-            pdfComment.setPageNumber(pageIndex);
+            pdfComment.setPageNumber(pageLabels[pageIndex]);
             comments.add(pdfComment);
         }
       }
