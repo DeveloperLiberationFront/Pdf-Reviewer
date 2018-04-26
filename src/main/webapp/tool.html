@@ -11,7 +11,6 @@
   <link rel="stylesheet" href="upload.css">
   <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
   <link rel="stylesheet" href="recentlyUsedRepo.css">
-  <link rel="stylesheet" type="text/css" href="dialog-polyfill.css" />
   <style>
       h3 {
           text-align:center;
@@ -134,19 +133,6 @@
   </style>
 </head>
 <body class="bodyPanel">
-    <dialog id="dialog" class="mdl-dialog">
-        <h3 class="mdl-dialog__title">Success</h3>
-        <div class="mdl-dialog__content">
-        </div>
-        <div class="mdl-dialog__actions">
-          <button type="button" class="mdl-button" onClick="window.location.reload();">Close</button>
-        </div>
-      </dialog>
-      <script>
-            var dialog = document.querySelector('dialog');
-            dialogPolyfill.registerDialog(dialog);
-            
-      </script>
   <!-- Always shows a header, even in smaller screens. -->
   <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
       <header class="mdl-layout__header mdl-color--blue-grey-700">
@@ -218,6 +204,14 @@
                           <button id="upload-button" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" disabled>
                               Upload File
                           </button>
+                          <dialog id="dialog" class="mdl-dialog">
+                            <h3 class="mdl-dialog__title">Success</h3>
+                            <div class="mdl-dialog__content">
+                            </div>
+                            <div class="mdl-dialog__actions">
+                              <button type="button" class="mdl-button" onClick="window.location.reload();">Close</button>
+                            </div>
+                          </dialog>
                       </div>
                   </div>
               </section>
@@ -232,6 +226,5 @@
   <script src="./js/upload.js"></script>
   <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
   <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-  <script src="./js/dialog-polyfill.js"></script>
 </body>
 </html>

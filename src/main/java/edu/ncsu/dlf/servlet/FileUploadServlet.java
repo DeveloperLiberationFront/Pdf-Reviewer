@@ -89,7 +89,12 @@ public class FileUploadServlet extends HttpServlet {
 		while(task.getCommentsToIssues() < comments.size()) {}
 
 		int finalIssues = getNumTotalIssues(client, repo);
-		String issueSuccessMessage = (finalIssues - totalIssues) + " issues have been created!";
+		String issueSuccessMessage = String.format((finalIssues - totalIssues) + " issues have been created!" +
+										"<p>Empty Issues: <p>" +
+										"<p>Must Fix Issues: <p>" +
+										"<p>Should Fix Issues: <p>" +
+										"<p>Consider Fix Issues: <p>" +
+										"<p>Positive: <p>");
 
 		String fullPDFUrl = String.format(
 			"https://github.com/%s/tree/%s/%s", 
