@@ -89,7 +89,7 @@ public class FileUploadServlet extends HttpServlet {
 		while(task.getCommentsToIssues() < comments.size()) {}
 
 		int finalIssues = getNumTotalIssues(client, repo);
-		String issueSuccessMessage = String.format("<h3> Success </h3>" + (finalIssues - totalIssues) + " issues have been created!" +
+		 String issueSuccessMessage = String.format("<h3> Success </h3>" + (finalIssues - totalIssues) + " issues have been created!" +
 										"<br/> <br/>" +
 										"<p>Empty Issues: " +
 										"<br/>Must Fix Issues: " +
