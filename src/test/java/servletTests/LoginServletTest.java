@@ -28,7 +28,7 @@ import org.junit.Test;
 
 /**
  * Tests the functionality of the LoginServlet
- * @author Nicholas Anthony
+ * @author Team 19
  */
 public class LoginServletTest {
 

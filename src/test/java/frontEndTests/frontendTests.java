@@ -21,7 +21,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 /**
  * Automated tests that check the front end functionality.
  * Uses a chrome web driver application
- * @author Nicholas Anthony
+ * @author Team 19
  */
 public class frontendTests {
 

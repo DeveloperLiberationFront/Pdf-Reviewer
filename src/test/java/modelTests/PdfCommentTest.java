@@ -15,7 +15,7 @@
 
  /**
   * Tests the functionality of the PdfComment object
-  * @author Nicholas Anthony
+  * @author Team 19
   */
  public class PdfCommentTest {
 

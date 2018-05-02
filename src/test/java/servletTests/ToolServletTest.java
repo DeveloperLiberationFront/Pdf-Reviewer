@@ -20,7 +20,7 @@ import edu.ncsu.dlf.servlet.ToolServlet;
 
 /**
  * Tests the functionality of the ToolServlet
- * @author Nicholas Anthony
+ * @author Team 19
  */
 public class ToolServletTest {
 

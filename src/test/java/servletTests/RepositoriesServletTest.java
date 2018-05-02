@@ -16,7 +16,7 @@ import edu.ncsu.dlf.servlet.RepositoriesServlet;
 
 /**
  * Attempts to test the RepositoriesServlet class
- * @author Nicholas Anthony
+ * @author Team 19
  */
 public class RepositoriesServletTest {
 
