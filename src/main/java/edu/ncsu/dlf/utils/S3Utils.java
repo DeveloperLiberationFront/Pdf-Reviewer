@@ -28,7 +28,7 @@ import javax.imageio.ImageIO;
 
 
 /**
- * A representation of an uploader that can upload images to Amazon S3
+ * Object that can upload images to Amazon S3 buckets
  */
 public class S3Utils {
     private static S3Utils singleton = new S3Utils();
@@ -43,6 +43,7 @@ public class S3Utils {
      * @param image Image to to be uploaded
      * @param repo GitHub repository associated with issues
      * @param commentIndex Number of comments created so far
+     * @return publicly hosted image url of the image uploaded
      * https://github.com/aws/aws-sdk-java/blob/master/src/samples/AmazonS3/S3Sample.java
      * https://docs.aws.amazon.com/AmazonS3/latest/dev/UploadObjSingleOpJava.html
      */
