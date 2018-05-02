@@ -43,6 +43,10 @@ import java.io.InputStream;
 import edu.ncsu.dlf.model.Pdf;
 import edu.ncsu.dlf.model.Repo;
 import edu.ncsu.dlf.model.PdfComment;
+import edu.ncsu.dlf.model.PdfComment.Tag;
+
+import java.util.Comparator;
+import java.util.Collections;
 
 public class FileUploadServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -84,6 +88,44 @@ public class FileUploadServlet extends HttpServlet {
 
 		Thread t = new Thread(task);
 		t.start();
+
+		List<PdfComment> emptyIssuesList = new ArrayList<PdfComment>();
+		List<PdfComment> mustFixIssuesList = new ArrayList<PdfComment>();
+		List<PdfComment> shouldFixIssuesList = new ArrayList<PdfComment>();
+		List<PdfComment> considerFixIssuesList = new ArrayList<PdfComment>();
+		List<PdfComment> positiveIssuesList = new ArrayList<PdfComment>();
+		List<PdfComment> customTagIssuesList = new ArrayList<PdfComment>();
+
+
+		for(PdfComment comment : comments) {
+			if(comment.getTitle().equalsIgnoreCase("[blank]")) {
+				emptyIssuesList.add(comment);
+			}
+
+			if(comment.getTags().contains(Tag.MUST_FIX)) {
+				mustFixIssuesList.add(comment);
+			}
+
+			if(comment.getTags().contains(Tag.SHOULD_FIX)) {
+				shouldFixIssuesList.add(comment);
+			}
+
+			if(comment.getTags().contains(Tag.CONSIDER_FIX)) {
+				considerFixIssuesList.add(comment);
+			}
+
+			if(comment.getTags().contains(Tag.POSITIVE)) {
+				positiveIssuesList.add(comment);
+			}
+
+			if(comment.getTags().contains(Tag.CUSTOM_TAG)) {
+				customTagIssuesList.add(comment);
+			}
+
+		}
+
+
+
 
 		//Don't return control to front end, until all issues are created.
 		while(task.getCommentsToIssues() < comments.size()) {}
@@ -232,8 +274,23 @@ public class FileUploadServlet extends HttpServlet {
             return builder.build();
         } catch (URISyntaxException e) {
             throw new IOException("Could not build uri", e);
-        }
-
+		}
 	}
-	
+	private class CommentComparator implements Comparator<PdfComment> {
+		@Override
+		public int compare(PdfComment c1, PdfComment c2) {
+			String c1TagString = tagsToString(c1.getTags());
+			String c2tagString = tagsToString(c2.getTags());
+			return c1TagString.compareToIgnoreCase(c2tagString);
+		} 
+
+		private String tagsToString(List<Tag> tags) {
+			StringBuilder tagString = new StringBuilder();
+			for(Tag tag : tags) {
+				tagString.append(tag.toString());
+			}
+
+			return tagString.toString();
+		}
+	}
 }
