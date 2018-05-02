@@ -1,230 +1,107 @@
 <html>
+
 <head>
     <meta charset="utf-8" />
-  <title>PDF Reviewer</title>
-  <link rel="icon" href="favicon.png" type="image/png">
-  <!-- Material Design Lite -->
-  <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
-  <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css">
-  <!-- Material Design icon font -->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-  <link rel="stylesheet" href="upload.css">
-  <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-  <link rel="stylesheet" href="recentlyUsedRepo.css">
-  <style>
-      h3 {
-          text-align:center;
-      }
-      .bodyPanel {
-          background-color: #90A4AE;
-      }
-      .bodyPanel section.section--center {
-          text-align:center;
-          max-width: 660px;
-      }
-      .bodyPanel .mdl-layout__content .mdl-layout__tab-panel .mdl-card > * {
-          height: auto;
-      }
-      .bodyPanel main > .mdl-layout__tab-panel {
-          padding: 8px;
-          padding-top: 48px;
-      }
-      .bodyPanel .mdl-layout__content section:not(:last-of-type) {
-          position: relative;
-          margin-bottom: 48px;
-      }
-      .bodyPanel .mdl-card__supporting-text {
-          color: black;
-      }
-
-      .bodyPanel .section--center .mdl-card {
-          align-items: center;
-          overflow: visible !important;
-      }
-      .bodyPanel .section--center .mdl-card ul {
-          overflow-y: auto;
-      }
-      
-      .bodyPanel .branch-selection-card {
-          z-index: 2;
-      }
-
-      .ui-autocomplete {
-            max-height: 300px;
-            overflow-y: auto;
-            /* prevent horizontal scrollbar */
-            overflow-x: hidden;
-        }
-        .ui-widget {
-            border-color: transparent;
-        }
-        .ui-widget-content {
-            margin-left: 1em;
-            margin-right: 1em;
-            margin-top: 0em;
-            margin-bottom: 0em;
-            line-height: 48px;
-            padding-top: 8px;
-            padding-right: 0px;
-            padding-bottom: 8px;
-            padding-left: 0px;
-            padding-inline-start: 1em;
-            font-size: 17px;
-            font-weight: 400;
-            text-align: center;
-            position: fixed;
-            
-        }
-        .ui-widget-shadow {
-            box-shadow: 16px;
-        }
-        .ui-button{
-            padding-left:16px;
-        }
-        
-        .ui-state-active,
-        .ui-widget-content .ui-state-active,
-        .ui-widget-header .ui-state-active,
-        a.ui-button:active,
-        .ui-button:active,
-        .ui-button.ui-state-active:hover {
-            border: none;
-            background-color: #eee;
-            font-weight: normal;
-            color: #000000;
-            
-        }
-        
-        .mdl-dialog {
-  border: none;
-  box-shadow: 16px;
-  width:660px;
-  }
-
-  .loading-container {
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    overflow: scroll;
-    background: rgba(0, 0, 0, 0.4);
-    z-index: 9999;
-    opacity: 0;
-    -webkit-transition: opacity 400ms ease-in;
-    -moz-transition: opacity 400ms ease-in;
-    transition: opacity 400ms ease-in;
-}
-
-.loading-container > div {
-    position: relative;
-    width: 50px;
-    height: 50px;
-    margin: 10% auto;
-    z-index: 99999;
-}
-
-.loading-container > div > div {
-    width: 100%;
-    height: 100%;
-}
-
-
-  </style>
+    <title>PDF Reviewer</title>
+    <link rel="icon" href="favicon.png" type="image/png">
+    <!-- Material Design Lite -->
+    <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+    <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css">
+    <!-- Material Design icon font -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="upload.css">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="recentlyUsedRepo.css">
+    <link rel="stylesheet" href="tool.css">
 </head>
+
 <body class="bodyPanel">
-  <!-- Always shows a header, even in smaller screens. -->
-  <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
-      <header class="mdl-layout__header mdl-color--blue-grey-700">
-          <h3>PDF Reviewer Tool</h3>
-      </header>
-      <main class="mdl-layout__content">
-          <div class="mdl-layout__tab-panel is-active">
-              <section class="section--center mdl-grid mdl-grid--no-spacing mdl-shadow--16dp sec1">
-                  <div class="mdl-card mdl-cell mdl-cell--12-col">
+    <!-- Always shows a header, even in smaller screens. -->
+    <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+        <header class="mdl-layout__header mdl-color--blue-grey-700">
+            <h3>PDF Reviewer Tool</h3>
+        </header>
+        <main class="mdl-layout__content">
+            <div class="mdl-layout__tab-panel is-active">
+                <section class="section--center mdl-grid mdl-grid--no-spacing mdl-shadow--16dp sec1">
+                    <div class="mdl-card mdl-cell mdl-cell--12-col">
                         <div class="mdl-card__supporting-text">
                             <h4 class="mdl-cell mdl-cell--12-col">Select A Repository</h4>
                         </div>
-                        
                         <div class="mdl-tabs vertical-mdl-tabs mdl-js-tabs mdl-js-ripple-effect">
-                        <div class="mdl-grid mdl-grid--no-spacing">
-                            <div class="mdl-cell mdl-cell--12-col tabSpacing">
+                            <div class="mdl-grid mdl-grid--no-spacing">
+                                <div class="mdl-cell mdl-cell--12-col tabSpacing">
                                     <!-- rendering with the repositories -->
                                     <script id="repoTemplate" type="x-tmpl-mustache">
                                         {{#repos}}
                                         <a class="mdl-tabs__tab" id="{{id}}">{{name.repoName}}</a>
                                         {{/repos}}
                                     </script>
-                                <div id="repoTemplateRendered">
-                                </div>
+                                    <div id="repoTemplateRendered">
+                                    </div>
                                 </div>
                             </div>
                         </div>
                         <div class="mdl-card__actions">
                             <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label ui-widget ">
                                 <input class="mdl-textfield__input repoSearchBar" id="repoList" type="text">
-                                <label class="mdl-textfield__label" for="repoList" >Search for Repository Name</label>
+                                <label class="mdl-textfield__label" for="repoList">Search for Repository Name</label>
                             </div>
                         </div>
                     </div>
-              </section>
-              <section class="section--center mdl-grid mdl-grid--no-spacing mdl-shadow--16dp">
-                  <div class="mdl-card mdl-cell mdl-cell--12-col branch-selection-card">
-                      <div class="mdl-card__supporting-text">
-                          <h4 class="mdl-cell mdl-cell--12-col">Select A Branch</h4>
-                      </div>
-                      <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                </section>
+                <section class="section--center mdl-grid mdl-grid--no-spacing mdl-shadow--16dp">
+                    <div class="mdl-card mdl-cell mdl-cell--12-col branch-selection-card">
+                        <div class="mdl-card__supporting-text">
+                            <h4 class="mdl-cell mdl-cell--12-col">Select A Branch</h4>
+                        </div>
+                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
                             <select class="mdl-textfield__input repoBranchList" id="branchList" name="branch">
-                        </select>
-                        <script id="branchTemplate" type="x-tmpl-mustache">                          
+                            </select>
+                            <script id="branchTemplate" type="x-tmpl-mustache">                          
                             {{#branches}}
                               <option>{{.}}</option>
                             {{/branches}}
                             </script>
-                      </div>
-                  </div>
-              </section>
-              <section class="section--center mdl-grid mdl-grid--no-spacing mdl-shadow--16dp">
-                  <div class="mdl-card mdl-cell mdl-cell--12-col">
-                      <!--https://codepen.io/aaronvanston/pen/yNYOXR-->
-                      <div class="file-upload align--center">
-                          <div class="pdf-upload-wrap">
-                              <input class="file-upload-input" type='file' onchange="readURL(this);" accept=".pdf" />
-                              <div class="drag-text">
-                                  <h6>Drag and drop a file or click inside the box</h6>
-                              </div>
-                          </div>
-                          <div class="file-upload-content">
-                              <div class="pdf-title-wrap">
-                              <button type="button" onclick="removeUpload()" class="remove-pdf">Remove <span class="pdf-title">Uploaded PDF</span></button>
-                              </div>
-                          </div>
-                      </div>
-                      <div class="mdl-card__actions mdl-card--border">
-                          <button id="upload-button" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" disabled>
-                              Upload File
-                          </button>
-                          <dialog id="dialog" class="mdl-dialog">
-                            <h3 class="mdl-dialog__title">Success</h3>
-                            <div class="mdl-dialog__content">
+                        </div>
+                    </div>
+                </section>
+                <section class="section--center mdl-grid mdl-grid--no-spacing mdl-shadow--16dp">
+                    <div class="mdl-card mdl-cell mdl-cell--12-col" id="uploadDiv">
+                        <!--https://codepen.io/aaronvanston/pen/yNYOXR-->
+                        <div class="file-upload align--center">
+                            <div class="pdf-upload-wrap">
+                                <input class="file-upload-input" type='file' onchange="readURL(this);" accept=".pdf" />
+                                <div class="drag-text">
+                                    <h6>Drag and drop a file or click inside the box</h6>
+                                </div>
                             </div>
-                            <div class="mdl-dialog__actions">
-                              <button type="button" class="mdl-button" onClick="window.location.reload();">Close</button>
+                            <div class="file-upload-content">
+                                <div class="pdf-title-wrap">
+                                    <button type="button" onclick="removeUpload()" class="remove-pdf">Remove
+                                        <span class="pdf-title">Uploaded PDF</span>
+                                    </button>
+                                </div>
                             </div>
-                          </dialog>
-                      </div>
-                  </div>
-              </section>
-          </div>
-      </main>
-  </div>
+                        </div>
+                        <div class="mdl-card__actions mdl-card--border">
+                            <button id="upload-button" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" disabled>
+                                Upload File
+                            </button>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
 
 
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-  <script src="./js/tool.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/2.3.0/mustache.min.js"></script>
-  <script src="./js/upload.js"></script>
-  <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
-  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="./js/tool.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/2.3.0/mustache.min.js"></script>
+    <script src="./js/upload.js"></script>
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 </body>
+
 </html>

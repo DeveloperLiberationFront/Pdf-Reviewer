@@ -19,6 +19,9 @@ import java.util.Date;
 import java.util.Map;
 import java.util.TreeMap;
 
+/**
+ * RepositoriesServlet is responsible for getting list of repositories and their branches
+ */
 public class RepositoriesServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	@Override
@@ -32,13 +35,10 @@ public class RepositoriesServlet extends HttpServlet {
 			sortedRepos.put(repo.getUpdatedAt(), repo);
 		}
 
+		// Building the JSON response
 		JSONArray reposJSON = new JSONArray();
 		for(Map.Entry<Date, Repository> entry : sortedRepos.entrySet()) {
-			// Date key = entry.getKey();
-			// String value = entry.getValue();
-			// System.out.println("key is: "+ key + " & Value is: " + value);
-			
-			
+
 			JSONArray branchArray = new JSONArray();
 			for(RepositoryBranch branch: service.getBranches(entry.getValue())){
 				branchArray.put(branch.getName());
