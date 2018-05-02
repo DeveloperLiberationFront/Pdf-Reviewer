@@ -1,16 +1,24 @@
+/**
+ * 
+ * @param input the pdf file.  
+ */
 function readURL(input) {
+    // Check if the branch is empty or is there something on branch selection.
+    // This makes sure that repository is selected before user selects a pdf to upload. 
     if ($('#branchList').find(":selected").text().length == 0) {
         alert("Please select a repository first.")
     } else {
+        // Checks to see if the uploaded file is pdf or not. If not then show an error message. 
         if (!input.files[0].name.endsWith(".pdf")) {
             alert("Please upload pdf files only.")
         } else {
+            //A valid pdf file uploaded will enable the upload button on the page. 
             enableUploadButton();
 
             if (input.files[0]) {
 
                 var reader = new FileReader();
-
+                // gets the name of pdf for remove  pdf button.     
                 reader.onload = function (e) {
                     $('.pdf-upload-wrap').hide();
 
@@ -18,23 +26,31 @@ function readURL(input) {
 
                     $('.pdf-title').html(input.files[0].name);
                 };
-
                 reader.readAsDataURL(input.files[0]);
+                // Takes repository, branch and pdf and sends it to back end. Once done it displays a success message. 
                 displayMessage(input.files[0]);
             } else {
+                // Removes the remove pdf button and replace it with the drag and drop container. 
                 removeUpload();
-
             }
         }
     }
 }
-
+/**
+ * Enables the upload button on the page. 
+ */
 function enableUploadButton() {
     $('#upload-button').prop("disabled", false);
 }
+/**
+ * Dissables the upload button on the page. 
+ */
 function dissableUploadButton() {
     $('#upload-button').prop("disabled", true);
 }
+/**
+ * Removes the uploaded pdf button and replace it with the drag and drop container. 
+ */
 function removeUpload() {
     $('.file-upload-input').replaceWith($('.file-upload-input').clone());
     $('.file-upload-content').hide();
@@ -49,6 +65,12 @@ $('.pdf-upload-wrap').bind('dragleave', function () {
     $('.pdf-upload-wrap').removeClass('pdf-dropping');
 });
 
+/**
+ * Takes the repository name, branch name, and uploaded pdf file. Send those information to backend. 
+ * Once everything is processed the function creates a pop up message card with success, number of issues,
+ * issues classified by types, and link where the pdf is archived.  
+ * @param inputFile the uploaded pdf. 
+ */
 function displayMessage(inputFile) {
     'use strict';
     var dialogButton = document.querySelector('#upload-button');
@@ -98,6 +120,9 @@ function displayMessage(inputFile) {
 
 /* library */
 /* Source:https://github.com/oRRs/mdl-jquery-modal-dialog */
+/**
+ * Displays the loading screen. 
+ */
 function showLoading() {
     // remove existing loaders
     $('.loading-container').remove();
@@ -108,14 +133,20 @@ function showLoading() {
         $('#orrsLoader').css({ opacity: 1 });
     }, 1);
 }
-
+/**
+ * Removes the loading screen. 
+ */
 function hideLoading() {
     $('#orrsLoader').css({ opacity: 0 });
     setTimeout(function () {
         $('#orrsLoader').remove();
     }, 400);
 }
-
+/**
+ * Creates and displays the pop up message card once the program is done processing pdf. 
+ * @param options options for the pop up message card
+ * @param data data from the backend. 
+ */
 function showDialog(options, data) {
     options = $.extend({
         id: 'dialog',
@@ -173,7 +204,9 @@ function showDialog(options, data) {
             options.onLoaded();
     }, 1);
 }
-
+/**
+ * Removes the pop up message card. 
+ */
 function hideDialog(dialog) {
     $(document).unbind("keyup.dialog");
     dialog.css({ opacity: 0 });
