@@ -65,6 +65,7 @@ window.onload = function() {
 function populateBranches(repoTemplateJSON, repoName){
     let repoTemplate = document.getElementById('branchTemplate').innerHTML;
     let selectedRepo = repoTemplateJSON.repos.find((repos)=>repos.name.repoName === repoName)
+    // Making sure the master is autoselected when the branch list is loaded. 
     selectedRepo.name.branches.sort((a, b)=> {
         if(a == 'master') 
             return -1;
