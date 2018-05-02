@@ -1,4 +1,8 @@
 ---
+- name: install git
+  become: yes
+  apt: name=git state=latest
+
 - name: stop any previously running instance
   # become: yes
   command: pkill java
@@ -40,7 +44,7 @@
     replace: '{{item}}'
     backup: yes
   with_items:
-    - "{{ansible_default_ipv4.address}}"
+    - "{{inventory_hostname}}"
 
 - name: ensure .aws directory exists
   file: 
