@@ -1,1 +1,1 @@
-{IP}  ansible_user={USERNAME} ansible_ssh_private_key_file={PATH TO KEY}  ansible_python_interpreter=/usr/bin/python3
+{IP}  ansible_user={USERNAME} ansible_python_interpreter=/usr/bin/python3
