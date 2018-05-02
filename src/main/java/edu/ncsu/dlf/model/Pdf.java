@@ -12,11 +12,10 @@ import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationMarkup;
 
 import org.apache.pdfbox.pdmodel.graphics.color.PDColor;
 import org.apache.pdfbox.pdmodel.graphics.color.PDDeviceRGB;
-
 import org.apache.pdfbox.rendering.PDFRenderer;
-import javax.imageio.ImageIO;
-
 import org.apache.pdfbox.rendering.ImageType;
+
+import javax.imageio.ImageIO;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -28,6 +27,12 @@ import edu.ncsu.dlf.utils.ImageUtils;
 
 import edu.ncsu.dlf.model.PdfComment.Tag;
 
+  /**
+   * The class is used to represent a PDF document in the system.
+   * Converts raw PDF data to a PDF representation in Apache PDFBox (https://pdfbox.apache.org/)
+   * and then retrieves PDF annotations as a list of PdfComments objects. 
+   * @author Team19
+   */
 public class Pdf {
 
   private PDDocument document = null;
@@ -38,7 +43,6 @@ public class Pdf {
 
   private static final float SCALE_UP_FACTOR = 2.0f;
   private static final int DEFAULT_SIZE = 72;
-
 
   private static final PDColor ORANGE = new PDColor(
         new float[] { 0.9921568627f, 0.5333333333f, 0.1803921568f },
@@ -55,15 +59,25 @@ public class Pdf {
         PDDeviceRGB.INSTANCE
     );
 
-
+  /**
+   * Create a new PDF object with the raw PDF file data and a stream of the comment box image.
+   * @param fileStream raw PDF file data
+   * @param commentBoxImageStream image of a comment box
+   */
   public Pdf(InputStream fileStream, InputStream commentBoxImageStream) throws IOException {
+    //https://pdfbox.apache.org/2.0/getting-started.html
     System.setProperty("sun.java2d.cmm", "sun.java2d.cmm.kcms.KcmsServiceProvider");
+
     document = PDDocument.load(fileStream);
     renderer = new PDFRenderer(document);
 
     commentBoxImage = ImageIO.read(commentBoxImageStream);
   }
 
+  /**
+   * Iterates through the PDF document and makes each annotation into a PdfComment object
+   * @return A list of PDFComment objects which map to annotations from the document
+   */
   public List<PdfComment> getPDFComments() throws IOException {
 	  if(document == null) {
           throw new NullPointerException("PDF Document has not been instantiated.");
@@ -100,9 +114,13 @@ public class Pdf {
 	  return comments;
   }
 
+  /**
+   * Filters out annotations that PDFBox draws poorly so they don't blot the text out and
+   * make the images hard to see.  This includes hightlight textMarkups and Popups
+   * @return A list of annotations that are not text markup or popup
+   */
   private List<PDAnnotation> nonBlockingAnnotations(List<PDAnnotation> annotations) {
-      //filters out annotations that pdfbox draws poorly so they don't blot the text out and
-      //make the images hard to see.  This includes hightlight textMarkups and Popups
+
       List<PDAnnotation> annotationsThatAreNotTextMarkupOrPopup = new ArrayList<>();
       for(PDAnnotation annotation: annotations) {
           if (annotation instanceof PDAnnotationTextMarkup) {
@@ -118,6 +136,11 @@ public class Pdf {
       return annotationsThatAreNotTextMarkupOrPopup;
   }
 
+  /**
+   * Turns a PDAnnotation object into a PdfComment object
+   * @param anno represents a PDF annotation
+   * @return A PdfComment object thats maps to the annotation
+   */
   private PdfComment turnAnnotationIntoPDFComment(PDAnnotation anno) {
       PdfComment pdfComment = null;
 
@@ -160,6 +183,11 @@ public class Pdf {
       return pdfComment;
   }
 
+  /**
+   * Updates a list of PdfComment objects to have colors and links to issues
+   * @param comments list of PdfComment objects
+   * @param repo the GitHub repository the issues will be added to
+   */
   public void updateCommentsWithColorsAndLinks(List<PdfComment> comments, Repo repo) {
     PDPageTree pages = document.getDocumentCatalog().getPages();
         int commentOn = 0;
@@ -193,15 +221,19 @@ public class Pdf {
         }
     }
 
-    //Makes a brand new text annotation that is almost exactly like the one passed in.
-	// this is the only way I could get the annotations to actually change color.
+    /**
+     * Makes a brand new text annotation that is almost exactly like the one passed in.
+     * this is the only way I could get the annotations to actually change color.
+     * @param comment original PDAnnotation object
+     * @param userComment PdfComment object of original PDAnnotation object
+     * @param messageWithLink comment message with link to issue in GitHub
+     * @return PDAnnotationTextMarkup representing the original annotation with 
+     * new colors and an issue link.
+     */
     private PDAnnotationTextMarkup makeNewAnnotation(PDAnnotationTextMarkup comment, PdfComment userComment, String messageWithLink) {
         PDAnnotationTextMarkup newComment = new PDAnnotationTextMarkup(PDAnnotationTextMarkup.SUB_TYPE_HIGHLIGHT);
         List<Tag> tags = userComment.getTags();
         if (tags.contains(Tag.CONSIDER_FIX) || tags.contains(Tag.POSITIVE)) {
-
-            //setColour() moved to setColor()
-            //https://pdfbox.apache.org/docs/2.0.8/javadocs/org/apache/pdfbox/pdmodel/interactive/annotation/PDAnnotation.html#setColor(org.apache.pdfbox.pdmodel.graphics.color.PDColor)
             newComment.setColor(GREEN);
         } else if (tags.contains(Tag.MUST_FIX)) {
             newComment.setColor(ORANGE);
@@ -210,8 +242,6 @@ public class Pdf {
         }
         newComment.setContents(messageWithLink);
 
-        //System.out.println(newComment.getContents());
-
         newComment.setRectangle(comment.getRectangle());   //both rectangle and quadpoints are needed... don't know why
         newComment.setQuadPoints(comment.getQuadPoints());
         newComment.setSubject(comment.getSubject());
@@ -219,10 +249,16 @@ public class Pdf {
         return newComment;
     }
 
+    /**
+     * @return PDDocument object created from the raw PDF data
+     */
     public PDDocument getDocument() {
         return document;
     }
 
+    /**
+     * Closes the PDDocument object
+     */
     public void close() throws IOException {
 	    document.close();
 	}

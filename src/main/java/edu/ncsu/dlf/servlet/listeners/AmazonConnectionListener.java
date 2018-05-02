@@ -4,6 +4,8 @@ import javax.servlet.ServletContextListener;
 import javax.servlet.ServletContextEvent;
 
 /**
+ * Deals with the error described in the Stack Overflow post below
+ * Specified in the web.xml file
  * https://stackoverflow.com/questions/18069042/spring-mvc-webapp-schedule-java-sdk-http-connection-reaper-failed-to-stop
  */
 

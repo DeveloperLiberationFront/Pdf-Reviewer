@@ -18,15 +18,23 @@ import org.apache.http.impl.client.HttpClients;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-
+/**
+ * Completes authetication of the GitHub user through OAuth 2. 
+ */
 public class LoginServlet extends HttpServlet {
+
 	private static final long serialVersionUID = 1L;
+
+	/**
+	 * Completes the second step of GitHub OAuth 2 web application flow
+	 * https://developer.github.com/apps/building-oauth-apps/authorization-options-for-oauth-apps/#web-application-flow
+	 */
 	@Override
 	public void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
-		//So if someone hits /login2 without going through our flow,
+		//So if someone hits /login without going through our flow,
 		//they will just see the client_id displayed on the page
-		//Display error page instead?
+		//TODO: Display error page instead?
 		if (req.getParameter("code") == null) {
 		    resp.setContentType("application/json");
 		    JSONObject jobj = new JSONObject();
@@ -40,7 +48,7 @@ public class LoginServlet extends HttpServlet {
 		    return;
 		}
 
-		//Make a POST to the GitHub OAuth API, with the code received from the previous page
+	 //Make a POST to the GitHub OAuth API, with the code received from the previous page
 	  HttpPost request = null;
 		try {
 			URIBuilder builder = new URIBuilder("https://github.com/login/oauth/access_token");
@@ -63,6 +71,7 @@ public class LoginServlet extends HttpServlet {
 				e.printStackTrace();
 			}
 
+			//Redirects to the tool page with the GitHub access token as a URL parameter
 			resp.sendRedirect(req.getContextPath() + "/tool?access_token=" + accessToken);
 
 		} catch(URISyntaxException e) {

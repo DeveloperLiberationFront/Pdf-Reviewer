@@ -27,7 +27,9 @@ import javax.imageio.ImageIO;
 
 
 
-
+/**
+ * A representation of an uploader that can upload images to Amazon S3
+ */
 public class S3Utils {
     private static S3Utils singleton = new S3Utils();
 
@@ -37,6 +39,10 @@ public class S3Utils {
     private ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
     /**
+     * Upload an image to S3 and returns its image URL.
+     * @param image Image to to be uploaded
+     * @param repo GitHub repository associated with issues
+     * @param commentIndex Number of comments created so far
      * https://github.com/aws/aws-sdk-java/blob/master/src/samples/AmazonS3/S3Sample.java
      * https://docs.aws.amazon.com/AmazonS3/latest/dev/UploadObjSingleOpJava.html
      */
@@ -73,10 +79,11 @@ public class S3Utils {
 
                 String systemTime = Long.toString(System.currentTimeMillis());
                 String fileName = String.format("%s-%d-%s.png", 
-                                                repo.getRepoOwner(), commentIndex, systemTime);
+                                                repo.getRepoOwner(), commentIndex, systemTime); //TODO: Active user instead of repoowner
 
                 String filePath = repo.getRepoName() + "/" + fileName;
 
+                //Upload the image and make sure its is avaialble for public reads
                 s3client.putObject(
                     new PutObjectRequest(bucketName, filePath, imageStream, metadata)
                     .withCannedAcl(CannedAccessControlList.PublicRead)
