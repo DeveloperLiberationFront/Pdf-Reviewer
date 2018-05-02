@@ -1,6 +1,6 @@
 ---
 - name: stop any previously running instance
-  become: yes
+  # become: yes
   command: pkill java
   ignore_errors: yes # returns status code 1
 
@@ -17,6 +17,7 @@
 - command: git reset --hard
   args:
     chdir: "/home/{{ansible_user}}/pdf-review-tool"
+  ignore_errors: yes # returns status code 1    
 
 - name: clone the pdf-review-tool repository
   git:
@@ -41,9 +42,16 @@
   with_items:
     - "{{ansible_default_ipv4.address}}"
 
-# - name: debug
-#   debug:
-#     msg: "{{ansible_default_ipv4.address}}"
+- name: ensure .aws directory exists
+  file: 
+    path: "/home/{{ansible_user}}/.aws"
+    state: directory
+    mode: 0755
+
+- name: copying the credentials from template
+  template:
+    src: template/credentials.j2
+    dest: "/home/{{ansible_user}}/.aws/credentials"
 
 - name: mvn clean install
   command: mvn clean install
@@ -51,6 +59,6 @@
     chdir: "/home/{{ansible_user}}/pdf-review-tool"
 
 # - name: start pdf-review-tool
-#   command: nohup mvn tomcat7:run </dev/null >/dev/null 2>&1 &
+#   command: mvn tomcat7:run
 #   args:
 #     chdir: "/home/{{ansible_user}}/pdf-review-tool"
