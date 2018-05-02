@@ -29,6 +29,13 @@ final class UploadIssuesRunnable implements Runnable {
 
     private volatile int commentsToIssues = 0;
 
+    List<PdfComment> emptyIssuesList = new ArrayList<PdfComment>();
+    List<PdfComment> mustFixIssuesList = new ArrayList<PdfComment>();
+    List<PdfComment> shouldFixIssuesList = new ArrayList<PdfComment>();
+    List<PdfComment> considerFixIssuesList = new ArrayList<PdfComment>();
+    List<PdfComment> positiveIssuesList = new ArrayList<PdfComment>();
+    List<PdfComment> customTagIssuesList = new ArrayList<PdfComment>();
+
     public void setter(List<PdfComment> comments, String accessToken, Repo repo, int issueCount, List<String> customLabels) {
         this.comments = comments;
         this.accessToken = accessToken;
@@ -110,6 +117,31 @@ final class UploadIssuesRunnable implements Runnable {
 
         System.out.println("created issue #" + issue.getNumber());
         comment.setIssueNumber(issue.getNumber());
+
+        if(comment.getTitle().equalsIgnoreCase("[blank]")) {
+            emptyIssuesList.add(comment);
+        }
+
+        if(comment.getTags().contains(Tag.MUST_FIX)) {
+            mustFixIssuesList.add(comment);
+        }
+
+        if(comment.getTags().contains(Tag.SHOULD_FIX)) {
+            shouldFixIssuesList.add(comment);
+        }
+
+        if(comment.getTags().contains(Tag.CONSIDER_FIX)) {
+            considerFixIssuesList.add(comment);
+        }
+
+        if(comment.getTags().contains(Tag.POSITIVE)) {
+            positiveIssuesList.add(comment);
+        }
+
+        if(comment.getTags().contains(Tag.CUSTOM_TAG)) {
+            customTagIssuesList.add(comment);
+        }
+
     }
 
     private void updateIssue(Repo repo, PdfComment comment, IssueService issueService)

@@ -90,12 +90,18 @@ public class FileUploadServlet extends HttpServlet {
 
 		int finalIssues = getNumTotalIssues(client, repo);
 		 String issueSuccessMessage = String.format("<h3> Success </h3>" + (finalIssues - totalIssues) + " issues have been created!" +
-										"<br/> <br/>" +
-										"<p>Empty Issues: " +
-										"<br/>Must Fix Issues: " +
-										"<br/>Should Fix Issues: " +
-										"<br/>Consider Fix Issues: " +
-										"<br/>Positive: <p>");
+											"<br/> <br/>" +
+											"<p><b>Empty (Highlighted) Issues:</b> %s" +
+											"<br/><b>Must Fix Issues:</b> %s " +
+											"<br/><b>Should Fix Issues:</b> %s " +
+											"<br/><b>Consider Fix Issues:</b> %s " +
+											"<br/><b>Positive:</b> %s <p/>",
+											pdfCommentListToIssueNumberString(task.emptyIssuesList),
+											pdfCommentListToIssueNumberString(task.mustFixIssuesList),
+											pdfCommentListToIssueNumberString(task.shouldFixIssuesList),
+											pdfCommentListToIssueNumberString(task.considerFixIssuesList),
+											pdfCommentListToIssueNumberString(task.positiveIssuesList)
+										);
 
 		String fullPDFUrl = String.format(
 			"https://github.com/%s/tree/%s/%s", 
@@ -115,6 +121,21 @@ public class FileUploadServlet extends HttpServlet {
 
 		System.out.println(issueSuccessMessage);
 
+	}
+
+	private String pdfCommentListToIssueNumberString(List<PdfComment> comments) {
+		StringBuilder issueString = new StringBuilder();
+		int commentsSize = comments.size();
+
+		for(int i = 0; i < commentsSize; i++) {
+			issueString.append("#");
+			issueString.append(comments.get(i).getIssueNumber());
+			if(i != (commentsSize - 1)) {
+				issueString.append(",");
+			}
+		}
+
+		return issueString.toString();
 	}
 
 	private InputStream getFileInputSteamFromReq(HttpServletRequest req) throws IOException {
@@ -233,8 +254,6 @@ public class FileUploadServlet extends HttpServlet {
             return builder.build();
         } catch (URISyntaxException e) {
             throw new IOException("Could not build uri", e);
-        }
-
+		}
 	}
-	
 }
