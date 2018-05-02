@@ -7,7 +7,7 @@ function readURL(input) {
         } else {
             enableUploadButton();
 
-            if (input.files && input.files[0]) {
+            if (input.files[0]) {
 
                 var reader = new FileReader();
 
@@ -39,6 +39,7 @@ function removeUpload() {
     $('.file-upload-input').replaceWith($('.file-upload-input').clone());
     $('.file-upload-content').hide();
     $('.pdf-upload-wrap').show();
+    $("#uploadDiv").load(" #uploadDiv > *");
     dissableUploadButton();
 }
 $('.pdf-upload-wrap').bind('dragover', function () {
@@ -91,14 +92,8 @@ function displayMessage(inputFile) {
                     },
                     cancelable: false
                 }, data);
-                dialog.showModal();
             });
     });
-    dialog.querySelector('button:not([disabled])')
-        .addEventListener('click', function () {
-            dialog.close();
-        });
-
 };
 
 /* library */
