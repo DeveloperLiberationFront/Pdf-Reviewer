@@ -10,7 +10,7 @@ import edu.ncsu.dlf.model.Repo;
 
 /**
  * Tests the Repo Class
- * @author Nicholas Anthony
+ * @author Team 19
  */
 public class RepoTest {
 

@@ -17,7 +17,7 @@
 
  /**
   * Tests the functionality of the PDF class
-  * @author Nicholas Anthony
+  * @author Team 19
   */
  public class PdfTest {
 
