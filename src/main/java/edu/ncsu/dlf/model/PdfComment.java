@@ -160,6 +160,21 @@ public class PdfComment {
     }
 
     /**
+     * @param comments A list of PdfComment objects
+     * @return a list of non-positive PdfComment objects
+     */
+    public static List<PdfComment> getNegComments(List<String> comments) {
+        List<PdfComment> retVal = new ArrayList<>();
+        for (String comment : comments) {
+            PdfComment pdfComment = new PdfComment(comment);
+            if (!pdfComment.getTags().contains(Tag.POSITIVE)) {
+                retVal.add(pdfComment);
+            }
+        }
+        return retVal;
+    }
+
+    /**
      * Return tag value from String using tagMap
      */
     public static Tag getTag(String t) {
