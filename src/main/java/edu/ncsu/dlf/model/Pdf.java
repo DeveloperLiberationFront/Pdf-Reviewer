@@ -35,6 +35,7 @@ import edu.ncsu.dlf.model.PdfComment.Tag;
    */
 public class Pdf {
 
+  //Document object from the Apache PDFBox library
   private PDDocument document = null;
   private PDFRenderer renderer;
 
@@ -139,7 +140,7 @@ public class Pdf {
   /**
    * Turns a PDAnnotation object into a PdfComment object
    * @param anno represents a PDF annotation
-   * @return A PdfComment object thats maps to the annotation
+   * @return A PdfComment object (with an image) thats maps to the annotation
    */
   private PdfComment turnAnnotationIntoPDFComment(PDAnnotation anno) {
       PdfComment pdfComment = null;

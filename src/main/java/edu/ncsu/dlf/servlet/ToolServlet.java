@@ -16,11 +16,13 @@ public class ToolServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	/**
- 	* Renders the tool.html page on the view
+	 * Renders the tool.html page on the view
+	*  @param req HTTP request
+	 * @param res HTTP response
  	*/
 	@Override
-	public void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		req.getRequestDispatcher("tool.html").forward(req, resp);
+	public void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+		req.getRequestDispatcher("tool.html").forward(req, res);
 	}
 
 }

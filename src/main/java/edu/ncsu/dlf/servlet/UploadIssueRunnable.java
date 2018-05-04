@@ -19,7 +19,10 @@ import edu.ncsu.dlf.model.PdfComment.Tag;
 
 import edu.ncsu.dlf.utils.S3Utils;
 
-
+/**
+ * Servlet that handles turning a list of PdfComments objects to GitHub issues
+ * Also categorizes the created issues by tag/type
+ */
 final class UploadIssuesRunnable implements Runnable {
     private String accessToken;
     private List<PdfComment> comments;
@@ -29,6 +32,7 @@ final class UploadIssuesRunnable implements Runnable {
 
     private volatile int commentsToIssues = 0;
 
+    //All the different categories of issues a PdfComment could be associated with (mostly Tag types)
     List<PdfComment> emptyIssuesList = new ArrayList<PdfComment>();
     List<PdfComment> mustFixIssuesList = new ArrayList<PdfComment>();
     List<PdfComment> shouldFixIssuesList = new ArrayList<PdfComment>();
@@ -44,6 +48,10 @@ final class UploadIssuesRunnable implements Runnable {
         this.customLabelStrings = customLabels;
     }
 
+    /**
+     * This method runs when an UploadIssueRunnable instance is passed to a thread.
+     * Instantiates the the GitHub client and calls the createIssues method
+     */
     @Override
     public void run() {
             try {
@@ -59,6 +67,13 @@ final class UploadIssuesRunnable implements Runnable {
             }
     }
 
+    /**
+     * Iterates through the list of PdfComment objects and passes each to be created as a GitHub issue
+     * Has a sleep functionality because there is a hidden rate limit on the GitHub API when it comes
+     * to creating issues. The issue is documented here: https://github.com/octokit/octokit.net/issues/638
+     * @param client GitHub client of the currrently authenicated user
+     * @param customLabels list of custom labels
+     */
     public void createIssues(GitHubClient client, List<Label> customLabels) throws IOException {
         int count = 0;
         for(PdfComment comment : comments) {
@@ -77,6 +92,13 @@ final class UploadIssuesRunnable implements Runnable {
         }
     }
 
+    /**
+     * Checks to see whether the issue exists yet and passes it to the appropiate function
+     * @param client GitHub client of the authenticated user
+     * @param repo The repository the user selected
+     * @param comment PdfComment object to be converted into a GitHub issue
+     * @param customLabels list of custom labels
+     */
     public void createOrUpdateIssue(GitHubClient client, Repo repo, PdfComment comment, List<Label> customLabels) throws IOException {
         IssueService issueService = new IssueService(client);
 
@@ -90,6 +112,15 @@ final class UploadIssuesRunnable implements Runnable {
         }
     }
 
+    /**
+     * Create a GitHub issue from a PdfComment
+     * Includes uploading the image to S3 and getting the imageURL to include in the issue
+     * Once the issue is created, categorizes the comment into one of the issueLists of the class.
+     * @param repo The repository the user selected
+     * @param comment PdfComment object to be converted into a GitHub issue
+     * @param issueService IssueService created using the GitHub client
+     * @param customLabels list of custom labels
+     */
     private void createIssue(Repo repo, PdfComment comment, IssueService issueService, List<Label> customLabels) throws IOException {
         Issue issue = new Issue();
         issue.setTitle(comment.getTitle());
@@ -144,6 +175,12 @@ final class UploadIssuesRunnable implements Runnable {
 
     }
 
+    /**
+     * If the issue already exists, update it instead of a creating a new one
+     * @param repo The repository the user selected
+     * @param comment PdfComment object to be converted into a GitHub issue
+     * @param issueService IssueService created using the GitHub client
+     */
     private void updateIssue(Repo repo, PdfComment comment, IssueService issueService)
             throws IOException {
         System.out.println("Looking for "+repo.repoOwner+'/'+repo.repoName);
@@ -183,6 +220,10 @@ final class UploadIssuesRunnable implements Runnable {
         }
     }
 
+    /**
+     * @param client GitHub client of the authenicated user
+     * @return A list of custom label objects
+     */
     private List<Label> createCustomLabels(GitHubClient client) {
         List<Label> labels = new ArrayList<>();
         LabelService labelService = new LabelService(client);
@@ -204,6 +245,9 @@ final class UploadIssuesRunnable implements Runnable {
         return labels;
     }
     
+    /**
+     * @return String representing a random color
+     */
     private String randomColor() {
         StringBuilder sb = new StringBuilder(6);
         Random r = new Random();
@@ -213,6 +257,9 @@ final class UploadIssuesRunnable implements Runnable {
         return sb.toString();
     }
 
+    /**
+     * @return The number of PdfComment objects that have already been made issues
+     */
     public int getCommentsToIssues() {
         return this.commentsToIssues;
     }

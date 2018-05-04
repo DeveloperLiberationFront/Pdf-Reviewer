@@ -13,7 +13,15 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.http.HttpResponse;
 
+/**
+ * Utils used to interact with the Http Reponse and Http Request objects
+ */
 public class HttpUtils {
+
+	/**
+	 * @param response HTTP response
+	 * @return Response body as a String
+	 */
 	public static String getResponseBody(HttpResponse response) throws IOException, UnsupportedEncodingException
 	{
 		StringBuilder sb = new StringBuilder();
@@ -33,6 +41,10 @@ public class HttpUtils {
 		return sb.toString();
 	}
 	
+	/**
+	 * @param request HTTP request
+	 * @return Request body as a String
+	 */
 	public static String getRequestBody(HttpServletRequest request) {
     	StringBuilder sb = new StringBuilder();
 		BufferedReader reader;

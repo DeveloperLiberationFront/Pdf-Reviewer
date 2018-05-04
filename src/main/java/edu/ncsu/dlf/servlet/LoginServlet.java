@@ -19,7 +19,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * Completes authetication of the GitHub user through OAuth 2. 
+ * Completes authetication of the GitHub user through GitHub's OAuth API. 
  */
 public class LoginServlet extends HttpServlet {
 
@@ -28,6 +28,8 @@ public class LoginServlet extends HttpServlet {
 	/**
 	 * Completes the second step of GitHub OAuth 2 web application flow
 	 * https://developer.github.com/apps/building-oauth-apps/authorization-options-for-oauth-apps/#web-application-flow
+	 * @param req HTTP request
+	 * @param res HTTP response
 	 */
 	@Override
 	public void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
