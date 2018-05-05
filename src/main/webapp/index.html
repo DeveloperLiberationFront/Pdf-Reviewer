@@ -2,150 +2,37 @@
 <head>
   <title>PDF Reviewer</title>
 
-  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
-  <link href="http://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
-  <link rel="stylesheet" href="//cdn.jsdelivr.net/select2/3.4.8/select2.css">
-  <link rel="stylesheet" href="style.css">
-
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css">
+  <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
   <link rel="icon" href="favicon.png" type="image/png">
-
-  <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
-  <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
-  <script src="//cdn.jsdelivr.net/select2/3.4.8/select2.min.js"></script>
-
-
-  <script src="js/login.js"></script>
-  <script src="js/repos.js"></script>
-  <script src="js/status.js"></script>
-  <script src="js/request_review.js"></script>
-  <script src="js/reviewer.js"></script>
-  <script src="js/main.js"></script>
 </head>
 <body>
+  <style>
+    body {
+      text-align: center;
+    }
+  .mdl-button {
+    margin-top: 40px;
+    font-size: larger;
+    text-align: center;
+    color: white;
+    width: 400px;
+    height:100px;
+    background-color: rgb(7, 157, 184);
+  }
+  </style>
 
-  <div class="navbar" id="navbar" role="navigation">
-    <div class="container">
-      
-      <div class="navbar-header">
-        <img id="logo" src="">
-        <span id="title">Pdf Reviewer</span>
-        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-          <span class="sr-only">Toggle navigation</span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-        </button>
-      </div>
+  <button id="login" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect ">
+    <img src="images/GitHub-Mark-Light-64px.png">  Login with GitHub
+  </button>
+  <!--<button id="login" class="btn btn-primary btn-lg">
+    <img src="images/github-icon.png"> Login with GitHub
+  </button>-->
 
-      <div class="collapse navbar-collapse">
-        <ul class="nav navbar-nav">
-          <li><a id="showStatusBtn">Pending Reviews</a></li>
-          <li><a id="showWriterBtn">New Review Request</a></li>
-        </ul>
 
-        <div class="nav navbar-nav navbar-right">
-          <div id="loggedIn">
-            <img id="avatar">
-            <span id="loginName"></span>
-            <a id="logout"><img src="images/logout.png" title="Log out"></a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="container main">
-
-    <button id="login" class="btn btn-primary btn-lg"><img src="images/github-icon.png">Login with GitHub</button>
-
-    <div id="statusDiv">
-      <h3>Review these papers</h3>
-      <div id="reviewRequests"></div>
-
-      <h3>Waiting for these reviews</h3>
-      <div id="pendingReviews"></div>
-    </div>
-
-    <div id="writerDiv">
-    <div id="selectRepoSource">
-      <h3>1. Select a Repository Source</h3>
-      <div id="repoSourceList" class="list-group">
-        No Sources
-      </div>
-    </div>
-
-      <div id="selectRepo">
-        <h3>2. Select a Repository and a File to be Reviewed</h3>
-        <div id="repoList" class="list-group">
-          No repositories, please select a repository source first
-        </div>
-      </div>
-
-      <div id="selectReviewers">
-        <h3>3. Select Reviewers</h3>
-        <div id="reviewersList" class="list-group">
-          No reviewers, please select a repository source first
-        </div>
-
-        <label>Add another reviewer:</label>
-
-        <input type="hidden" id="addOtherReviewer" placeholder="GitHub Login">
-        <button class="btn btn-default" id="addOtherReviewerBtn">Add</button>
-      </div>
-
-      <div id="selectRepo">
-        <h3>4. [Optional] Add additional tags to these reviewers' comments</h3>
-        <label for="Tags">Tags (in square brackets)</label>
-        <input type="text" class="form-control" id="customTags" placeholder="[ICSE] [unprocessed]">
-      </div>
-
-      <button id="submitReview" class="btn btn-primary btn-lg">5. Submit Review Request</button>
-    </div>
-
-    
-
-    <div id="reviewerDiv">
-      <a id="downloadPaper" class="btn btn-primary btn-lg">Download Paper</a>
-      <h3>Select a Pdf to upload</h3>
-      <form id="uploadForm" method="post">
-        <span class="btn btn-file btn-default">
-          Browse
-          <input id="pdf-file" type="file" accept="application/pdf" />
-        </span>
-        <input type="submit" id="upload" class="btn btn-primary" value="Upload" />
-      </form>
-      
-      <h3 id="commentInfoTitle">Comment Info</h3>
-        Comments can be more useful if you use the syntax of Pdf-Reviewer. These are both optional, and can be combined with each other as well.
-      <h4>Labels</h4>
-      <ul class="commentInfo">
-        <li><code>{{label1, label2}}</code> will create an issue with two labels <code>label1</code>, and <code>label2</code></li>
-        <li>Shortcut tags include
-          <ul>
-            <li><code>mf</code> - <code>Must Fix</code></li>
-            <li><code>sf</code> - <code>Should Fix</code></li>
-            <li><code>cf</code> - <code>Consider Fixing</code></li>
-            <li><code>g</code> - <code>Positive</code> (This will not be included as an issue).</li>
-            <li><code>p</code> - <code>Positive</code> (This will not be included as an issue).</li>
-          </ul>
-        </li>
-      </ul>
-      <h4>Connecting to Issues</h4>
-      <ul class="commentInfo">
-        <li><code>[[https://github.com/mpeterson2/Pdf-Reviewer/issues/4]]</code> will connect <code>issue #4</code> of <code>mpeterson2's</code> <code>Pdf-Reviewer</code> project.</li>
-        <li>Your Pdf will be updated with the issues included when you submit it. If you want to update your review, just download your review in the repository, edit the comments, and reupload it.
-          <ul>
-            <li>Any unchanged comments connected to an issue will not be recreated.</li>
-            <li>Any changed comments will append a comment to the connected issue.</li>
-          </ul>
-        </li>
-      </ul>
-
-    </div>
-  </div>
-
-  <div id="alerts" class="container"></div>
-  <div id="loading"><img src="images/loading.gif"></div>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="./js/login.js"></script>
 
 </body>
 </html>

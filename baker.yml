@@ -2,7 +2,7 @@
 name: pdf-review
 vm:
   ip: "192.168.88.88"
-  ports: 9090
+  ports: 9090:9090
 tools:
   - maven
 lang:
@@ -14,7 +14,5 @@ packages:
 env:
   - GITHUB_ID: c806c99f0bddb0fdd605
   - GITHUB_API: 79cf9d3f7d1049cdec99728c34431e32fcfb2dbf
-  - OPENSHIFT_MONGODB_DB_PORT: '27017'
-  - OPENSHIFT_MONGODB_DB_HOST: 'localhost'
-  - OPENSHIFT_MONGODB_DB_USERNAME: 'username'
-  - OPENSHIFT_MONGODB_DB_PASSWORD: 'password'
+  - S3_BUCKET_NAME: github-paper-review-images
+  - S3_BUCKET_REGION: us-east-1

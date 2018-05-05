@@ -36,3 +36,11 @@ eclipse-launch-profiles/
 SecretKeys.java
 test.pdf
 test.jpg
+
+ansible/inventory
+*.retry
+
+.vscode
+TestFilePleaseIgnore.txt
+
+baker.yml

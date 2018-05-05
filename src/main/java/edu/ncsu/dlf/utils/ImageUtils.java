@@ -1,165 +1,211 @@
 package edu.ncsu.dlf.utils;
 
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Scanner;
 
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import javax.imageio.ImageIO;
+import java.io.IOException;
+import java.awt.image.BufferedImage;
 
-import com.google.api.client.auth.oauth2.Credential;
-import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
-import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeRequestUrl;
-import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
-import com.google.api.client.googleapis.auth.oauth2.GoogleRefreshTokenRequest;
-import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
-import com.google.api.client.http.HttpTransport;
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.JsonFactory;
-import com.google.api.client.json.jackson2.JacksonFactory;
-import com.google.gdata.client.photos.PicasawebService;
-import com.google.gdata.data.media.MediaByteArraySource;
-import com.google.gdata.data.photos.PhotoEntry;
-import com.google.gdata.util.ServiceException;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.image.RenderedImage;
+import java.io.File;
+import java.util.Arrays;
 
 public class ImageUtils {
 
-    private PicasawebService photoService;
+    private static Color highlightColor = new Color(234, 249, 35, 140);
+    private static boolean DEBUG = Boolean.parseBoolean(System.getenv("DEBUG"));
 
-    private URL pdfAlbumUrl;
+    private static final int BORDER_WIDTH = 30;
+    private static final float SCALE_UP_FACTOR = 2.0f;
 
-    private static ImageUtils singleton = new ImageUtils();
+    private enum PostExtractMarkup {
+        NONE(1), HIGHLIGHTS(1), POPUP(2);
+  
+        public final float subImageContextMultiplier;
+  
+        PostExtractMarkup(float subImageContextMultiplier) {
+            this.subImageContextMultiplier = subImageContextMultiplier;
+        }
+    }
 
-    private ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    public static BufferedImage makePlainSubImage(BufferedImage image, PDRectangle r) {
+        float[] convertedQuadPoints = rectToQuadArray(r);
+        return makeSubImage(image, convertedQuadPoints, PostExtractMarkup.NONE, null);
+    }
+  
+    public static BufferedImage makeHighlightedSubImage(BufferedImage img, float[] quadPoints) {
+        return makeSubImage(img, quadPoints, PostExtractMarkup.HIGHLIGHTS, null);
+    }
+  
+    public static BufferedImage makePopupSubImage(BufferedImage img, PDRectangle r, BufferedImage commentBoxImage) {
+        float[] convertedQuadPoints = rectToQuadArray(r);
+        return makeSubImage(img, convertedQuadPoints, PostExtractMarkup.POPUP, commentBoxImage);
+    }
+  
+    private static float[] rectToQuadArray(PDRectangle r) {
+        float[] convertedQuadPoints = new float[]{r.getLowerLeftX(),r.getLowerLeftY(),
+                r.getUpperRightX(), r.getLowerLeftY(), r.getLowerLeftX(), r.getUpperRightY(),
+                r.getUpperRightX(), r.getUpperRightY()};
+        return convertedQuadPoints;
+    }
 
-    private ImageUtils() {
-        photoService = new PicasawebService("ncsu-pdfreviewer-0.1");
+    /* adapted the specs of a pdf tool http://www.pdf-technologies.com/api/html/P_PDFTech_PDFMarkupAnnotation_QuadPoints.htm
+   * The QuadPoints array must contain 8*n elements specifying the coordinates of n quadrilaterals.
+   * Each quadrilateral encompasses a word or group of continuous words in the text underlying the annotation.
+   * The coordinates for each quadrilateral are given in the order x4 y4 x3 y3 x1 y1 x2 y2 specifying the quadrilateral's
+   * four vertices  x1 is upper left and numbering goes clockwise.
+   *
+   * I assume all quadrilaterals are rectangles.  No guarantees on multi-column selects
+   *
+   */
+  private static BufferedImage makeSubImage(BufferedImage img, float[] quadPoints, PostExtractMarkup markup, BufferedImage commentBoxImage) {
+    if (quadPoints.length < 8) {
+        return null;
+    }
 
-        String clientID = System.getenv("PICASSA_CLIENT_ID");
-        String clientSecret = System.getenv("PICASSA_CLIENT_SECRET");
-        String refreshToken = System.getenv("PICASSA_REFRESH_TOKEN");
+    Rectangle subImageRect = scaleAndTransformSubImageQuad(quadPoints, img, markup);
 
-        String pdfAlbumId = System.getenv("PICASSA_PDF_ALBUM_ID");
+    BufferedImage subImage = img.getSubimage(subImageRect.x, subImageRect.y, subImageRect.width, subImageRect.height);
 
+    BufferedImage newImage = new BufferedImage(subImage.getWidth(), subImage.getHeight(), img.getType());
+    Graphics2D g2 = newImage.createGraphics();
+
+    g2.drawImage(subImage, 0, 0, null);
+
+    if (markup == PostExtractMarkup.HIGHLIGHTS) {
+        for (int n = 0; n < quadPoints.length; n += 8) {
+            float[] oneQuad = Arrays.copyOfRange(quadPoints, n, n + 8);
+
+            paintHighlight(g2, scaleAndTransformAnnotationQuad(oneQuad, subImageRect, img.getHeight()));
+        }
+    } else if (markup == PostExtractMarkup.POPUP) {
+        //we know quadPoints will be only one quad because that's how makePopupSubImage defines it.
+        if(commentBoxImage == null) {
+           // throw new Exception("Comment box image not available");
+        }
+        paintCommentBox(g2, scaleAndTransformAnnotationQuad(quadPoints, subImageRect, img.getHeight()), commentBoxImage);
+    }
+
+    g2.dispose();
+
+    if (DEBUG) {
         try {
-            pdfAlbumUrl = new URL("https://picasaweb.google.com/data/feed/api/user/default/albumid/" + pdfAlbumId);
-
-            HttpTransport transport = new NetHttpTransport();
-            JsonFactory jsonFactory = new JacksonFactory();
-
-            //get a current token
-            GoogleRefreshTokenRequest req = new GoogleRefreshTokenRequest(transport, jsonFactory, refreshToken, clientID, clientSecret);
-            GoogleTokenResponse res = req.execute();
-            String accessToken = res.getAccessToken();
-            
-            //build a refreshable credential
-            Credential credential = new GoogleCredential.Builder()
-            .setClientSecrets(clientID, clientSecret)
-            .setJsonFactory(jsonFactory)
-            .setTransport(transport)
-            .build();
-            
-            //Load OAuth2 credential
-            credential.setAccessToken(accessToken);
-            credential.setRefreshToken(refreshToken);
-            photoService.setOAuth2Credentials(credential);
+            // for debugging
+            File output = new File("test"+Math.random()+".png");
+            System.out.println("Saving image to disk "+output.getAbsolutePath());
+            ImageIO.write(newImage, "png", output);
         } catch (IOException e) {
             e.printStackTrace();
-            photoService = null;
         }
     }
 
-    /**
-     * Uploads a photo to a hosting service and returns the publicly-accessible URI to be used in the markdown of a new issue.
-     * 
-     * @param img
-     * @return
-     */
-    public static String uploadPhoto(BufferedImage image) throws IOException {
-        if (image == null) {
-            throw new IOException("image was null", new NullPointerException());
+
+    return newImage;
+}
+
+private static Rectangle scaleAndTransformSubImageQuad(float[] quadPoints, RenderedImage img, PostExtractMarkup markup) {
+    // we find the upper left corner
+    int minX = getMinXFromQuadPoints(quadPoints);
+    int minY = getMinYFromQuadPoints(quadPoints);
+
+    // allows us to make
+    float scaledBorder = BORDER_WIDTH * markup.subImageContextMultiplier;
+
+    int x = Math.round((minX - scaledBorder) * SCALE_UP_FACTOR);
+    x = Math.max(x, 0); // keep subimage on screen
+    int y = Math.round((minY - scaledBorder) * SCALE_UP_FACTOR);
+    y = Math.max(y, 0); // keep subimage on screen
+
+    int width = Math.round((getMaxXFromQuadPoints(quadPoints) - minX + 2 * scaledBorder) * SCALE_UP_FACTOR);
+    width = Math.min(width, img.getWidth() - x); // clamp width
+    int height = Math.round((getMaxYFromQuadPoints(quadPoints) - minY + 2 * scaledBorder) * SCALE_UP_FACTOR);
+    height = Math.min(height, img.getHeight() - y); // clamp height
+
+    // the y is counted from the bottom, so we have to flip our coordinate
+    y = (img.getHeight() - y - height);
+    return new Rectangle(x, y, width, height);
+}
+
+private static Rectangle scaleAndTransformAnnotationQuad(float[] oneQuad, Rectangle boundingRect, int imageHeight) {
+    int x = getMinXFromQuadPoints(oneQuad);
+    int y = getMinYFromQuadPoints(oneQuad);
+
+    int width = Math.round((getMaxXFromQuadPoints(oneQuad) - x) * SCALE_UP_FACTOR);
+    int height = Math.round((getMaxYFromQuadPoints(oneQuad) - y) * SCALE_UP_FACTOR);
+
+    x *= SCALE_UP_FACTOR;
+    y *= SCALE_UP_FACTOR;
+
+    x -= boundingRect.x;
+    // invert y again
+    y = imageHeight - y - boundingRect.y - height;
+
+    return new Rectangle(x, y, width, height);
+}
+
+private static void paintCommentBox(Graphics2D g2, Rectangle rect, BufferedImage commentBoxImage) {
+    if (commentBoxImage != null) {
+        g2.drawImage(commentBoxImage, rect.x, rect.y, rect.width, rect.height, null);
+    } else {
+        g2.setColor(highlightColor);
+        g2.setStroke(new BasicStroke(2 * SCALE_UP_FACTOR));
+        g2.drawRect(rect.x, rect.y , rect.width, rect.height);
+    }
+
+}
+
+private static void paintHighlight(Graphics2D g2, Rectangle rect) {
+    g2.setColor(highlightColor);
+
+    g2.fillRect(rect.x, rect.y , rect.width, rect.height);
+
+}
+      //x values are on the even integers
+  private static int getMinXFromQuadPoints(float[] quadPoints) {
+    int min = Integer.MAX_VALUE;
+    for(int i = 0; i< quadPoints.length; i += 2) {
+        if (quadPoints[i] < min) {
+            min = (int)quadPoints[i];
         }
-        String publicLinkToPhoto = null;
-        synchronized (singleton) {
-            if (singleton.photoService == null) {
-                throw new IOException("Could not authenticate with Picassa");
-            }
+    }
+    return min;
+}
 
-            singleton.baos.reset();
-            ImageIO.write(image, "png", singleton.baos);
-            MediaByteArraySource myMedia = new MediaByteArraySource(singleton.baos.toByteArray(), "image/png");
-
-            PhotoEntry returnedPhoto;
-            try {
-                returnedPhoto = singleton.photoService.insert(singleton.pdfAlbumUrl, PhotoEntry.class, myMedia);
-            } catch (ServiceException e) {
-                e.printStackTrace();
-                throw new IOException("Problem uploading photo", e);
-            }
-
-            publicLinkToPhoto = returnedPhoto.getMediaThumbnails().get(0).getUrl();
-
-            // scale it up to 800 px, which is the largest we can hotlink to
-            publicLinkToPhoto = publicLinkToPhoto.replace("/s72/", "/s800/").replace("/s144/", "/s800/").replace("/s288/", "/s800/");
+//y values are on the even integers
+private static int getMinYFromQuadPoints(float[] quadPoints) {
+    int min = Integer.MAX_VALUE;
+    for(int i = 1; i< quadPoints.length; i += 2) {
+        if (quadPoints[i] < min) {
+            min = (int)quadPoints[i];
         }
-        return publicLinkToPhoto;
     }
+    return min;
+}
 
-    //Can be used to regenerate a refresh token
-    @SuppressWarnings("unused")
-    private static String getRefreshToken() throws IOException {
-        String client_id = System.getenv("PICASSA_CLIENT_ID");
-        String client_secret = System.getenv("PICASSA_CLIENT_SECRET");
-        
-        // Adapted from http://stackoverflow.com/a/14499390/1447621
-        String redirect_uri = "http://localhost";
-        String scope = "http://picasaweb.google.com/data/";
-        List<String> scopes;
-        HttpTransport transport = new NetHttpTransport();
-        JsonFactory jsonFactory = new JacksonFactory();
-
-        scopes = new LinkedList<String>();
-        scopes.add(scope);
-        GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(transport, jsonFactory, client_id, client_secret, scopes).build();
-        GoogleAuthorizationCodeRequestUrl url = flow.newAuthorizationUrl();
-        url.setRedirectUri(redirect_uri);
-        url.setApprovalPrompt("force");
-        url.setAccessType("offline");
-        String authorize_url = url.build();
-       
-        // paste into browser to get code
-        System.out.println("Put this url into your browser and paste in the access token:");
-        System.out.println(authorize_url);
-        
-        Scanner scanner = new Scanner(System.in);
-        String code = scanner.nextLine();
-        scanner.close();
-
-        flow = new GoogleAuthorizationCodeFlow.Builder(transport, jsonFactory, client_id, client_secret, scopes).build();
-        GoogleTokenResponse res = flow.newTokenRequest(code).setRedirectUri(redirect_uri).execute();
-        String refreshToken = res.getRefreshToken();
-        String accessToken = res.getAccessToken();
-
-        System.out.println("refresh:");
-        System.out.println(refreshToken);
-        System.out.println("access:");
-        System.out.println(accessToken);
-        return refreshToken;
+//x values are on the even integers
+private static int getMaxXFromQuadPoints(float[] quadPoints) {
+    int max = 0;
+    for(int i = 0; i< quadPoints.length; i += 2) {
+        if (quadPoints[i] > max) {
+            max = (int)quadPoints[i];
+        }
     }
+    return max;
+}
 
-    @SuppressWarnings("unused")
-    private static void main(String[] args) throws IOException, ServiceException {
-      //  getRefreshToken();
-        
-        //For testing
-        BufferedImage image = ImageIO.read(new File("test.jpg"));
-
-        System.out.println(uploadPhoto(image));
-
+//y values are on the even integers
+private static int getMaxYFromQuadPoints(float[] quadPoints) {
+    int max = 0;
+    for(int i = 1; i< quadPoints.length; i += 2) {
+        if (quadPoints[i] > max) {
+            max = (int)quadPoints[i];
+        }
     }
+    return max;
+}
 
 }

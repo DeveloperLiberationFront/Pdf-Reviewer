@@ -1,0 +1,31 @@
+.mdl-tabs__panel {
+  display: none;
+  max-width:300px;
+  
+}
+.vertical-mdl-tabs .mdl-tabs__tab {
+    width: 100%;
+    height: 35px;
+    line-height: 35px;
+    box-sizing: border-box;
+    letter-spacing: 2px;
+}
+
+.vertical-mdl-tabs .mdl-tabs__tab:hover {
+  background: rgba(158, 158, 158, 0.34);
+  color: black;
+}
+
+.vertical-mdl-tabs.mdl-tabs.is-upgraded .mdl-tabs__tab.is-active:after {
+    height: 0;
+}
+
+.vertical-mdl-tabs.mdl-tabs .mdl-tabs__tab {
+    text-align: center;
+    color:black;
+}
+
+.mdl-tabs.is-upgraded .mdl-tabs__tab.is-active {
+   background-color:rgb(7, 157, 184);;
+   color: white;
+}
