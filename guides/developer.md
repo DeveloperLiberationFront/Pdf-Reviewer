@@ -68,6 +68,14 @@ Tip: Due to some issues with Maven, the Wait function must be commented out befo
 
 1. Create your desired Unit test class in the `src/test/java/modelTests` folder with the naming convention `[New Model Component Name]Test.java`
 2. Begin writing unit tests to make sure the new component&#39;s methods all work properly
+Tip: If using Eclipse, run the test files by right clicking on the file in the Package Explorer and select Run As and JUnit Test. If you want to see the code coverage then right click the file in the Package Explorer and select Coverage As and JUnit Test. (Must have EclEmma installed in Eclipse)
+Tip: All model tests are run upon build. In order to exclude certain tests from being run, add 
+```xml
+<exclude>**/[Desired Excluded Test Name].java</exclude>
+```
+In the <excludes> section of the pom.xml file.
+
+
 
 ## Updating Features of the Application
 
