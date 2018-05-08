@@ -6,10 +6,9 @@ PDF Reviewer Tool is a cloud based open source application that takes a PDF file
 This user guide assumes that the user is connected to NCSU VPN, has a GitHub account, and the PDF Reviewer Tool is accessible at the following URL: http://sd-vm24.csc.ncsu.edu:9090/ 
 
 ## Login to Application
-
 ### How to gain access to the system?
 1. Click the “LOGIN WITH GITHUB” button on the home page. 
-
+	![GitHub profile options menu](./assets/userGuides/LoginButton.png)
 2. Enter a valid GitHub credentials.
 	* Click “Sign in” 
 
@@ -32,25 +31,26 @@ By default, a Master branch is selected.
 To change branch, just click the drop-down arrow on the select branch section. Then select the branch where you want to archive the pdf file.
 
 #### 3. Selecting a File 
-	**Sample Commented/Annotated Pdf File**
-	**Browse**
+-**Sample Commented/Annotated Pdf File**
+
+-**Browse**
 Click inside the drag and drop box to browse for the file that you want to upload. Then a new window will open.
 1.  Navigate to the file to which you wish to upload.
 2. Select the file2 you want to upload 
 3. Click Open
-	**Drag and Drop**
+-**Drag and Drop**
 1. Navigate to the file to which you wish to upload.
 2. Drag and drop the file3 inside the upload box in the webpage. 
 
-	**Remove Selected File**
+-**Remove Selected File**
 If you accidently uploaded the wrong file, then you can simply click “Remove your_file_name.pdf.” It will remove your selected file then you can follow the above steps to upload the correct file.
 
 #### 4. Upload
 To upload the selected file, just click “Upload File” button.
 
-	**Sample Success Message**
+-**Sample Success Message**
 
-	**Sample GitHub Issue**
+-**Sample GitHub Issue**
 
 
 
