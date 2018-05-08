@@ -11,7 +11,7 @@ This user guide assumes that the user is connected to NCSU VPN, has a GitHub acc
 	![GitHub profile options menu](./assets/userGuides/LoginButton.png)
 2. Enter a valid GitHub credentials.
 	* Click “Sign in” 
-
+	![GitHub profile options menu](./assets/userGuides/GitHubOauth2Page.png)
 3. Congratulations, now you are in the PDF Reviewer Tool page. 
 
 ## Using PDF Reviewer Tool
@@ -19,22 +19,23 @@ This user guide assumes that the user is connected to NCSU VPN, has a GitHub acc
 #### 1. Selecting a Repository
 	**Visible list of repositories**
 The page should have a list of the 10 last updated repositories from your GitHub account. Select the repository that you want the uploaded pdf file to be archived. 
-
+	![GitHub profile options menu](./assets/userGuides/RecentlyUsed10Repos.png)
 ##### Search for repository
 If you don’t see the repository where you want to archive the pdf, then search for the repository using search bar. Start typing the name of the repository in the search bar. Select the repository that matches the name that you typed.
-
+	![GitHub profile options menu](./assets/userGuides/SearchForRepo.png)
 #### 2. Selecting a Branch
 ##### Default 
 By default, a Master branch is selected. 
-
+	![GitHub profile options menu](./assets/userGuides/DefaultBranch.png)
 ##### Change Branch
 To change branch, just click the drop-down arrow on the select branch section. Then select the branch where you want to archive the pdf file.
-
+	![GitHub profile options menu](./assets/userGuides/ChangeDefaultBranch.png)
 #### 3. Selecting a File 
 -**Sample Commented/Annotated Pdf File**
-
+	![GitHub profile options menu](./assets/userGuides/SampleCommentedPdfFile.png)
 -**Browse**
 Click inside the drag and drop box to browse for the file that you want to upload. Then a new window will open.
+	![GitHub profile options menu](./assets/userGuides/Browse_DragandDropFile.png)
 1.  Navigate to the file to which you wish to upload.
 2. Select the file2 you want to upload 
 3. Click Open
@@ -44,13 +45,13 @@ Click inside the drag and drop box to browse for the file that you want to uploa
 
 -**Remove Selected File**
 If you accidently uploaded the wrong file, then you can simply click “Remove your_file_name.pdf.” It will remove your selected file then you can follow the above steps to upload the correct file.
-
+	![GitHub profile options menu](./assets/userGuides/RemoveUploadedFile.png)
 #### 4. Upload
 To upload the selected file, just click “Upload File” button.
-
+	![GitHub profile options menu](./assets/userGuides/UploadingPDFFile.png)
 -**Sample Success Message**
-
+	![GitHub profile options menu](./assets/userGuides/SampleSuccessMessage.png)
 -**Sample GitHub Issue**
-
+	![GitHub profile options menu](./assets/userGuides/SampleGitHubIssues.png)
 
 
