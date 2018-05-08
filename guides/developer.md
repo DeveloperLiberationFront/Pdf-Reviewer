@@ -2,8 +2,13 @@
 
 ## Setting Up the Environment
 
-1. Follow the steps detailed in the installation guide to install and build the application
-2. To run the tomcat server run the command `mvn tomcat7:run` and the application will now be running on localhost:9090.
+1. Install [Apache Maven](https://maven.apache.org/) following the instructions provided on: https://maven.apache.org/install.html
+2. Set the `GITHUB_ID`, `GITHUB_API`, `S3_BUCKET_NAME`, and `S3_BUCKET_REGION` environment variables according to the credentials provided in our Ansible vault 
+    * Resource to help set environment variables: https://www.schrodinger.com/kb/1842
+3. Clone the [repository](https://github.ncsu.edu/engr-csc-sdc/2018SpringTeam19/tree/master) to a directory of your choice
+4. Move to the directory where the repository was cloned, in the shell command of your choice and then run `mvn clean install` to install all the dependencies and build the Maven project. 
+    * Some tests will be run before it builds and if they do not pass the build will fail.
+5. To run the tomcat server run the command `mvn tomcat7:run` and the application will now be running on localhost:9090.
     * The port used can be changed in the xml file under the `<port>` tag, however all the documentation will be referencing port 9090 as the port to be used
 
 We as a team use several different IDEs so we do not provided support for any singular one.
