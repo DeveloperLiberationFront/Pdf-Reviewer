@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?><web-app xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.5" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
 
+
     <servlet>
         <servlet-name>Login</servlet-name>
         <servlet-class>edu.ncsu.dlf.servlet.LoginServlet</servlet-class>
@@ -11,103 +12,34 @@
     </servlet-mapping>
 
     <servlet>
-        <servlet-name>Repo</servlet-name>
-        <servlet-class>edu.ncsu.dlf.servlet.RepoServlet</servlet-class>
+        <servlet-name>Repositories</servlet-name>
+        <servlet-class>edu.ncsu.dlf.servlet.RepositoriesServlet</servlet-class>
     </servlet>
 
     <servlet-mapping>
-        <servlet-name>Repo</servlet-name>
-        <url-pattern>/repo</url-pattern>
+        <servlet-name>Repositories</servlet-name>
+        <url-pattern>/repositories</url-pattern>
     </servlet-mapping>
 
     <servlet>
-        <servlet-name>Reviewer</servlet-name>
-        <servlet-class>edu.ncsu.dlf.servlet.ReviewerServlet</servlet-class>
+        <servlet-name>Tool</servlet-name>
+        <servlet-class>edu.ncsu.dlf.servlet.ToolServlet</servlet-class>
     </servlet>
 
     <servlet-mapping>
-        <servlet-name>Reviewer</servlet-name>
-        <url-pattern>/reviewer</url-pattern>
+        <servlet-name>Tool</servlet-name>
+        <url-pattern>/tool</url-pattern>
     </servlet-mapping>
 
+
     <servlet>
-        <servlet-name>ReviewRequest</servlet-name>
-        <servlet-class>edu.ncsu.dlf.servlet.ReviewRequestServlet</servlet-class>
+        <servlet-name>FileUpload</servlet-name>
+        <servlet-class>edu.ncsu.dlf.servlet.FileUploadServlet</servlet-class>
     </servlet>
 
     <servlet-mapping>
-        <servlet-name>ReviewRequest</servlet-name>
-        <url-pattern>/reviewRequest</url-pattern>
-    </servlet-mapping>
-
-    <servlet>
-        <servlet-name>Files</servlet-name>
-        <servlet-class>edu.ncsu.dlf.servlet.FilesServlet</servlet-class>
-    </servlet>
-
-    <servlet-mapping>
-        <servlet-name>Files</servlet-name>
-        <url-pattern>/files</url-pattern>
-    </servlet-mapping>
-
-    <servlet>
-        <servlet-name>Avatar</servlet-name>
-        <servlet-class>edu.ncsu.dlf.servlet.AvatarServlet</servlet-class>
-    </servlet>
-
-    <servlet-mapping>
-        <servlet-name>Avatar</servlet-name>
-        <url-pattern>/avatar</url-pattern>
-    </servlet-mapping>
-
-    <servlet>
-        <servlet-name>ReviewSubmit</servlet-name>
-        <servlet-class>edu.ncsu.dlf.servlet.ReviewSubmitServlet</servlet-class>
-    </servlet>
-
-    <servlet-mapping>
-        <servlet-name>ReviewSubmit</servlet-name>
-        <url-pattern>/review</url-pattern>
-    </servlet-mapping>
-
-    <servlet>
-        <servlet-name>Status</servlet-name>
-        <servlet-class>edu.ncsu.dlf.servlet.StatusServlet</servlet-class>
-    </servlet>
-
-    <servlet-mapping>
-        <servlet-name>Status</servlet-name>
-        <url-pattern>/status</url-pattern>
-    </servlet-mapping>
-
-    <servlet>
-        <servlet-name>User</servlet-name>
-        <servlet-class>edu.ncsu.dlf.servlet.UserServlet</servlet-class>
-    </servlet>
-
-    <servlet-mapping>
-        <servlet-name>User</servlet-name>
-        <url-pattern>/user</url-pattern>
-    </servlet-mapping>
-
-    <servlet>
-        <servlet-name>Search</servlet-name>
-        <servlet-class>edu.ncsu.dlf.servlet.SearchServlet</servlet-class>
-    </servlet>
-
-    <servlet-mapping>
-        <servlet-name>Search</servlet-name>
-        <url-pattern>/search</url-pattern>
-    </servlet-mapping>
-
-    <servlet>
-        <servlet-name>RepoSource</servlet-name>
-        <servlet-class>edu.ncsu.dlf.servlet.RepoSourceServlet</servlet-class>
-    </servlet>
-
-    <servlet-mapping>
-        <servlet-name>RepoSource</servlet-name>
-        <url-pattern>/repoSource</url-pattern>
+        <servlet-name>FileUpload</servlet-name>
+        <url-pattern>/fileupload</url-pattern>
     </servlet-mapping>
 
 
@@ -118,4 +50,10 @@
     <welcome-file-list>
         <welcome-file>index.html</welcome-file>
     </welcome-file-list>
+
+    <listener>
+        <listener-class>
+            edu.ncsu.dlf.servlet.listeners.AmazonConnectionListener 
+        </listener-class>
+    </listener>
 </web-app>

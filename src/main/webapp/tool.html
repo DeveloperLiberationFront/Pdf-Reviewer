@@ -1,0 +1,107 @@
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>PDF Reviewer</title>
+    <link rel="icon" href="favicon.png" type="image/png">
+    <!-- Material Design Lite -->
+    <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+    <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css">
+    <!-- Material Design icon font -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="upload.css">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="recentlyUsedRepo.css">
+    <link rel="stylesheet" href="tool.css">
+</head>
+
+<body class="bodyPanel">
+    <!-- Always shows a header, even in smaller screens. -->
+    <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+        <header class="mdl-layout__header mdl-color--blue-grey-700">
+            <h3>PDF Reviewer Tool</h3>
+        </header>
+        <main class="mdl-layout__content">
+            <div class="mdl-layout__tab-panel is-active">
+                <section class="section--center mdl-grid mdl-grid--no-spacing mdl-shadow--16dp sec1">
+                    <div class="mdl-card mdl-cell mdl-cell--12-col">
+                        <div class="mdl-card__supporting-text">
+                            <h4 class="mdl-cell mdl-cell--12-col">Select A Repository</h4>
+                        </div>
+                        <div class="mdl-tabs vertical-mdl-tabs mdl-js-tabs mdl-js-ripple-effect">
+                            <div class="mdl-grid mdl-grid--no-spacing">
+                                <div class="mdl-cell mdl-cell--12-col tabSpacing">
+                                    <!-- rendering with the repositories -->
+                                    <script id="repoTemplate" type="x-tmpl-mustache">
+                                        {{#repos}}
+                                        <a class="mdl-tabs__tab" id="{{id}}">{{name.repoName}}</a>
+                                        {{/repos}}
+                                    </script>
+                                    <div id="repoTemplateRendered">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mdl-card__actions">
+                            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label ui-widget ">
+                                <input class="mdl-textfield__input repoSearchBar" id="repoList" type="text">
+                                <label class="mdl-textfield__label" for="repoList">Search for Repository Name</label>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <section class="section--center mdl-grid mdl-grid--no-spacing mdl-shadow--16dp">
+                    <div class="mdl-card mdl-cell mdl-cell--12-col branch-selection-card">
+                        <div class="mdl-card__supporting-text">
+                            <h4 class="mdl-cell mdl-cell--12-col">Select A Branch</h4>
+                        </div>
+                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                            <select class="mdl-textfield__input repoBranchList" id="branchList" name="branch">
+                            </select>
+                            <script id="branchTemplate" type="x-tmpl-mustache">                          
+                            {{#branches}}
+                              <option>{{.}}</option>
+                            {{/branches}}
+                            </script>
+                        </div>
+                    </div>
+                </section>
+                <section class="section--center mdl-grid mdl-grid--no-spacing mdl-shadow--16dp">
+                    <div class="mdl-card mdl-cell mdl-cell--12-col" id="uploadDiv">
+                        <!--https://codepen.io/aaronvanston/pen/yNYOXR-->
+                        <div class="file-upload align--center">
+                            <div class="pdf-upload-wrap">
+                                <input class="file-upload-input" type='file' onchange="readURL(this);" accept=".pdf" />
+                                <div class="drag-text">
+                                    <h6>Drag and drop a file or click inside the box</h6>
+                                </div>
+                            </div>
+                            <div class="file-upload-content">
+                                <div class="pdf-title-wrap">
+                                    <button type="button" onclick="removeUpload()" class="remove-pdf">Remove
+                                        <span class="pdf-title">Uploaded PDF</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mdl-card__actions mdl-card--border">
+                            <button id="upload-button" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" disabled>
+                                Upload File
+                            </button>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="./js/tool.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/2.3.0/mustache.min.js"></script>
+    <script src="./js/upload.js"></script>
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+</body>
+
+</html>
